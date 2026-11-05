@@ -52,6 +52,7 @@ export const DOC_NAV: NavItem[] = [
 export const GROUPS = [
   "Executive",
   "Civic systems",
+  "Departments",
   "Operating records",
   "Communications",
   "Governance",
