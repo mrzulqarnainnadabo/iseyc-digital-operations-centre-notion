@@ -26,6 +26,12 @@ export const DOC_NAV: NavItem[] = [
     external: true,
   },
   {
+    label: "Civic Intelligence Observatory",
+    href: "https://iseyc-civic-intelligence-observator.vercel.app",
+    group: "Civic systems",
+    external: true,
+  },
+  {
     label: "Civic Brain",
     href: "https://iseyc-civic-brain.vercel.app",
     group: "Civic systems",
