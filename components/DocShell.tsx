@@ -84,7 +84,12 @@ export function DocShell({ children }: { children: React.ReactNode }) {
         </header>
         <main className="flex-1 px-4 py-6 sm:px-8 sm:py-8">{children}</main>
         <footer className="border-t border-[#c4a35a]/40 px-4 py-4 text-center text-xs text-[#49584f]">
-          Empowering Youth, Shaping Communities · Non-partisan · Not a campaign tool
+          <p>Empowering Youth, Shaping Communities · Non-partisan · Not a campaign tool</p>
+          <nav aria-label="Institutional charter and contact" className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-2">
+            <a className="text-[#80621f] underline-offset-2 hover:underline" href="https://2027-street-mandate.vercel.app/methodology" target="_blank" rel="noopener noreferrer">Methodology</a>
+            <a className="text-[#80621f] underline-offset-2 hover:underline" href="https://2027-street-mandate.vercel.app/about" target="_blank" rel="noopener noreferrer">Non-partisan charter</a>
+            <a className="text-[#80621f] underline-offset-2 hover:underline" href="mailto:iseycglobal@gmail.com">Contact ISEYC</a>
+          </nav>
         </footer>
       </div>
     </div>
