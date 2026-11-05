@@ -5,6 +5,8 @@ export const metadata: Metadata = {
   title: "ISEYC Digital Operations Centre",
   description:
     "ISEYC institutional Digital Operations Centre — Notion-backed. Non-partisan.",
+  icons: { icon: "/iseyc-seal.svg", apple: "/iseyc-seal.svg" },
+  themeColor: "#072A20",
   robots: { index: false, follow: false },
 };
 

@@ -1,4 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-body { @apply bg-slate-50 text-slate-900 antialiased; }
+:root { color-scheme: light; scroll-behavior: smooth; }
+body { @apply bg-[#f7f3e9] text-[#16201b] antialiased; }
+::selection { background: #c4a35a; color: #072a20; }
+@media (prefers-reduced-motion: reduce) {
+  :root { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

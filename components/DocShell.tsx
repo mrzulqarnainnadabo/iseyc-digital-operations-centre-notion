@@ -15,12 +15,12 @@ export function DocShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 lg:flex-row">
-      <aside className="w-full border-b border-slate-800 bg-slate-950 text-slate-200 lg:w-72 lg:border-b-0 lg:border-r">
+    <div className="flex min-h-screen flex-col bg-[#f7f3e9] lg:flex-row">
+      <aside className="w-full border-b border-[#c4a35a]/30 bg-[#072a20] text-[#f7f3e9] lg:w-72 lg:border-b-0 lg:border-r">
         <div className="border-b border-slate-800 px-5 py-5">
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-300">ISEYC</p>
+          <div className="flex items-center gap-3"><img src="/iseyc-seal.svg" alt="ISEYC official seal" width="42" height="42" className="rounded-full border border-[#c4a35a] bg-white object-contain" /><div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#d4bc7a]">ISEYC</p></div></div>
           <p className="mt-1 font-serif text-lg text-white">Digital Operations Centre</p>
-          <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-slate-500">
+          <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-[#d4bc7a]/70">
             Notion · human approval
           </p>
         </div>
@@ -41,8 +41,8 @@ export function DocShell({ children }: { children: React.ReactNode }) {
                         (m.href !== "/ops" && pathname.startsWith(m.href)));
                     const className = `block rounded-lg px-3 py-2.5 text-sm transition ${
                       active
-                        ? "bg-emerald-400 font-medium text-slate-950"
-                        : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                        ? "bg-[#c4a35a] font-medium text-[#072a20]"
+                        : "text-[#f7f3e9]/80 hover:bg-[#0f4d34] hover:text-white"
                     }`;
                     if (m.external) {
                       return (
@@ -66,8 +66,8 @@ export function DocShell({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
-        <div className="border-t border-slate-800 px-5 py-4">
-          <button type="button" onClick={logout} className="text-xs font-medium text-slate-400 hover:text-white">
+        <div className="border-t border-[#c4a35a]/25 px-5 py-4">
+          <button type="button" onClick={logout} className="text-xs font-medium text-[#d4bc7a] hover:text-white">
             Sign out
           </button>
           <p className="mt-2 text-xs leading-5 text-slate-500">
@@ -76,15 +76,20 @@ export function DocShell({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:px-8">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-700">
+        <header className="sticky top-0 z-10 border-b border-[#c4a35a]/40 bg-white/95 px-4 py-3 backdrop-blur sm:px-8">
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#80621f]">
             Institutional operations
           </p>
-          <h1 className="font-serif text-xl text-slate-950 sm:text-2xl">Digital Operations Centre</h1>
+          <h1 className="font-serif text-xl text-[#072a20] sm:text-2xl">Digital Operations Centre</h1>
         </header>
         <main className="flex-1 px-4 py-6 sm:px-8 sm:py-8">{children}</main>
-        <footer className="border-t border-slate-200 px-4 py-4 text-center text-xs text-slate-500">
-          Empowering Youth, Shaping Communities · Non-partisan · Not a campaign tool
+        <footer className="border-t border-[#c4a35a]/40 px-4 py-4 text-center text-xs text-[#49584f]">
+          <p>Empowering Youth, Shaping Communities · Non-partisan · Not a campaign tool</p>
+          <nav aria-label="Institutional charter and contact" className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-2">
+            <a className="text-[#80621f] underline-offset-2 hover:underline" href="https://2027-street-mandate.vercel.app/methodology" target="_blank" rel="noopener noreferrer">Methodology</a>
+            <a className="text-[#80621f] underline-offset-2 hover:underline" href="https://2027-street-mandate.vercel.app/about" target="_blank" rel="noopener noreferrer">Non-partisan charter</a>
+            <a className="text-[#80621f] underline-offset-2 hover:underline" href="mailto:iseycglobal@gmail.com">Contact ISEYC</a>
+          </nav>
         </footer>
       </div>
     </div>
