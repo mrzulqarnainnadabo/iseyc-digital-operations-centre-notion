@@ -1,4 +1,1 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-body { @apply bg-slate-50 text-slate-900 antialiased; }
+@tailwind base;\n@tailwind components;\n@tailwind utilities;\n:root { color-scheme: light; }\nbody { @apply bg-[#f7f3e9] text-[#16201b] antialiased; }\n::selection { background: #d4bc7a; color: #072a20; }\n
