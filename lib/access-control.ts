@@ -165,6 +165,9 @@ export function canDecideMembership(
     return true;
   }
 
+  // Delegated authority is usable only by a currently approved, linked member.
+  if (!checkMemberAccess(context, now).allowed) return false;
+
   return context.delegations.some(
     (delegation) =>
       delegation.delegateGoogleSubject === context.googleSubject &&
@@ -173,5 +176,22 @@ export function canDecideMembership(
       delegation.decisionScopes.includes(decision) &&
       !delegation.revokedAt &&
       dateIsActive(now, delegation.effectiveFrom, delegation.effectiveUntil)
+  );
+}
+
+
+/**
+ * Only the currently recorded National President may grant, change or revoke
+ * membership decision delegations. A Membership Administrator cannot
+ * delegate onward or expand their own authority.
+ */
+export function canManageMembershipDelegations(
+  context: AuthorizationContext,
+  now = new Date()
+): boolean {
+  return (
+    checkMemberAccess(context, now).allowed &&
+    Boolean(context.nationalPresidentGoogleSubject) &&
+    context.googleSubject === context.nationalPresidentGoogleSubject
   );
 }
