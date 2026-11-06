@@ -27,8 +27,8 @@ export function googleOidcConfigured(): boolean {
     docAppOrigin() &&
     process.env.DOC_GOOGLE_CLIENT_ID?.trim() &&
     process.env.DOC_GOOGLE_CLIENT_SECRET?.trim() &&
-    process.env.DOC_SESSION_SECRET &&
-    Buffer.byteLength(process.env.DOC_SESSION_SECRET) >= 32
+    process.env.DOC_IDENTITY_PROOF_SECRET &&
+    Buffer.byteLength(process.env.DOC_IDENTITY_PROOF_SECRET) >= 32
   );
 }
 
@@ -50,14 +50,15 @@ export function safeEqual(left: string, right: string): boolean {
  * Short-lived proof that Google verified an identity. This cookie is
  * deliberately NOT accepted by requireStaffSession and grants no DOC access.
  */
-export function signPendingIdentity(subject: string): string {
-  const secret = process.env.DOC_SESSION_SECRET;
-  if (!secret || Buffer.byteLength(secret) < 32 || !subject) {
+export function signPendingIdentity(subject: string, email: string): string {
+  const secret = process.env.DOC_IDENTITY_PROOF_SECRET;
+  if (!secret || Buffer.byteLength(secret) < 32 || !subject || !email || !email.includes("@")) {
     throw new Error("Pending identity signing is not configured");
   }
   const issuedAt = Math.floor(Date.now() / 1000);
   const payload = Buffer.from(JSON.stringify({
     sub: subject,
+    email: email.trim().toLowerCase(),
     iat: issuedAt,
     exp: issuedAt + PENDING_TTL_SECONDS,
   })).toString("base64url");
@@ -65,23 +66,32 @@ export function signPendingIdentity(subject: string): string {
   return `${payload}.${signature}`;
 }
 
-export function verifyPendingIdentity(token: string | undefined): boolean {
-  const secret = process.env.DOC_SESSION_SECRET;
-  if (!token || !secret || Buffer.byteLength(secret) < 32) return false;
+export type PendingIdentity = { subject: string; email: string };
+
+export function readPendingIdentity(token: string | undefined): PendingIdentity | null {
+  const secret = process.env.DOC_IDENTITY_PROOF_SECRET;
+  if (!token || !secret || Buffer.byteLength(secret) < 32) return null;
   const parts = token.split(".");
-  if (parts.length !== 2 || !/^[A-Za-z0-9_-]+$/.test(parts[0]) || !/^[A-Za-z0-9_-]{43}$/.test(parts[1])) return false;
+  if (parts.length !== 2 || !/^[A-Za-z0-9_-]+$/.test(parts[0]) || !/^[A-Za-z0-9_-]{43}$/.test(parts[1])) return null;
   const expected = createHmac("sha256", secret).update(`doc-pending-identity:${parts[0]}`).digest("base64url");
-  if (!safeEqual(parts[1], expected)) return false;
+  if (!safeEqual(parts[1], expected)) return null;
   try {
     const payload = JSON.parse(Buffer.from(parts[0], "base64url").toString("utf8")) as {
-      sub?: unknown; iat?: unknown; exp?: unknown;
+      sub?: unknown; email?: unknown; iat?: unknown; exp?: unknown;
     };
     const now = Math.floor(Date.now() / 1000);
     return typeof payload.sub === "string" && payload.sub.length > 0 &&
+      typeof payload.email === "string" && payload.email.includes("@") &&
       Number.isSafeInteger(payload.iat) && Number.isSafeInteger(payload.exp) &&
       Number(payload.iat) <= now + 30 && Number(payload.exp) > now &&
-      Number(payload.exp) - Number(payload.iat) <= PENDING_TTL_SECONDS;
+      Number(payload.exp) - Number(payload.iat) <= PENDING_TTL_SECONDS
+      ? { subject: payload.sub, email: payload.email }
+      : null;
   } catch {
-    return false;
+    return null;
   }
+}
+
+export function verifyPendingIdentity(token: string | undefined): boolean {
+  return readPendingIdentity(token) !== null;
 }
