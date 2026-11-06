@@ -5,11 +5,11 @@
  * identity, membership, appointment or role-based authorization.
  */
 export function legacySessionCanReadMeeting(sensitivity: unknown): boolean {
-  return sensitivity === "Standard" || sensitivity === "" || sensitivity == null;
+  return sensitivity === "Standard";
 }
 
 export function legacySessionCanCreateMeeting(sensitivity: unknown): boolean {
-  return sensitivity === "Standard" || sensitivity === "" || sensitivity == null;
+  return sensitivity === "Standard";
 }
 
 export function legacySessionCanSetMeetingStatus(status: unknown): boolean {
