@@ -100,7 +100,7 @@ export async function getMeeting(id: string): Promise<MeetingRecord | null> {
         textProp(props["Convening body"]) || textProp(props.ConveningBody) || "—",
       meetingDate: textProp(props["Meeting date"]) || textProp(props.Date) || "",
       summary: textProp(props.Summary) || textProp(props.Notes) || "",
-      sensitivity: textProp(props.Sensitivity) || "Standard",
+      sensitivity: textProp(props.Sensitivity) || "Unclassified",
     };
   } catch {
     return null;
