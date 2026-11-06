@@ -51,7 +51,7 @@ for (const [route, contract] of Object.entries(contracts)) {
   test(`${route} preserves its reviewed method and security contract`, () => {
     const absolute = path.join(apiRoot, route);
     const source = fs.readFileSync(absolute, "utf8");
-    const exportedMethods = [...source.matchAll(/export async function (GET|POST|PUT|PATCH|DELETE)\\s*\\(/g)]
+    const exportedMethods = [...source.matchAll(/export async function (GET|POST|PUT|PATCH|DELETE)\s*\(/g)]
       .map((match) => match[1])
       .sort();
     assert.deepEqual(exportedMethods, [...contract.methods].sort(), "HTTP method surface changed");
