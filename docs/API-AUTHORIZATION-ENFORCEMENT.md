@@ -110,3 +110,12 @@ The CI workflow runs the policy suite and application TypeScript check. Passing 
 Officer appointment records must declare an explicit scope. The policy primitive now requires the protected handler to pass a resource scope; it fails closed when scope is omitted or malformed. Department-scoped appointments can operate only on a resource whose server-derived department identifier exactly matches the appointment. An explicit global appointment may operate across departments; global scope must be present in the trusted appointment record and is never inferred from role title.
 
 The policy tests cover same-department allow, cross-department deny, omitted resource scope deny, missing appointment scope deny, malformed department scope deny and explicitly global access. These are pure policy tests; there is not yet a trusted appointment adapter or live route integration. The application must not claim department RBAC is active until both are connected.
+
+
+## Session-token parsing and operations-page guard
+
+The transitional shared-key session verifier now rejects non-canonical token encodings before HMAC comparison: timestamps must be bounded decimal strings, nonces must match the generated 16-byte base64url form, and signatures must be lowercase SHA-256 hex. Existing HMAC verification, constant-time digest comparison, 12-hour expiry and limited future-clock tolerance remain in force.
+
+Regression coverage now includes valid-token acceptance, signature tampering, malformed token segments, invalid nonce/signature encodings, expired tokens, future timestamps and the shared authenticated layout protecting every current operations page.
+
+This does not add individual identity or central per-session revocation. Logout clears the browser cookie; because sessions remain stateless, a copied token remains valid until expiry or staff-key rotation. Treat this as a documented transitional limitation, not a production identity system.
