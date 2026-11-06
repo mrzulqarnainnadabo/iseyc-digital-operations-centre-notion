@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireStaffSession } from "@/lib/auth";
 import { isSameOriginRequest } from "@/lib/request-security";
 import { getMeeting, setMeetingStatus } from "@/lib/notion";
+import { legacySessionCanReadMeeting, legacySessionCanSetMeetingStatus } from "@/lib/legacy-session-boundary";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,7 +18,7 @@ export async function GET(
   try {
     const { id } = await ctx.params;
     const meeting = await getMeeting(id);
-    if (!meeting) {
+    if (!meeting || !legacySessionCanReadMeeting(meeting.sensitivity)) {
       return NextResponse.json({ ok: false, error: "Not found" }, { status: 404 });
     }
     return NextResponse.json({ ok: true, meeting });
@@ -53,10 +54,24 @@ export async function PATCH(
     return NextResponse.json({ ok: false, error: "Invalid status" }, { status: 400 });
   }
 
+  if (!legacySessionCanSetMeetingStatus(body.status)) {
+    return NextResponse.json(
+      { ok: false, error: "Approval requires individually authorised officer access." },
+      { status: 403 }
+    );
+  }
+
   try {
     const { id } = await ctx.params;
+    const existing = await getMeeting(id);
+    if (!existing || !legacySessionCanReadMeeting(existing.sensitivity)) {
+      return NextResponse.json({ ok: false, error: "Not found" }, { status: 404 });
+    }
     await setMeetingStatus(id, body.status as (typeof allowed)[number]);
     const meeting = await getMeeting(id);
+    if (!meeting || !legacySessionCanReadMeeting(meeting.sensitivity)) {
+      return NextResponse.json({ ok: false, error: "Not found" }, { status: 404 });
+    }
     return NextResponse.json({ ok: true, meeting });
   } catch {
     return NextResponse.json(
