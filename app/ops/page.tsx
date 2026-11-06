@@ -47,7 +47,7 @@ export default async function CommandBriefPage() {
           </div>
           <div className="rounded-xl border border-slate-700 bg-white/5 p-4">
             <p className="text-xs uppercase tracking-wide text-slate-400">Notion meetings DB</p>
-            <p className="mt-1 font-serif text-xl">{flags.meetings ? "Connected" : "Not set"}</p>
+            <p className="mt-1 font-serif text-xl">{flags.meetings ? "Configured" : "Not configured"}</p>
           </div>
         </div>
         {listError ? <p className="mt-4 text-sm text-amber-200">{listError}</p> : null}
@@ -73,7 +73,8 @@ export default async function CommandBriefPage() {
         </div>
       </section>
       <section className="rounded-2xl border border-slate-200 bg-white p-5">
-        <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Configuration</p>
+        <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Environment configuration</p>
+        <p className="mt-1 text-xs text-slate-500">These indicators confirm that environment values are present; they do not verify database connectivity, permissions or workflow readiness.</p>
         <ul className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
           {(
             [
@@ -88,7 +89,7 @@ export default async function CommandBriefPage() {
             <li key={label} className="flex justify-between rounded-lg border border-slate-100 px-3 py-2">
               <span>{label}</span>
               <span className={ok ? "font-semibold text-emerald-700" : "text-slate-400"}>
-                {ok ? "Ready" : "Missing"}
+                {ok ? "Configured" : "Not configured"}
               </span>
             </li>
           ))}
