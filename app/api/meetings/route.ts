@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
   if (conveningBody.length > 200 || summary.length > 1900) {
     return privateJson({ ok: false, error: "Meeting details exceed the allowed length." }, { status: 400 });
   }
-  if (meetingDate && (!/^\\d{4}-\\d{2}-\\d{2}$/.test(meetingDate) ||
+  if (meetingDate && (!/^\d{4}-\d{2}-\d{2}$/.test(meetingDate) ||
       Number.isNaN(Date.parse(`${meetingDate}T00:00:00.000Z`)) ||
       new Date(`${meetingDate}T00:00:00.000Z`).toISOString().slice(0, 10) !== meetingDate)) {
     return privateJson({ ok: false, error: "Meeting date must be a valid calendar date." }, { status: 400 });
