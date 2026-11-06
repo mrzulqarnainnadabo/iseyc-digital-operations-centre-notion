@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - "lib/**"
+      - "app/**"
+      - "components/**"
+      - "tailwind.config.js"
+      - "docs/IDCC-DESIGN-SYSTEM-AND-SCREENS.md"
       - "app/api/**"
       - "scripts/**"
       - "docs/API-AUTHORIZATION-ENFORCEMENT.md"
