@@ -45,7 +45,12 @@ export function verifySessionToken(token: string | undefined): boolean {
   if (parts.length !== 3) return false;
 
   const [issuedAtText, nonce, signature] = parts;
-  if (!issuedAtText || !nonce || !signature) return false;
+  // signSession always emits a 16-byte base64url nonce (22 chars) and a
+  // lowercase SHA-256 HMAC hex digest (64 chars). Reject alternate or
+  // oversized encodings before doing cryptographic work.
+  if (!/^\\d{1,12}$/.test(issuedAtText) ||
+      !/^[A-Za-z0-9_-]{22}$/.test(nonce) ||
+      !/^[a-f0-9]{64}$/.test(signature)) return false;
 
   const issuedAt = Number(issuedAtText);
   if (!Number.isSafeInteger(issuedAt)) return false;
