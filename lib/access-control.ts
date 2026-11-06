@@ -19,6 +19,7 @@ export type AppointmentRecord = {
   status: "Active" | "Inactive" | "Expired" | "Revoked";
   role: string;
   permissions: string[];
+  scope: { type: "global" } | { type: "department"; departmentId: string };
   effectiveFrom?: string | null;
   effectiveUntil?: string | null;
 };
@@ -82,13 +83,48 @@ export function checkMemberAccess(context: AuthorizationContext, now = new Date(
   return { allowed: true };
 }
 
-export function hasOfficerPermission(context: AuthorizationContext, permission: string, now = new Date()): boolean {
+export type AuthorizationResourceScope =
+  | { type: "global" }
+  | { type: "department"; departmentId: string };
+
+/**
+ * Department appointments are usable only against the exact department
+ * requested by the server-side resource handler. A global appointment must
+ * be explicit in the trusted appointment record; it is never inferred from
+ * a role title or a missing department identifier.
+ */
+export function hasOfficerPermission(
+  context: AuthorizationContext,
+  permission: string,
+  now = new Date(),
+  resourceScope?: AuthorizationResourceScope
+): boolean {
   if (!isDocPermission(permission) || !checkMemberAccess(context, now).allowed) return false;
-  if (!Array.isArray(context.appointments)) return false;
+  if (!Array.isArray(context.appointments) || !isRecord(resourceScope)) return false;
+
+  const validResourceScope =
+    resourceScope.type === "global" ||
+    (resourceScope.type === "department" &&
+      typeof resourceScope.departmentId === "string" &&
+      resourceScope.departmentId.trim().length > 0);
+  if (!validResourceScope) return false;
+
   return context.appointments.some((raw) => {
     if (!isRecord(raw) || raw.status !== "Active" || !Array.isArray(raw.permissions) ||
-        !raw.permissions.every((item) => typeof item === "string")) return false;
-    return raw.permissions.includes(permission) &&
+        !raw.permissions.every((item) => typeof item === "string") ||
+        !isRecord(raw.scope)) return false;
+
+    const scopeMatches =
+      raw.scope.type === "global"
+        ? resourceScope.type === "global" || resourceScope.type === "department"
+        : raw.scope.type === "department" &&
+          resourceScope.type === "department" &&
+          typeof raw.scope.departmentId === "string" &&
+          raw.scope.departmentId.trim().length > 0 &&
+          raw.scope.departmentId === resourceScope.departmentId;
+
+    return scopeMatches &&
+      raw.permissions.includes(permission) &&
       dateIsActive(now, raw.effectiveFrom as string | null | undefined,
         raw.effectiveUntil as string | null | undefined);
   });
@@ -100,7 +136,7 @@ export function canAdministerMembershipRecords(context: AuthorizationContext, no
   const isPresident = typeof context.nationalPresidentGoogleSubject === "string" &&
     context.nationalPresidentGoogleSubject.length > 0 &&
     context.googleSubject === context.nationalPresidentGoogleSubject;
-  return isPresident || hasOfficerPermission(context, "membership.records.manage", now);
+  return isPresident || hasOfficerPermission(context, "membership.records.manage", now, { type: "global" });
 }
 
 /** Delegation provenance must be independently verified by the trusted data adapter. */
