@@ -13,5 +13,5 @@ export function legacySessionCanCreateMeeting(sensitivity: unknown): boolean {
 }
 
 export function legacySessionCanSetMeetingStatus(status: unknown): boolean {
-  return status === "In review" || status === "Archived" || status === "Draft";
+  return status === "In review";
 }
