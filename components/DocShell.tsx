@@ -76,8 +76,9 @@ export function DocShell({ children }: { children: React.ReactNode }) {
             <div className="flex min-w-0 items-center gap-3">
               <img src="/iseyc-seal.svg" alt="" width="30" height="30" className="rounded-full border border-gold-600 bg-white object-contain lg:hidden" />
               <div className="min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">ISEYC · Private operations</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">ISEYC</p>
                 <p className="truncate text-sm font-semibold text-forest-950 sm:text-base">Digital Operations Centre</p>
+                <p className="hidden text-[9px] leading-tight text-ink-600 sm:block">Initiative for Sustainable Evolution for Youth and Community</p>
               </div>
             </div>
             <button type="button" onClick={logout} className="min-h-[44px] shrink-0 rounded-control px-3 text-xs font-semibold text-ink-700 hover:bg-white lg:hidden">Sign out</button>
