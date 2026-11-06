@@ -42,15 +42,11 @@ export default function IntakePage() {
     <div className="mx-auto max-w-2xl space-y-6">
       <header className="space-y-2">
         <Link href="/ops/queue" className="inline-flex min-h-[40px] items-center text-sm font-semibold text-forest-800 hover:underline">← Approval queue</Link>
-        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Notion-backed workflow · intake</p>
         <h1 className="font-serif text-2xl text-forest-950 sm:text-3xl">New meeting intake</h1>
         
       </header>
 
-      <section className="rounded-card border border-amber-200 bg-amber-50 p-4">
-        <p className="text-sm font-semibold text-amber-950">Current access limitation</p>
-        <p className="mt-1 text-sm leading-5 text-amber-900">Transitional shared-key sessions may submit Standard records only. Restricted records require verified individual identity and scoped permissions.</p>
-      </section>
+      <p className="text-xs text-ink-600" role="status">Standard records only · Transitional access</p>
 
       <form onSubmit={onSubmit} aria-busy={pending} className="space-y-5 rounded-card border border-line bg-white p-5 shadow-card sm:p-6">
         <div>
