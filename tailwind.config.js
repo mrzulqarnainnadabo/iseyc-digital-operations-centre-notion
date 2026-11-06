@@ -16,7 +16,7 @@ module.exports = {
           700: "#48544c",
           600: "#626d65",
         },
-        gold: { 600: "#a7833f" },
+        gold: { 600: "#80621f" },
         line: "#e4e6df",
       },
       fontFamily: {
