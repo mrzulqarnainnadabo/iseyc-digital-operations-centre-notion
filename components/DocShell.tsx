@@ -43,7 +43,7 @@ export function DocShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-cream-50 text-ink-950 lg:flex">
+    <div className="min-h-screen bg-cream-50 text-ink-950 lg:flex">\n      <a href="#main-content" className="sr-only z-50 rounded-control bg-white px-4 py-3 font-semibold text-forest-950 focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Skip to main content</a>
       <aside className="hidden w-[264px] shrink-0 border-r border-line bg-white lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col">
         <div className="border-b border-line px-5 py-5">
           <div className="flex items-center gap-3">
@@ -86,7 +86,7 @@ export function DocShell({ children }: { children: React.ReactNode }) {
           </nav>
         </header>
 
-        <main id="main-content" className="w-full flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <main id="main-content" tabIndex={-1} className="w-full flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
           {children}
         </main>
         <footer className="border-t border-line bg-white/70 px-4 py-4 sm:px-6 lg:px-8">
