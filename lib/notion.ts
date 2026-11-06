@@ -10,14 +10,28 @@ function canonicalNotionId(id: string): string {
   return id.replace(/-/g, "").trim().toLowerCase();
 }
 
+const NOTION_DATABASE_ID_PATTERN = /^[a-f0-9]{32}$/;
+type InternalDatabaseEnv = "NOTION_MEETINGS_DATABASE_ID";
+
 export function dbId(envName: string): string {
-  return canonicalNotionId(process.env[envName] || "");
+  const candidate = canonicalNotionId(process.env[envName] || "");
+  return NOTION_DATABASE_ID_PATTERN.test(candidate) ? candidate : "";
 }
 
 const MANDATE_BLOCKLIST = new Set(["19b213d55bfc4ce8a653a05147cbbe2a"]);
 
-export function assertInternalDb(id: string): void {
-  if (MANDATE_BLOCKLIST.has(canonicalNotionId(id))) {
+/**
+ * Bind each operational adapter to its declared internal database setting.
+ * A syntactically valid Notion ID is not, by itself, proof that it is an
+ * approved DOC database. Do not pass request-supplied IDs to this function.
+ */
+export function assertInternalDb(id: string, envName: InternalDatabaseEnv): void {
+  const configuredId = dbId(envName);
+  const candidate = canonicalNotionId(id);
+  if (!configuredId || !NOTION_DATABASE_ID_PATTERN.test(candidate) || candidate !== configuredId) {
+    throw new Error("Refusing to use an unconfigured or invalid DOC database.");
+  }
+  if (MANDATE_BLOCKLIST.has(candidate)) {
     throw new Error("Refusing to use Civic Mandate public database for DOC operations.");
   }
 }
@@ -49,7 +63,7 @@ export async function listMeetings(): Promise<MeetingRecord[]> {
   const client = notion();
   const database_id = dbId("NOTION_MEETINGS_DATABASE_ID");
   if (!client || !database_id) return [];
-  assertInternalDb(database_id);
+  assertInternalDb(database_id, "NOTION_MEETINGS_DATABASE_ID");
   const pages: Array<{ id: string; properties: Record<string, unknown> }> = [];
   let cursor: string | undefined;
 
@@ -91,7 +105,7 @@ export async function getMeeting(id: string): Promise<MeetingRecord | null> {
   const client = notion();
   const database_id = dbId("NOTION_MEETINGS_DATABASE_ID");
   if (!client || !database_id) return null;
-  assertInternalDb(database_id);
+  assertInternalDb(database_id, "NOTION_MEETINGS_DATABASE_ID");
   try {
     const page: any = await client.pages.retrieve({ page_id: id });
     if (!("properties" in page) || typeof page.parent?.database_id !== "string" || canonicalNotionId(page.parent.database_id) !== database_id) return null;
@@ -123,7 +137,7 @@ export async function createMeeting(input: {
   if (!client || !database_id) {
     throw new Error("NOTION_TOKEN or NOTION_MEETINGS_DATABASE_ID not configured");
   }
-  assertInternalDb(database_id);
+  assertInternalDb(database_id, "NOTION_MEETINGS_DATABASE_ID");
   const properties: Record<string, unknown> = {
     Name: { title: [{ text: { content: input.title.slice(0, 200) } }] },
     Status: { select: { name: "New" } },
@@ -156,7 +170,7 @@ export async function setMeetingStatus(
   const client = notion();
   const database_id = dbId("NOTION_MEETINGS_DATABASE_ID");
   if (!client || !database_id) throw new Error("Notion meetings database not configured");
-  assertInternalDb(database_id);
+  assertInternalDb(database_id, "NOTION_MEETINGS_DATABASE_ID");
 
   // Re-check the page's parent immediately before mutation. Callers should
   // enforce authorization too, but this adapter must never mutate a page
