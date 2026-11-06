@@ -34,20 +34,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: {
-    title?: string;
-    conveningBody?: string;
-    meetingDate?: string;
-    summary?: string;
-    sensitivity?: string;
-  };
+  let body: unknown;
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 });
   }
 
-  const title = (typeof body.title === "string" ? body.title : "").trim();
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return NextResponse.json({ ok: false, error: "Invalid request body" }, { status: 400 });
+  }
+  const input = body as Record<string, unknown>;
+  const asText = (value: unknown) => typeof value === "string" ? value.trim() : "";
+  const title = asText(input.title);
   if (title.length < 5) {
     return NextResponse.json(
       { ok: false, error: "Title must be at least 5 characters." },
@@ -55,7 +54,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const sensitivity = body.sensitivity === "Restricted" ? "Restricted" : "Standard";
+  const sensitivity = input.sensitivity === "Restricted" ? "Restricted" : "Standard";
   if (!legacySessionCanCreateMeeting(sensitivity)) {
     return NextResponse.json(
       { ok: false, error: "Restricted meeting intake requires individually authorised officer access." },
@@ -66,9 +65,9 @@ export async function POST(req: NextRequest) {
   try {
     const created = await createMeeting({
       title,
-      conveningBody: (body.conveningBody || "").trim(),
-      meetingDate: (body.meetingDate || "").trim(),
-      summary: (body.summary || "").trim(),
+      conveningBody: asText(input.conveningBody),
+      meetingDate: asText(input.meetingDate),
+      summary: asText(input.summary),
       sensitivity,
     });
     return NextResponse.json({ ok: true, id: created.id });
