@@ -6,6 +6,7 @@ export {
   OIDC_VERIFIER_COOKIE,
   PENDING_IDENTITY_COOKIE,
   googleOidcConfigured,
+  docAppOrigin,
   createOidcTransaction,
   safeEqual,
   signPendingIdentity,
