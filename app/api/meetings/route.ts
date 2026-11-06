@@ -54,10 +54,18 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const sensitivity = input.sensitivity === "Restricted" ? "Restricted" : "Standard";
+  // Do not coerce missing or unknown values to Standard: that would let a
+  // malformed client request bypass the restricted-intake boundary.
+  if (input.sensitivity !== "Standard") {
+    return NextResponse.json(
+      { ok: false, error: "Legacy staff access may create Standard meetings only. Explicit Standard sensitivity is required." },
+      { status: 403 }
+    );
+  }
+  const sensitivity = "Standard";
   if (!legacySessionCanCreateMeeting(sensitivity)) {
     return NextResponse.json(
-      { ok: false, error: "Restricted meeting intake requires individually authorised officer access." },
+      { ok: false, error: "Meeting intake is unavailable for this session." },
       { status: 403 }
     );
   }
