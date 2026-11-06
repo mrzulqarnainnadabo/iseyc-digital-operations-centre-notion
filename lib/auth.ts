@@ -1,7 +1,8 @@
-import { createHmac, timingSafeEqual } from "crypto";
+import { createHmac, randomBytes, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 
 const COOKIE = "iseyc_doc_session";
+const SESSION_TTL_SECONDS = 60 * 60 * 12;
 
 export function staffKeyConfigured(): boolean {
   return Boolean(process.env.ISEYC_STAFF_KEY?.trim());
@@ -20,23 +21,46 @@ export function isValidStaffKey(key: string | null | undefined): boolean {
   }
 }
 
+/**
+ * Issue a short-lived signed session token without embedding the staff key
+ * in the cookie payload. This remains a shared-key gate, not user identity.
+ */
 export function signSession(key: string): string {
-  const secret = process.env.ISEYC_STAFF_KEY || "doc";
-  const sig = createHmac("sha256", secret).update(`doc:${key}`).digest("hex");
-  return `${Buffer.from(key).toString("base64url")}.${sig}`;
+  if (!isValidStaffKey(key)) throw new Error("Invalid staff key");
+
+  const issuedAt = Math.floor(Date.now() / 1000);
+  const nonce = randomBytes(16).toString("base64url");
+  const payload = `${issuedAt}.${nonce}`;
+  const signature = createHmac("sha256", key)
+    .update(`doc-session:${payload}`)
+    .digest("hex");
+
+  return `${payload}.${signature}`;
 }
 
 export function verifySessionToken(token: string | undefined): boolean {
   if (!token || !staffKeyConfigured()) return false;
-  const [payload, sig] = token.split(".");
-  if (!payload || !sig) return false;
+
+  const parts = token.split(".");
+  if (parts.length !== 3) return false;
+
+  const [issuedAtText, nonce, signature] = parts;
+  if (!issuedAtText || !nonce || !signature) return false;
+
+  const issuedAt = Number(issuedAtText);
+  if (!Number.isSafeInteger(issuedAt)) return false;
+
+  const now = Math.floor(Date.now() / 1000);
+  if (issuedAt > now + 60 || now - issuedAt > SESSION_TTL_SECONDS) return false;
+
+  const secret = process.env.ISEYC_STAFF_KEY?.trim();
+  if (!secret) return false;
+
   try {
-    const key = Buffer.from(payload, "base64url").toString("utf8");
-    if (!isValidStaffKey(key)) return false;
-    const expected = createHmac("sha256", process.env.ISEYC_STAFF_KEY!)
-      .update(`doc:${key}`)
+    const expected = createHmac("sha256", secret)
+      .update(`doc-session:${issuedAtText}.${nonce}`)
       .digest("hex");
-    const a = Buffer.from(sig);
+    const a = Buffer.from(signature);
     const b = Buffer.from(expected);
     if (a.length !== b.length) return false;
     return timingSafeEqual(a, b);

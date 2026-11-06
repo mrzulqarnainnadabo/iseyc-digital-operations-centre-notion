@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireStaffSession } from "@/lib/auth";
+import { isSameOriginRequest } from "@/lib/request-security";
 import { createMeeting, listMeetings } from "@/lib/notion";
 
 export const runtime = "nodejs";
@@ -9,19 +10,27 @@ export async function GET() {
   if (!(await requireStaffSession())) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
+
   try {
     const meetings = await listMeetings();
     return NextResponse.json({ ok: true, meetings });
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : "Failed to list meetings";
-    return NextResponse.json({ ok: false, error: msg }, { status: 500 });
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: "Unable to retrieve meetings." },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(req: NextRequest) {
+  if (!isSameOriginRequest(req)) {
+    return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
+  }
+
   if (!(await requireStaffSession())) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
+
   let body: {
     title?: string;
     conveningBody?: string;
@@ -34,6 +43,7 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 });
   }
+
   const title = (body.title || "").trim();
   if (title.length < 5) {
     return NextResponse.json(
@@ -41,6 +51,7 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
+
   try {
     const created = await createMeeting({
       title,
@@ -50,8 +61,10 @@ export async function POST(req: NextRequest) {
       sensitivity: body.sensitivity === "Restricted" ? "Restricted" : "Standard",
     });
     return NextResponse.json({ ok: true, id: created.id });
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : "Create failed";
-    return NextResponse.json({ ok: false, error: msg }, { status: 500 });
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: "Unable to create meeting." },
+      { status: 500 }
+    );
   }
 }
