@@ -1,3 +1,5 @@
+import { isDocPermission } from "@/lib/doc-permissions";
+
 /**
  * Server-side DOC authorization policy primitives.
  *
@@ -81,7 +83,7 @@ export function checkMemberAccess(context: AuthorizationContext, now = new Date(
 }
 
 export function hasOfficerPermission(context: AuthorizationContext, permission: string, now = new Date()): boolean {
-  if (typeof permission !== "string" || !permission.trim() || !checkMemberAccess(context, now).allowed) return false;
+  if (!isDocPermission(permission) || !checkMemberAccess(context, now).allowed) return false;
   if (!Array.isArray(context.appointments)) return false;
   return context.appointments.some((raw) => {
     if (!isRecord(raw) || raw.status !== "Active" || !Array.isArray(raw.permissions) ||
