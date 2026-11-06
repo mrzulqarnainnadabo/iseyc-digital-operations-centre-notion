@@ -336,3 +336,19 @@ test("bounded JSON parser rejects oversized and malformed payloads", async () =>
     ok: false, reason: "invalid_json"
   });
 });
+
+const permissionCatalogue = require("../lib/doc-permissions.ts");
+test("closed DOC permission catalogue accepts only declared capabilities", () => {
+  assert.equal(permissionCatalogue.isDocPermission("meetings.read"), true);
+  assert.equal(permissionCatalogue.isDocPermission("membership.records.manage"), true);
+  assert.equal(permissionCatalogue.isDocPermission("superuser.all"), false);
+  assert.equal(permissionCatalogue.isDocPermission(""), false);
+  assert.equal(permissionCatalogue.isDocPermission(null), false);
+});
+
+test("unknown permission identifiers cannot be granted by an appointment", () => {
+  const c = context({ appointments: [{
+    status: "Active", role: "Officer", permissions: ["superuser.all"]
+  }] });
+  assert.equal(policy.hasOfficerPermission(c, "superuser.all", now), false);
+});
