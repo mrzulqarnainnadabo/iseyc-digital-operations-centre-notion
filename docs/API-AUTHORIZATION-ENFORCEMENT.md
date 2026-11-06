@@ -54,7 +54,7 @@ No deployment, production configuration change, or access migration is authorise
 
 Until individual Google identity and trusted appointment records are implemented, the legacy shared staff-key session is treated as a restricted transitional credential:
 
-- Meeting list and detail reads exclude records marked `Restricted`.
+- Meeting list and detail reads expose only records explicitly marked `Standard`; restricted, missing or unknown sensitivity values are denied.
 - Restricted meeting intake is rejected by the API.
 - The legacy session cannot transition a meeting to `Approved`.
 - The interface disables the approval action and explains that individually authorised officer access is required.
