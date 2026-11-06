@@ -64,6 +64,12 @@ export default async function CommandBriefPage() {
           >
             New meeting intake
           </Link>
+          <Link
+            href="/ops/readiness"
+            className="inline-flex min-h-[44px] items-center rounded-xl border border-slate-600 px-4 text-sm font-semibold text-white"
+          >
+            Module readiness
+          </Link>
         </div>
       </section>
       <section className="rounded-2xl border border-slate-200 bg-white p-5">
