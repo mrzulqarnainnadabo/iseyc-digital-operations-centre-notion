@@ -3,9 +3,12 @@ name: DOC policy tests
 on:
   pull_request:
     paths:
-      - "lib/access-control.ts"
+      - "lib/**"
+      - "app/api/**"
       - "scripts/**"
+      - "docs/API-AUTHORIZATION-ENFORCEMENT.md"
       - "package.json"
+      - "package-lock.json"
       - ".github/workflows/doc-policy-tests.yml"
   push:
     branches:
@@ -25,6 +28,8 @@ jobs:
         with:
           node-version: 22
       - name: Install dependencies
-        run: npm install --ignore-scripts
+        run: npm ci --ignore-scripts
       - name: Run authorization policy tests
         run: npm test
+      - name: Type-check application
+        run: npx tsc --noEmit
