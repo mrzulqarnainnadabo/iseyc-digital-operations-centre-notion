@@ -68,7 +68,7 @@ export default function LoginPage() {
         <form onSubmit={onSubmit} className="space-y-5 rounded-card border border-line bg-white p-5 shadow-card sm:p-7">
           <div>
             <span className="inline-flex min-h-[26px] items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 text-[11px] font-semibold text-amber-900">Temporary access method</span>
-            <h1 className="mt-3 font-serif text-2xl text-forest-950">Officer access</h1>
+            <h1 className="mt-3 font-serif text-2xl text-forest-950">Sign in</h1>
             
           </div>
 
@@ -80,17 +80,17 @@ export default function LoginPage() {
             ) : (
               <p className="rounded-control border border-line bg-cream-50 px-3 py-3 text-sm text-ink-700">Google identity sign-in · Setup pending</p>
             )}
-            <p className="text-xs leading-5 text-ink-600">Google verifies identity only. Membership and appointment checks are separate and are not yet connected.</p>
+            <p className="text-xs text-ink-600" role="status">Identity verified separately · Officer access not connected</p>
             {identityNotice ? <p role="status" className="rounded-control border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-950">{identityNotice}</p> : null}
           </div>
 
           <div className="rounded-control border border-amber-200 bg-amber-50 p-3">
             <p className="text-sm font-semibold text-amber-950">Shared-key session · transitional</p>
-            <p className="mt-1 text-xs leading-5 text-amber-900">This method does not verify an individual's identity, membership or appointment. Restricted membership, personnel, finance and safeguarding records must not be entered through this session.</p>
+            <p className="mt-1 text-xs text-amber-900" role="status">Shared session · Not individual identity</p>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-ink-950" htmlFor="staff-key">Institutional staff key</label>
+            <label className="block text-sm font-semibold text-ink-950" htmlFor="staff-key">Shared staff key</label>
             <input
               id="staff-key"
               name="staff-key"
@@ -102,7 +102,7 @@ export default function LoginPage() {
               required
               className="mt-2 min-h-[48px] w-full rounded-control border border-line bg-white px-3 text-base text-ink-950"
             />
-            <p id="staff-key-help" className="mt-2 text-xs leading-5 text-ink-600">Credentials are checked by the server. They are not stored in this page.</p>
+            
           </div>
 
           {error ? <p role="alert" aria-live="assertive" className="rounded-control border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p> : null}
