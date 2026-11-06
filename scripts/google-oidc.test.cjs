@@ -67,6 +67,8 @@ test("pending Google identity proof is signed, short-lived and tamper-evident", 
     const token = oidc.signPendingIdentity("google-subject-test", "person@example.com");
     assert.equal(oidc.verifyPendingIdentity(token), true);
     assert.deepEqual(oidc.readPendingIdentity(token), { subject: "google-subject-test", email: "person@example.com" });
+    assert.throws(() => oidc.signPendingIdentity("google-subject-test", "not-an-email"));
+    assert.throws(() => oidc.signPendingIdentity("x".repeat(256), "person@example.com"));
     assert.equal(oidc.verifyPendingIdentity(token + "x"), false);
     assert.equal(oidc.verifyPendingIdentity(""), false);
   } finally {
