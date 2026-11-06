@@ -136,13 +136,15 @@ test("AI draft and human decision components preserve the authority boundary", (
   const ai = fs.readFileSync(path.join(root, "components/AIDraftBanner.tsx"), "utf8");
   const decisions = fs.readFileSync(path.join(root, "components/HumanDecisionPanel.tsx"), "utf8");
   const status = fs.readFileSync(path.join(root, "components/StatusBadge.tsx"), "utf8");
+  const review = fs.readFileSync(path.join(opsRoot, "review/[id]/page.tsx"), "utf8");
   assert.match(ai, /AI draft — not an institutional decision/);
   assert.match(decisions, /Accept/);
   assert.match(decisions, /Edit/);
   assert.match(decisions, /Return/);
   assert.match(decisions, /Reject/);
   assert.match(decisions, /disabled/);
-  assert.match(decisions, /scoped appointment permissions/);
+  assert.match(review, /scoped appointment permissions/);
+  assert.match(review, /HumanDecisionPanel/);
   for (const label of ["Operational", "Partial", "Not operational", "Published", "Draft", "Awaiting human review", "Verified"]) {
     assert.ok(status.includes(label), `Missing status style: ${label}`);
   }
