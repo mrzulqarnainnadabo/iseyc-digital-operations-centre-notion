@@ -5,9 +5,8 @@ export default function SeatBriefingPage() {
     <div className="mx-auto max-w-3xl space-y-6">
       <header className="space-y-2">
         <Link href="/ops" className="inline-flex min-h-[40px] items-center text-sm font-semibold text-forest-800 hover:underline">← Command home</Link>
-        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Governance · Seat briefing</p>
         <h1 className="font-serif text-2xl text-forest-950 sm:text-3xl">Day-1 seat packet</h1>
-        
+        <p className="text-xs text-ink-600" role="status">Generic seat packet · no active appointment</p>
       </header>
 
       <section className="rounded-card border border-amber-200 bg-amber-50 p-4">
