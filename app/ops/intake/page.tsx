@@ -13,66 +13,71 @@ export default function IntakePage() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
-  async function onSubmit(e: FormEvent) {
-    e.preventDefault();
+  async function onSubmit(event: FormEvent) {
+    event.preventDefault();
+    if (pending) return;
     setPending(true);
     setError(null);
     try {
-      const res = await fetch("/api/meetings", {
+      const response = await fetch("/api/meetings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, conveningBody, meetingDate, summary, sensitivity: "Standard" }),
       });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || "Could not create meeting");
+      const data = await response.json();
+      if (!response.ok) {
+        setError(typeof data.error === "string" ? data.error : "The meeting record could not be created.");
         return;
       }
-      router.push(`/ops/review/${data.id}`);
+      router.push(`/ops/review/${encodeURIComponent(data.id)}`);
       router.refresh();
     } catch {
-      setError("Network error");
+      setError("The service could not be reached. No successful submission was confirmed.");
     } finally {
       setPending(false);
     }
   }
 
   return (
-    <div className="mx-auto max-w-xl space-y-4">
-      <Link href="/ops/queue" className="text-sm text-emerald-800 hover:underline">
-        ← Meeting queue
-      </Link>
-      <h2 className="font-serif text-2xl text-slate-950">New meeting intake</h2>
-      <p className="text-sm text-slate-600">
-        Creates a New record in Notion. Not institutional memory until an officer approves it.
-      </p>
-      <form onSubmit={onSubmit} aria-busy={pending} className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5">
+    <div className="mx-auto max-w-2xl space-y-6">
+      <header className="space-y-2">
+        <Link href="/ops/queue" className="inline-flex min-h-[40px] items-center text-sm font-semibold text-forest-800 hover:underline">← Approval queue</Link>
+        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Notion-backed workflow · intake</p>
+        <h1 className="font-serif text-2xl text-forest-950 sm:text-3xl">New meeting intake</h1>
+        <p className="text-sm leading-6 text-ink-600">Create a Standard meeting record for human review. Submission does not approve the record or create an institutional decision.</p>
+      </header>
+
+      <section className="rounded-card border border-amber-200 bg-amber-50 p-4">
+        <p className="text-sm font-semibold text-amber-950">Current access limitation</p>
+        <p className="mt-1 text-sm leading-5 text-amber-900">Transitional shared-key sessions may submit Standard records only. Restricted records require verified individual identity and scoped permissions.</p>
+      </section>
+
+      <form onSubmit={onSubmit} aria-busy={pending} className="space-y-5 rounded-card border border-line bg-white p-5 shadow-card sm:p-6">
         <div>
-          <label className="text-sm font-medium" htmlFor="title">Meeting title</label>
-          <input id="title" required minLength={5} maxLength={200} autoComplete="off" value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 min-h-[48px] w-full rounded-xl border border-slate-300 px-3" />
-        </div>
-        <div>
-          <label className="text-sm font-medium" htmlFor="body">Convening body</label>
-          <input id="body" maxLength={200} autoComplete="organization" value={conveningBody} onChange={(e) => setConveningBody(e.target.value)} className="mt-1 min-h-[48px] w-full rounded-xl border border-slate-300 px-3" />
-        </div>
-        <div>
-          <label className="text-sm font-medium" htmlFor="date">Meeting date</label>
-          <input id="date" type="date" value={meetingDate} onChange={(e) => setMeetingDate(e.target.value)} className="mt-1 min-h-[48px] w-full rounded-xl border border-slate-300 px-3" />
+          <label className="block text-sm font-semibold text-ink-950" htmlFor="title">Meeting title <span className="text-red-700">*</span></label>
+          <input id="title" required minLength={5} maxLength={200} autoComplete="off" value={title} onChange={(event) => setTitle(event.target.value)} className="mt-2 min-h-[48px] w-full rounded-control border border-line px-3 text-base" />
+          <p className="mt-1 text-xs text-ink-600">5–200 characters.</p>
         </div>
         <div>
-          <label className="text-sm font-medium" htmlFor="summary">Summary / notes</label>
-          <textarea id="summary" rows={4} maxLength={1900} value={summary} onChange={(e) => setSummary(e.target.value)} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2" />
+          <label className="block text-sm font-semibold text-ink-950" htmlFor="body">Convening body</label>
+          <input id="body" maxLength={200} autoComplete="organization" value={conveningBody} onChange={(event) => setConveningBody(event.target.value)} className="mt-2 min-h-[48px] w-full rounded-control border border-line px-3 text-base" />
         </div>
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-          <p className="text-sm font-medium text-slate-800">Sensitivity: Standard</p>
-          <p className="mt-1 text-xs leading-5 text-slate-600">
-            Transitional staff sessions may submit Standard records only. Restricted records
-            cannot be submitted through this intake until individual officer authorisation is available.
-          </p>
+        <div>
+          <label className="block text-sm font-semibold text-ink-950" htmlFor="date">Meeting date</label>
+          <input id="date" type="date" value={meetingDate} onChange={(event) => setMeetingDate(event.target.value)} className="mt-2 min-h-[48px] w-full rounded-control border border-line px-3 text-base" />
         </div>
-        {error ? <p className="text-sm text-red-700" role="alert" aria-live="assertive">{error}</p> : null}
-        <button type="submit" disabled={pending || title.trim().length < 5} className="min-h-[52px] w-full rounded-xl bg-emerald-700 font-semibold text-white disabled:opacity-60">
-          {pending ? "Saving…" : "Submit for queue"}
+        <div>
+          <label className="block text-sm font-semibold text-ink-950" htmlFor="summary">Summary / notes</label>
+          <textarea id="summary" rows={5} maxLength={1900} value={summary} onChange={(event) => setSummary(event.target.value)} className="mt-2 w-full rounded-control border border-line px-3 py-2 text-base leading-6" />
+          <p className="mt-1 text-xs text-ink-600">Do not include restricted personal, safeguarding or disciplinary information in this Standard intake.</p>
+        </div>
+        <div className="rounded-control border border-line bg-cream-50 p-3">
+          <p className="text-sm font-semibold text-ink-950">Sensitivity: Standard</p>
+          <p className="mt-1 text-xs leading-5 text-ink-600">This intake is limited to Standard records. The server enforces the same restriction; changing the client request cannot grant higher access.</p>
+        </div>
+        {error ? <p role="alert" aria-live="assertive" className="rounded-control border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p> : null}
+        <button type="submit" disabled={pending || title.trim().length < 5} className="inline-flex min-h-[48px] w-full items-center justify-center rounded-control bg-forest-900 px-4 text-sm font-semibold text-white hover:bg-forest-800 disabled:cursor-not-allowed disabled:opacity-50">
+          {pending ? "Submitting…" : "Submit for human review"}
         </button>
       </form>
     </div>
