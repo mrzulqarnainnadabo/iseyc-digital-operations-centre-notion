@@ -54,6 +54,9 @@ export async function PATCH(
     return privateJson({ ok: false, error: "Invalid request body" }, { status: 400 });
   }
   const input = body as Record<string, unknown>;
+  if (Object.keys(input).some((key) => key !== "status")) {
+    return privateJson({ ok: false, error: "Unexpected meeting update fields." }, { status: 400 });
+  }
   const allowed = ["In review", "Approved", "Archived", "Draft"] as const;
   if (!allowed.includes(input.status as (typeof allowed)[number])) {
     return privateJson({ ok: false, error: "Invalid status" }, { status: 400 });
