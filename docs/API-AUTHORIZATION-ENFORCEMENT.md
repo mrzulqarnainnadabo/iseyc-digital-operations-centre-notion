@@ -103,3 +103,10 @@ The policy test suite now includes regression cases for:
 - Private API cache headers and bounded JSON parsing.
 
 The CI workflow runs the policy suite and application TypeScript check. Passing CI is necessary but does not replace OIDC integration, durable storage, route-by-route authorization, authenticated browser QA or production security review.
+
+
+## Department resource scope
+
+Officer appointment records must declare an explicit scope. The policy primitive now requires the protected handler to pass a resource scope; it fails closed when scope is omitted or malformed. Department-scoped appointments can operate only on a resource whose server-derived department identifier exactly matches the appointment. An explicit global appointment may operate across departments; global scope must be present in the trusted appointment record and is never inferred from role title.
+
+The policy tests cover same-department allow, cross-department deny, omitted resource scope deny, missing appointment scope deny, malformed department scope deny and explicitly global access. These are pure policy tests; there is not yet a trusted appointment adapter or live route integration. The application must not claim department RBAC is active until both are connected.
