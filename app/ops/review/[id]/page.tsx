@@ -88,7 +88,7 @@ export default function ReviewPage() {
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       <div className="flex flex-wrap gap-2">
         <button type="button" disabled={pending} onClick={() => setStatus("In review")} className="min-h-[44px] rounded-xl border border-slate-300 px-4 text-sm font-medium">Open review</button>
-        <button type="button" disabled={pending} onClick={() => setStatus("Approved")} className="min-h-[44px] rounded-xl bg-emerald-700 px-4 text-sm font-semibold text-white">Approve record</button>
+        <button type="button" disabled className="min-h-[44px] cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 px-4 text-sm font-semibold text-slate-500">Approval requires authorised officer access</button>
         <button type="button" disabled={pending} onClick={() => setStatus("Archived")} className="min-h-[44px] rounded-xl border border-slate-300 px-4 text-sm font-medium text-slate-600">Archive</button>
       </div>
     </div>
