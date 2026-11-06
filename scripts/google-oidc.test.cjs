@@ -30,15 +30,18 @@ test("Google OIDC is disabled unless client credentials and a 32-byte session se
     id: process.env.DOC_GOOGLE_CLIENT_ID,
     secret: process.env.DOC_GOOGLE_CLIENT_SECRET,
     signing: process.env.DOC_SESSION_SECRET,
+    appUrl: process.env.DOC_APP_URL,
   };
   try {
     delete process.env.DOC_GOOGLE_CLIENT_ID;
     delete process.env.DOC_GOOGLE_CLIENT_SECRET;
     delete process.env.DOC_SESSION_SECRET;
+    delete process.env.DOC_APP_URL;
     assert.equal(oidc.googleOidcConfigured(), false);
     process.env.DOC_GOOGLE_CLIENT_ID = "client-id";
     process.env.DOC_GOOGLE_CLIENT_SECRET = "client-secret";
     process.env.DOC_SESSION_SECRET = "too-short";
+    process.env.DOC_APP_URL = "https://doc.example";
     assert.equal(oidc.googleOidcConfigured(), false);
     process.env.DOC_SESSION_SECRET = "a".repeat(32);
     assert.equal(oidc.googleOidcConfigured(), true);
@@ -46,6 +49,7 @@ test("Google OIDC is disabled unless client credentials and a 32-byte session se
     if (prior.id === undefined) delete process.env.DOC_GOOGLE_CLIENT_ID; else process.env.DOC_GOOGLE_CLIENT_ID = prior.id;
     if (prior.secret === undefined) delete process.env.DOC_GOOGLE_CLIENT_SECRET; else process.env.DOC_GOOGLE_CLIENT_SECRET = prior.secret;
     if (prior.signing === undefined) delete process.env.DOC_SESSION_SECRET; else process.env.DOC_SESSION_SECRET = prior.signing;
+    if (prior.appUrl === undefined) delete process.env.DOC_APP_URL; else process.env.DOC_APP_URL = prior.appUrl;
   }
 });
 
