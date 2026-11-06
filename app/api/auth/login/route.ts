@@ -6,6 +6,7 @@ import {
   staffKeyConfigured,
 } from "@/lib/auth";
 import { isSameOriginRequest } from "@/lib/request-security";
+import { readStaffKeyInput } from "@/lib/login-input";
 
 export const runtime = "nodejs";
 
@@ -21,15 +22,15 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let body: { key?: string };
+  let body: unknown;
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 });
   }
 
-  const key = (body.key || "").trim();
-  if (!isValidStaffKey(key)) {
+  const key = readStaffKeyInput(body);
+  if (!key || !isValidStaffKey(key)) {
     return NextResponse.json({ ok: false, error: "Invalid staff key" }, { status: 401 });
   }
 
