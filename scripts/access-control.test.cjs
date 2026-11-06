@@ -11,6 +11,7 @@ require.extensions[".ts"] = (mod, filename) => {
 };
 const policy = require("../lib/access-control.ts");
 const legacyBoundary = require("../lib/legacy-session-boundary.ts");
+const loginInput = require("../lib/login-input.ts");
 const now = new Date("2026-11-06T12:00:00.000Z");
 const context = (extra = {}) => ({
   googleSubject: "member",
@@ -201,4 +202,16 @@ test("legacy shared session cannot approve meeting records", () => {
   assert.equal(legacyBoundary.legacySessionCanSetMeetingStatus("Draft"), true);
   assert.equal(legacyBoundary.legacySessionCanSetMeetingStatus("Approved"), false);
   assert.equal(legacyBoundary.legacySessionCanSetMeetingStatus("unknown"), false);
+});
+
+test("login input parser rejects malformed and non-string payloads", () => {
+  assert.equal(loginInput.readStaffKeyInput(null), null);
+  assert.equal(loginInput.readStaffKeyInput([]), null);
+  assert.equal(loginInput.readStaffKeyInput("secret"), null);
+  assert.equal(loginInput.readStaffKeyInput({ key: 123 }), null);
+  assert.equal(loginInput.readStaffKeyInput({ key: "   " }), null);
+  assert.equal(loginInput.readStaffKeyInput({ key: "x".repeat(513) }), null);
+});
+test("login input parser trims valid string keys without coercion", () => {
+  assert.equal(loginInput.readStaffKeyInput({ key: "  valid-key  " }), "valid-key");
 });
