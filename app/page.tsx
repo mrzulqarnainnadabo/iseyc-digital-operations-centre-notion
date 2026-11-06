@@ -2,36 +2,26 @@ import Link from "next/link";
 
 export default function GatePage() {
   return (
-    <div className="grid min-h-screen place-items-center bg-[radial-gradient(circle_at_top_left,#e5f1eb,transparent_45%),#f7f3e9] p-6">
-      <div className="w-full max-w-lg rounded-3xl border border-[#d7ddd8] bg-white p-8 shadow-xl">
-        <img src="/iseyc-seal.svg" alt="ISEYC official seal" width="56" height="56" className="rounded-full border border-[#c4a35a] bg-white object-contain" />
-        <p className="mt-4 text-xs font-bold uppercase tracking-[0.16em] text-[#80621f]">Initiative for Sustainable Evolution for Youth and Community</p>
-        <h1 className="mt-2 font-serif text-3xl text-[#072a20]">Digital Operations Centre</h1>
-        <p className="mt-3 text-sm leading-relaxed text-[#49584f]">
-          Institutional command surface for authorised ISEYC officers. Same DOC product vision —
-          data on Notion, not Supabase.
-        </p>
-        <ul className="mt-4 list-inside list-disc text-sm text-[#49584f]">
-          <li>Command Brief</li>
-          <li>Meeting intake → queue → human approval</li>
-          <li>Chamber, Media, Actions (Notion-backed)</li>
-          <li>Links to Civic Mandate, Civic Brain and Observatory</li>
-        </ul>
-        <Link
-          href="/login"
-          className="mt-7 flex min-h-[52px] items-center justify-center rounded-xl bg-[#072a20] text-sm font-semibold text-white"
-        >
-          Officer sign-in
-        </Link>
-        <a
-          href="https://2027-street-mandate.vercel.app"
-          className="mt-3 flex min-h-[48px] items-center justify-center rounded-xl border border-[#c4a35a] text-sm font-semibold text-[#072a20]"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Public Civic Mandate ↗
-        </a>
-      </div>
-    </div>
+    <main className="grid min-h-screen place-items-center bg-cream-50 px-4 py-10">
+      <section className="w-full max-w-md rounded-card border border-line bg-white p-6 shadow-card sm:p-8">
+        <div className="flex items-center gap-3">
+          <img src="/iseyc-seal.svg" alt="ISEYC seal" width="44" height="44" className="rounded-full border border-gold-600 bg-white object-contain" />
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold-600">ISEYC</p>
+            <p className="text-sm font-semibold text-forest-950">Private institutional workspace</p>
+          </div>
+        </div>
+        <h1 className="mt-6 font-serif text-2xl text-forest-950">Digital Operations Centre</h1>
+        <p className="mt-2 text-sm leading-6 text-ink-600">Authorised access is required. This workspace supports internal coordination, meeting records and human review.</p>
+        <Link href="/login" className="mt-6 inline-flex min-h-[48px] w-full items-center justify-center rounded-control bg-forest-900 px-4 text-sm font-semibold text-white hover:bg-forest-800">Officer sign-in</Link>
+        <div className="mt-6 border-t border-line pt-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Public civic systems</p>
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold text-forest-800">
+            <a href="https://2027-street-mandate.vercel.app" target="_blank" rel="noopener noreferrer" className="min-h-[40px] inline-flex items-center hover:underline">Civic Mandate ↗</a>
+            <a href="https://iseyc-civic-brain.vercel.app" target="_blank" rel="noopener noreferrer" className="min-h-[40px] inline-flex items-center hover:underline">Civic Brain ↗</a>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }
