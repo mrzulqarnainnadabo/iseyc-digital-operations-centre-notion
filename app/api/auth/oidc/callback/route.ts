@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { privateResponseHeaders } from "@/lib/private-response";
 import {
-  googleOidcConfigured,
+  docAppOrigin,\n  googleOidcConfigured,
   OIDC_NONCE_COOKIE,
   OIDC_STATE_COOKIE,
   OIDC_VERIFIER_COOKIE,
