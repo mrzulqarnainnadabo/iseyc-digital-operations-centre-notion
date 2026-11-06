@@ -68,3 +68,10 @@ These controls reduce exposure while the legacy gate exists. They do not provide
 Meeting detail lookup now verifies that the retrieved Notion page's `parent.database_id` matches the configured Meetings database before returning it. This prevents a caller with a valid legacy session from supplying an arbitrary Notion page ID and using the meeting endpoint to read or update a page in another database.
 
 Missing meeting sensitivity is represented as `Unclassified`, not silently defaulted to `Standard`; legacy-session filters therefore deny it.
+
+
+### Login request validation
+
+The legacy login endpoint now parses its untrusted JSON body through a strict input helper. Null, array, primitive, missing-key, non-string-key, blank-key and overlong-key payloads are rejected without calling string methods on attacker-controlled values. This prevents malformed payloads from turning into an unhandled server error.
+
+This is input validation only. Durable rate limiting and abuse monitoring are still outstanding; no in-memory limiter is being presented as reliable protection in a serverless deployment. A distributed limiter must be selected and configured before the shared-key login is considered production-hardened.
