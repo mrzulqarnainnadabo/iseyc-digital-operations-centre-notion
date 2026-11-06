@@ -95,3 +95,12 @@ Every decision event should capture:
 - [ ] Pass direct-route/API authorization tests for every status and role.
 
 No member records, personal emails, identity subjects or appointments should be populated until the access model and register permissions have been tested.
+
+
+## Member self-service read boundary
+
+A verified active member may receive only a minimal membership summary for their own linked Google OIDC subject. The application must never return the raw Notion page or expose other members through list, search, export, relation, or predictable-ID endpoints.
+
+The National President and an appointed Membership Administrator may access the restricted operational register only through server-side authorization. A Membership Administrator's access is limited to intake, verification, record maintenance and recommendations; it does not grant decision authority. Any API returning membership records must apply this rule independently of UI navigation and must emit a minimal response DTO.
+
+Audit events must identify the authenticated actor from the verified server session. The actor identity must not be accepted from a browser-supplied request field.
