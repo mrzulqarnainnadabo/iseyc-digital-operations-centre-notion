@@ -623,19 +623,36 @@ test("readiness register distinguishes placeholders from implemented workflows",
 
 const notionAdapter = require("../lib/notion.ts");
 
-test("Notion database IDs are canonicalized before security comparisons", () => {
-  const previous = process.env.TEST_NOTION_DATABASE_ID;
-  process.env.TEST_NOTION_DATABASE_ID = "19B213D5-5BFC-4CE8-A653-A05147CBBE2A";
+test("Notion database IDs are canonicalized and bound to the declared DOC database setting", () => {
+  const previous = process.env.NOTION_MEETINGS_DATABASE_ID;
+  process.env.NOTION_MEETINGS_DATABASE_ID = "19B213D5-5BFC-4CE8-A653-A05147CBBE2A";
   try {
-    assert.equal(notionAdapter.dbId("TEST_NOTION_DATABASE_ID"), "19b213d55bfc4ce8a653a05147cbbe2a");
+    assert.equal(notionAdapter.dbId("NOTION_MEETINGS_DATABASE_ID"), "19b213d55bfc4ce8a653a05147cbbe2a");
     assert.throws(
-      () => notionAdapter.assertInternalDb("19B213D5-5BFC-4CE8-A653-A05147CBBE2A"),
+      () => notionAdapter.assertInternalDb("19B213D5-5BFC-4CE8-A653-A05147CBBE2A", "NOTION_MEETINGS_DATABASE_ID"),
       /Civic Mandate public database/
     );
     assert.throws(
-      () => notionAdapter.assertInternalDb("19b213d55bfc4ce8a653a05147cbbe2a"),
+      () => notionAdapter.assertInternalDb("19b213d55bfc4ce8a653a05147cbbe2a", "NOTION_MEETINGS_DATABASE_ID"),
       /Civic Mandate public database/
     );
+    assert.throws(
+      () => notionAdapter.assertInternalDb("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "NOTION_MEETINGS_DATABASE_ID"),
+      /unconfigured or invalid DOC database/
+    );
+  } finally {
+    if (previous === undefined) delete process.env.NOTION_MEETINGS_DATABASE_ID;
+    else process.env.NOTION_MEETINGS_DATABASE_ID = previous;
+  }
+});
+
+test("malformed Notion database IDs are not treated as configured", () => {
+  const previous = process.env.TEST_NOTION_DATABASE_ID;
+  try {
+    for (const value of ["", "not-a-database", "aaaaaaaa", "g".repeat(32), "a".repeat(33)]) {
+      process.env.TEST_NOTION_DATABASE_ID = value;
+      assert.equal(notionAdapter.dbId("TEST_NOTION_DATABASE_ID"), "");
+    }
   } finally {
     if (previous === undefined) delete process.env.TEST_NOTION_DATABASE_ID;
     else process.env.TEST_NOTION_DATABASE_ID = previous;
