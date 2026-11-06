@@ -616,7 +616,8 @@ test("readiness register distinguishes placeholders from implemented workflows",
   assert.ok(readiness.includes("not verified individual identity"));
   assert.ok(readiness.includes("Do not enter real membership"));
   assert.ok(dashboard.includes("Environment configuration"));
-  assert.ok(dashboard.includes("do not verify database connectivity"));
+  assert.ok(dashboard.includes("Not connected"));
+  assert.ok(dashboard.includes("Configured"));
   assert.ok(dashboard.includes('href="/ops/readiness"'));
 });
 
