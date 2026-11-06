@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { privateJson } from "@/lib/private-response";
 import {
   isValidStaffKey,
   SESSION_COOKIE,
@@ -12,11 +13,11 @@ export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   if (!isSameOriginRequest(req)) {
-    return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
+    return privateJson({ ok: false, error: "Forbidden" }, { status: 403 });
   }
 
   if (!staffKeyConfigured()) {
-    return NextResponse.json(
+    return privateJson(
       { ok: false, error: "Sign-in is temporarily unavailable." },
       { status: 503 }
     );
@@ -26,15 +27,15 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 });
+    return privateJson({ ok: false, error: "Invalid JSON" }, { status: 400 });
   }
 
   const key = readStaffKeyInput(body);
   if (!key || !isValidStaffKey(key)) {
-    return NextResponse.json({ ok: false, error: "Invalid staff key" }, { status: 401 });
+    return privateJson({ ok: false, error: "Invalid staff key" }, { status: 401 });
   }
 
-  const res = NextResponse.json({ ok: true });
+  const res = privateJson({ ok: true });
   res.cookies.set(SESSION_COOKIE, signSession(key), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
