@@ -12,24 +12,26 @@ Status: implementation specification for the private officer interface. This doc
 
 ## A. Design tokens
 
+Official identity: use the supplied ISEYC seal as a small header mark, never as a full-bleed background. Primary institutional surfaces show the full name, Initiative for Sustainable Evolution for Youth and Community; compact navigation uses ISEYC. Do not invent replacement logo artwork.
+
 | Token | Value | Intended use |
 |---|---|---|
-| Forest 950 | #102F26 | Institutional shell and dark command surface |
+| Forest 950 | #123B2F | Institutional shell and dark command surface |
 | Forest 900 | #123B2F | Primary actions and navigation |
 | Forest 800 | #194B3B | Hover and selected states |
 | Forest 100 | #E8F0EA | Quiet selected surfaces |
 | Cream 50 | #FAF9F5 | Application canvas |
 | White | #FFFFFF | Cards and form surfaces |
 | Ink 950 | #202923 | Main text |
-| Ink 700 | #48544C | Secondary text |
+| Ink 700 | #626D65 | Secondary text |
 | Ink 600 | #626D65 | Metadata |
-| Gold 600 | #80621F | Restrained accent and section eyebrow |
+| Gold 600 | #A7833F | Restrained accent and section eyebrow |
 | Border | #E4E6DF | Dividers and card outlines |
 | Success | #28664A | Confirmed operational state only |
 | Warning | #93651D | Awaiting human action |
 | Danger | #A43D37 | Rejected or destructive state |
 
-Typography: Inter/system sans for UI; Georgia/Cambria serif only for major page titles. 12px metadata, 14px secondary copy, 16px body, 20px section titles, 26–30px mobile page titles.
+Typography: Inter/system sans for UI; Georgia/Cambria serif only for major page titles. 12px metadata, 14px secondary copy, 16px body, 20px section titles, 26–28px mobile page titles.
 
 Spacing: 4px base scale; primary rhythm 8/12/16/20/24/32px. Mobile gutters 16px; desktop gutters 32px. Card padding 16–20px. Section gap 24px.
 
