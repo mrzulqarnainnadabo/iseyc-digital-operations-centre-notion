@@ -96,7 +96,7 @@ export function checkMemberAccess(
   if (member.status !== "Approved") {
     return { allowed: false, reason: "membership_not_active" };
   }
-  if (!member.emailVerified) {
+  if (member.emailVerified !== true) {
     return { allowed: false, reason: "email_not_verified" };
   }
   if (
@@ -118,8 +118,11 @@ export function hasOfficerPermission(
 ): boolean {
   if (!checkMemberAccess(context, now).allowed) return false;
 
+  if (!Array.isArray(context.appointments)) return false;
+
   return context.appointments.some(
     (appointment) =>
+      Boolean(appointment) &&
       appointment.status === "Active" &&
       appointment.permissions.includes(permission) &&
       dateIsActive(now, appointment.effectiveFrom, appointment.effectiveUntil)
@@ -167,6 +170,8 @@ export function canDecideMembership(
     return true;
   }
 
+  if (!Array.isArray(context.delegations)) return false;
+
   return context.delegations.some((delegation) => {
     // Fail closed on incomplete or malformed delegation records.
     if (
@@ -174,6 +179,7 @@ export function canDecideMembership(
       !delegation.grantedByGoogleSubject ||
       !delegation.effectiveFrom ||
       !delegation.effectiveUntil ||
+      !Array.isArray(delegation.decisionScopes) ||
       !Number.isFinite(Date.parse(delegation.effectiveFrom)) ||
       !Number.isFinite(Date.parse(delegation.effectiveUntil)) ||
       Date.parse(delegation.effectiveUntil) < Date.parse(delegation.effectiveFrom)
