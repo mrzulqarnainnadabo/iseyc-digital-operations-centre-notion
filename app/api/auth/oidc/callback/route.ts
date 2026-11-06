@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { privateResponseHeaders } from "@/lib/private-response";
 import {
-  docAppOrigin,\n  googleOidcConfigured,
+  docAppOrigin,
+  googleOidcConfigured,
   OIDC_NONCE_COOKIE,
   OIDC_STATE_COOKIE,
   OIDC_VERIFIER_COOKIE,
@@ -28,8 +29,12 @@ function loginRedirect(origin: string, result: string) {
 }
 
 export async function GET(req: NextRequest) {
-  const origin = req.nextUrl.origin;
-  if (!googleOidcConfigured()) return loginRedirect(origin, "unavailable");
+  const configuredOrigin = docAppOrigin();
+  const requestOrigin = req.nextUrl.origin;
+  if (!configuredOrigin || requestOrigin !== configuredOrigin || !googleOidcConfigured()) {
+    return loginRedirect(configuredOrigin || requestOrigin, "unavailable");
+  }
+  const origin = configuredOrigin;
 
   const code = req.nextUrl.searchParams.get("code");
   const returnedState = req.nextUrl.searchParams.get("state");
