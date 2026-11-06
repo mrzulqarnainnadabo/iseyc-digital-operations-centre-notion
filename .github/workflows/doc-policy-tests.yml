@@ -8,7 +8,6 @@ on:
       - "scripts/**"
       - "docs/API-AUTHORIZATION-ENFORCEMENT.md"
       - "package.json"
-      - "package-lock.json"
       - ".github/workflows/doc-policy-tests.yml"
   push:
     branches:
@@ -28,7 +27,7 @@ jobs:
         with:
           node-version: 22
       - name: Install dependencies
-        run: npm ci --ignore-scripts
+        run: npm install --ignore-scripts
       - name: Run authorization policy tests
         run: npm test
       - name: Type-check application
