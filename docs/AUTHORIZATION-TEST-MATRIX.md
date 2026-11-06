@@ -70,3 +70,27 @@ Do not mark DOC access control production-ready until:
 5. Delegation creation/revocation is President-only and audited.
 6. Session revocation, rate limiting, PIN lifecycle and recovery are tested.
 7. An authenticated browser QA pass confirms public/member/officer boundaries on mobile and desktop.
+
+
+## Google OIDC identity-verification gate
+
+These checks verify identity only. Passing them must not be interpreted as membership or officer authorization.
+
+| Case | Expected result |
+| --- | --- |
+| OIDC provider credentials absent | Start endpoint fails closed; sign-in UI shows setup pending |
+| Canonical DOC origin absent or malformed | OIDC remains disabled |
+| Production canonical origin uses HTTP | OIDC remains disabled |
+| OAuth callback arrives on a host other than configured DOC origin | Reject and redirect only to the configured canonical origin |
+| State missing, mismatched or replayed | Reject callback |
+| Nonce missing or mismatched | Reject ID token |
+| PKCE verifier mismatch | Token exchange rejected by Google |
+| Invalid Google signature, issuer, audience or expiry | Reject identity |
+| Google email is not verified | Reject identity |
+| Valid verified Google identity | Issue a short-lived pending-identity proof only |
+| Pending identity proof is expired, malformed or tampered | Reject proof |
+| Pending identity proof presented to `requireStaffSession` | Deny; it is not an operations session |
+| Pending identity status endpoint | Return `accessGranted: false` until membership and appointment authorization are implemented |
+| Logout | Clear shared session, OIDC transaction and pending identity cookies |
+
+The OAuth flow must not log authorization codes, ID tokens, access tokens, client secrets, Google subjects or cookie values. Provider credentials and the signing secret must remain server-only environment variables; `DOC_SESSION_SECRET` must be distinct from `ISEYC_STAFF_KEY`.
