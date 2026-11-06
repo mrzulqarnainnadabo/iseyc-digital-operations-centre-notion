@@ -61,3 +61,10 @@ Until individual Google identity and trusted appointment records are implemented
 - The legacy session may continue to read standard meeting records and create standard meeting submissions; this is not individual member access or role-based authorization.
 
 These controls reduce exposure while the legacy gate exists. They do not provide per-person accountability, officer identity, approval authority, record-level permissions for other DOC modules, or a durable audit trail. They must not be represented as the final authorization system.
+
+
+### Meeting record boundary correction
+
+Meeting detail lookup now verifies that the retrieved Notion page's `parent.database_id` matches the configured Meetings database before returning it. This prevents a caller with a valid legacy session from supplying an arbitrary Notion page ID and using the meeting endpoint to read or update a page in another database.
+
+Missing meeting sensitivity is represented as `Unclassified`, not silently defaulted to `Standard`; legacy-session filters therefore deny it.
