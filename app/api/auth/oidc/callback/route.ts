@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
     const identity = await verifyGoogleIdToken((tokens as { id_token: string }).id_token, nonce);
 
     const response = loginRedirect(origin, "pending");
-    response.cookies.set(PENDING_IDENTITY_COOKIE, signPendingIdentity(identity.subject), {
+    response.cookies.set(PENDING_IDENTITY_COOKIE, signPendingIdentity(identity.subject, identity.email), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
