@@ -215,3 +215,16 @@ test("login input parser rejects malformed and non-string payloads", () => {
 test("login input parser trims valid string keys without coercion", () => {
   assert.equal(loginInput.readStaffKeyInput({ key: "  valid-key  " }), "valid-key");
 });
+
+test("dashboard aggregates exclude restricted and unclassified meetings", () => {
+  const records = [
+    { id: "standard", sensitivity: "Standard", status: "New" },
+    { id: "restricted", sensitivity: "Restricted", status: "New" },
+    { id: "missing", status: "New" },
+    { id: "unclassified", sensitivity: "Unclassified", status: "New" },
+    { id: "lowercase", sensitivity: "standard", status: "New" }
+  ];
+  const visible = legacyBoundary.filterLegacyVisibleMeetings(records);
+  assert.deepEqual(visible.map((record) => record.id), ["standard"]);
+  assert.equal(visible.length, 1);
+});
