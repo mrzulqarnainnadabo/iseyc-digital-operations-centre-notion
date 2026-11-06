@@ -106,3 +106,37 @@ test("malformed appointment collection fails closed", () => {
   const c = context({ appointments: null });
   assert.equal(policy.hasOfficerPermission(c, "meetings.read", now), false);
 });
+
+test("malformed appointment entries and permission fields fail closed", () => {
+  const c = context({ appointments: [null, { status: "Active" }, {
+    status: "Active", permissions: "meetings.approve"
+  }] });
+  assert.equal(policy.hasOfficerPermission(c, "meetings.approve", now), false);
+});
+test("invalid authorization context and invalid clock fail closed", () => {
+  assert.equal(policy.checkMemberAccess(null, now).allowed, false);
+  assert.equal(policy.checkMemberAccess(context(), new Date("invalid")).allowed, false);
+});
+test("malformed membership date fields fail closed", () => {
+  const c = context({ membership: {
+    status: "Approved", googleSubject: "member", emailVerified: true,
+    effectiveFrom: 42
+  } });
+  assert.equal(policy.checkMemberAccess(c, now).allowed, false);
+});
+test("malformed delegation entries fail closed without throwing", () => {
+  const c = context({ delegations: [null, { delegateGoogleSubject: "member",
+    grantedByGoogleSubject: "president", decisionScopes: "approve",
+    effectiveFrom: "2026-10-01T00:00:00.000Z",
+    effectiveUntil: "2026-12-01T00:00:00.000Z" }] });
+  assert.equal(policy.canDecideMembership(c, "approve", now), false);
+});
+test("unknown membership decision is denied", () => {
+  assert.equal(policy.canDecideMembership(context({ googleSubject: "president",
+    membership: { status: "Approved", googleSubject: "president", emailVerified: true }
+  }), "delete", now), false);
+});
+test("empty or non-string audit identities are denied", () => {
+  assert.equal(policy.canAttributeGovernanceAction(context(), ""), false);
+  assert.equal(policy.canAttributeGovernanceAction(context(), null), false);
+});
