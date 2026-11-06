@@ -77,3 +77,29 @@ Missing meeting sensitivity is represented as `Unclassified`, not silently defau
 The legacy login endpoint now parses its untrusted JSON body through a strict input helper. Null, array, primitive, missing-key, non-string-key, blank-key and overlong-key payloads are rejected without calling string methods on attacker-controlled values. This prevents malformed payloads from turning into an unhandled server error.
 
 This is input validation only. Durable rate limiting and abuse monitoring are still outstanding; no in-memory limiter is being presented as reliable protection in a serverless deployment. A distributed limiter must be selected and configured before the shared-key login is considered production-hardened.
+
+
+### Private response and request-boundary hardening
+
+The review branch now applies a shared private-response helper to login, logout and meeting API responses. It sets `Cache-Control: private, no-store, max-age=0, must-revalidate`, `Pragma: no-cache` and `Vary: Cookie`. This reduces the risk of sensitive operational responses being retained or reused across sessions by browser or intermediary caches.
+
+State-changing JSON endpoints now use a bounded parser that:
+- Requires an `application/json` media type.
+- Measures the actual encoded request body before parsing.
+- Enforces a 2 KiB login body limit, 16 KiB meeting-intake limit and 8 KiB meeting-update limit.
+- Returns controlled 400, 413 or 415 responses for malformed, oversized or incorrectly typed requests.
+
+The meeting queue and review screens request fresh data without browser caching and include cancellation, retry and network-error states. These are usability and cache-safety improvements; they do not change the shared-key identity limitation.
+
+### Test coverage at this checkpoint
+
+The policy test suite now includes regression cases for:
+- Membership Administrator record-maintenance access without decision authority.
+- Own-record versus another-member record access.
+- Unverified and suspended membership denial.
+- President access requiring active, verified membership.
+- Revoked/expired appointments and delegation provenance.
+- Dashboard aggregates excluding restricted, unclassified and malformed-sensitivity records.
+- Private API cache headers and bounded JSON parsing.
+
+The CI workflow runs the policy suite and application TypeScript check. Passing CI is necessary but does not replace OIDC integration, durable storage, route-by-route authorization, authenticated browser QA or production security review.
