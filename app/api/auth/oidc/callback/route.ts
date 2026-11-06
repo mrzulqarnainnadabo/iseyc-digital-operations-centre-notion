@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { privateResponseHeaders } from "@/lib/private-response";
+import { privateJson, privateResponseHeaders } from "@/lib/private-response";
 import {
   docAppOrigin,
   googleOidcConfigured,
@@ -31,8 +31,11 @@ function loginRedirect(origin: string, result: string) {
 export async function GET(req: NextRequest) {
   const configuredOrigin = docAppOrigin();
   const requestOrigin = req.nextUrl.origin;
-  if (!configuredOrigin || requestOrigin !== configuredOrigin || !googleOidcConfigured()) {
-    return loginRedirect(configuredOrigin || requestOrigin, "unavailable");
+  if (!configuredOrigin) {
+    return privateJson({ ok: false, error: "Google sign-in is not configured." }, { status: 503 });
+  }
+  if (requestOrigin !== configuredOrigin || !googleOidcConfigured()) {
+    return loginRedirect(configuredOrigin, "unavailable");
   }
   const origin = configuredOrigin;
 
