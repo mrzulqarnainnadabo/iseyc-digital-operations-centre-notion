@@ -19,14 +19,14 @@ export function EmptyState({
   actionLabel,
 }: {
   title: string;
-  description: string;
+  description?: string;
   actionHref?: string;
   actionLabel?: string;
 }) {
   return (
     <div className="rounded-card border border-dashed border-line bg-white px-5 py-10 text-center">
       <p className="font-semibold text-ink-950">{title}</p>
-      <p className="mx-auto mt-2 max-w-md text-sm leading-5 text-ink-600">{description}</p>
+      {description ? <p className="mx-auto mt-2 max-w-md text-sm leading-5 text-ink-600">{description}</p> : null}
       {actionHref && actionLabel ? (
         <Link href={actionHref} className="mt-4 inline-flex min-h-[44px] items-center rounded-control bg-forest-900 px-4 text-sm font-semibold text-white">{actionLabel}</Link>
       ) : null}
