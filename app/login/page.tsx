@@ -108,7 +108,7 @@ export default function LoginPage() {
           {error ? <p role="alert" aria-live="assertive" className="rounded-control border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p> : null}
 
           <button type="submit" disabled={pending || !key.trim()} className="inline-flex min-h-[48px] w-full items-center justify-center rounded-control bg-forest-900 px-4 text-sm font-semibold text-white hover:bg-forest-800 disabled:cursor-not-allowed disabled:opacity-50">
-            {pending ? "Checking access…" : "Continue to command desk"}
+            {pending ? "Checking access…" : "Sign in"}
           </button>
         </form>
 
