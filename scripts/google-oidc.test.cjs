@@ -36,41 +36,42 @@ test("Google OIDC is disabled unless client credentials and a 32-byte session se
   const prior = {
     id: process.env.DOC_GOOGLE_CLIENT_ID,
     secret: process.env.DOC_GOOGLE_CLIENT_SECRET,
-    signing: process.env.DOC_SESSION_SECRET,
+    signing: process.env.DOC_IDENTITY_PROOF_SECRET,
     appUrl: process.env.DOC_APP_URL,
   };
   try {
     delete process.env.DOC_GOOGLE_CLIENT_ID;
     delete process.env.DOC_GOOGLE_CLIENT_SECRET;
-    delete process.env.DOC_SESSION_SECRET;
+    delete process.env.DOC_IDENTITY_PROOF_SECRET;
     delete process.env.DOC_APP_URL;
     assert.equal(oidc.googleOidcConfigured(), false);
     process.env.DOC_GOOGLE_CLIENT_ID = "client-id";
     process.env.DOC_GOOGLE_CLIENT_SECRET = "client-secret";
-    process.env.DOC_SESSION_SECRET = "too-short";
+    process.env.DOC_IDENTITY_PROOF_SECRET = "too-short";
     process.env.DOC_APP_URL = "https://doc.example";
     assert.equal(oidc.googleOidcConfigured(), false);
-    process.env.DOC_SESSION_SECRET = "a".repeat(32);
+    process.env.DOC_IDENTITY_PROOF_SECRET = "a".repeat(32);
     assert.equal(oidc.googleOidcConfigured(), true);
   } finally {
     if (prior.id === undefined) delete process.env.DOC_GOOGLE_CLIENT_ID; else process.env.DOC_GOOGLE_CLIENT_ID = prior.id;
     if (prior.secret === undefined) delete process.env.DOC_GOOGLE_CLIENT_SECRET; else process.env.DOC_GOOGLE_CLIENT_SECRET = prior.secret;
-    if (prior.signing === undefined) delete process.env.DOC_SESSION_SECRET; else process.env.DOC_SESSION_SECRET = prior.signing;
+    if (prior.signing === undefined) delete process.env.DOC_IDENTITY_PROOF_SECRET; else process.env.DOC_IDENTITY_PROOF_SECRET = prior.signing;
     if (prior.appUrl === undefined) delete process.env.DOC_APP_URL; else process.env.DOC_APP_URL = prior.appUrl;
   }
 });
 
 test("pending Google identity proof is signed, short-lived and tamper-evident", () => {
-  const prior = process.env.DOC_SESSION_SECRET;
-  process.env.DOC_SESSION_SECRET = "test-only-signing-secret-that-is-at-least-32-bytes";
+  const prior = process.env.DOC_IDENTITY_PROOF_SECRET;
+  process.env.DOC_IDENTITY_PROOF_SECRET = "test-only-signing-secret-that-is-at-least-32-bytes";
   try {
-    const token = oidc.signPendingIdentity("google-subject-test");
+    const token = oidc.signPendingIdentity("google-subject-test", "person@example.com");
     assert.equal(oidc.verifyPendingIdentity(token), true);
+    assert.deepEqual(oidc.readPendingIdentity(token), { subject: "google-subject-test", email: "person@example.com" });
     assert.equal(oidc.verifyPendingIdentity(token + "x"), false);
     assert.equal(oidc.verifyPendingIdentity(""), false);
   } finally {
-    if (prior === undefined) delete process.env.DOC_SESSION_SECRET;
-    else process.env.DOC_SESSION_SECRET = prior;
+    if (prior === undefined) delete process.env.DOC_IDENTITY_PROOF_SECRET;
+    else process.env.DOC_IDENTITY_PROOF_SECRET = prior;
   }
 });
 
