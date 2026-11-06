@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { privateResponseHeaders } from "@/lib/private-response";
 import {
   createOidcTransaction,
+  docAppOrigin,
   googleOidcConfigured,
   OIDC_NONCE_COOKIE,
   OIDC_STATE_COOKIE,
@@ -12,12 +13,13 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
-  if (!googleOidcConfigured()) {
-    return NextResponse.redirect(new URL("/login?oidc=unavailable", req.nextUrl.origin));
+  const origin = docAppOrigin();
+  if (!origin || !googleOidcConfigured()) {
+    return NextResponse.redirect(new URL("/login?oidc=unavailable", origin || req.nextUrl.origin));
   }
 
   const { state, nonce, verifier, challenge } = createOidcTransaction();
-  const callback = new URL("/api/auth/oidc/callback", req.nextUrl.origin);
+  const callback = new URL("/api/auth/oidc/callback", origin);
   const authorize = new URL("https://accounts.google.com/o/oauth2/v2/auth");
   authorize.searchParams.set("client_id", process.env.DOC_GOOGLE_CLIENT_ID!.trim());
   authorize.searchParams.set("redirect_uri", callback.toString());
