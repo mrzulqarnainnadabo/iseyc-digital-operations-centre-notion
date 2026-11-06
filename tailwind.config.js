@@ -5,19 +5,19 @@ module.exports = {
     extend: {
       colors: {
         forest: {
-          950: "var(--iseyc-forest-950)",
-          900: "var(--iseyc-forest-900)",
-          800: "var(--iseyc-forest-800)",
-          100: "var(--iseyc-forest-100)",
+          950: "#102f26",
+          900: "#123b2f",
+          800: "#194b3b",
+          100: "#e8f0ea",
         },
-        cream: { 50: "var(--iseyc-cream-50)" },
+        cream: { 50: "#faf9f5" },
         ink: {
-          950: "var(--iseyc-ink-950)",
-          700: "var(--iseyc-ink-700)",
-          600: "var(--iseyc-ink-600)",
+          950: "#202923",
+          700: "#48544c",
+          600: "#626d65",
         },
-        gold: { 600: "var(--iseyc-gold-600)" },
-        line: "var(--iseyc-border)",
+        gold: { 600: "#a7833f" },
+        line: "#e4e6df",
       },
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
