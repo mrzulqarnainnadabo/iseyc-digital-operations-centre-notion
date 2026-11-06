@@ -7,6 +7,7 @@ import {
   OIDC_NONCE_COOKIE,
   OIDC_STATE_COOKIE,
   OIDC_VERIFIER_COOKIE,
+  PENDING_IDENTITY_COOKIE,
 } from "@/lib/google-oidc";
 
 export const runtime = "nodejs";
@@ -43,5 +44,6 @@ export async function GET(req: NextRequest) {
   response.cookies.set(OIDC_STATE_COOKIE, state, cookieOptions);
   response.cookies.set(OIDC_NONCE_COOKIE, nonce, cookieOptions);
   response.cookies.set(OIDC_VERIFIER_COOKIE, verifier, cookieOptions);
+  response.cookies.set(PENDING_IDENTITY_COOKIE, "", { ...cookieOptions, maxAge: 0 });
   return response;
 }
