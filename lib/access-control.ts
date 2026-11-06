@@ -1,4 +1,4 @@
-import { isDocPermission } from "@/lib/doc-permissions";
+import { isDocPermission } from "./doc-permissions";
 
 /**
  * Server-side DOC authorization policy primitives.
