@@ -74,3 +74,36 @@ test("no DOC API route is implicitly treated as public", () => {
     );
   }
 });
+
+function assertInOrder(source, markers, label) {
+  let previous = -1;
+  for (const marker of markers) {
+    const index = source.indexOf(marker);
+    assert.ok(index >= 0, `${label}: missing ${marker}`);
+    assert.ok(index > previous, `${label}: ${marker} must follow the preceding guard`);
+    previous = index;
+  }
+}
+
+test("state-changing DOC routes enforce origin and session checks before parsing or writing", () => {
+  const login = fs.readFileSync(path.join(apiRoot, "auth/login/route.ts"), "utf8");
+  assertInOrder(login, ["isSameOriginRequest(req)", "readBoundedJson(req", "isValidStaffKey(key)", "signSession(key)"], "login");
+
+  const createMeeting = fs.readFileSync(path.join(apiRoot, "meetings/route.ts"), "utf8");
+  const postBody = createMeeting.slice(createMeeting.indexOf("export async function POST"));
+  assertInOrder(postBody, ["isSameOriginRequest(req)", "requireStaffSession()", "readBoundedJson(req", "createMeeting({"], "meeting POST");
+
+  const updateMeeting = fs.readFileSync(path.join(apiRoot, "meetings/[id]/route.ts"), "utf8");
+  const patchBody = updateMeeting.slice(updateMeeting.indexOf("export async function PATCH"));
+  assertInOrder(patchBody, ["isSameOriginRequest(req)", "requireStaffSession()", "readBoundedJson(req", "getMeeting(id)", "setMeetingStatus(id"], "meeting PATCH");
+});
+
+test("protected meeting reads authenticate before accessing Notion records", () => {
+  const collection = fs.readFileSync(path.join(apiRoot, "meetings/route.ts"), "utf8");
+  const getBody = collection.slice(collection.indexOf("export async function GET"));
+  assertInOrder(getBody, ["requireStaffSession()", "listMeetings()"], "meeting GET");
+
+  const detail = fs.readFileSync(path.join(apiRoot, "meetings/[id]/route.ts"), "utf8");
+  const getDetail = detail.slice(detail.indexOf("export async function GET"));
+  assertInOrder(getDetail, ["requireStaffSession()", "getMeeting(id)"], "meeting detail GET");
+});
