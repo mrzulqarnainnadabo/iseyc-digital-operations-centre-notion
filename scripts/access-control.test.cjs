@@ -352,3 +352,24 @@ test("unknown permission identifiers cannot be granted by an appointment", () =>
   }] });
   assert.equal(policy.hasOfficerPermission(c, "superuser.all", now), false);
 });
+
+function collectRouteFiles(directory) {
+  if (!fs.existsSync(directory)) return [];
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const full = require("node:path").join(directory, entry.name);
+    if (entry.isDirectory()) return collectRouteFiles(full);
+    return entry.isFile() && entry.name === "route.ts" ? [full] : [];
+  });
+}
+
+test("every DOC API route declares private caching or an explicit public classification", () => {
+  const routes = collectRouteFiles(require("node:path").join(__dirname, "../app/api"));
+  assert.ok(routes.length > 0, "API route inventory should not be empty");
+  for (const route of routes) {
+    const source = fs.readFileSync(route, "utf8");
+    assert.ok(
+      source.includes("privateJson(") || source.includes("PUBLIC_API_ROUTE:"),
+      `${route} must use privateJson or declare PUBLIC_API_ROUTE with an explicit public rationale`
+    );
+  }
+});
