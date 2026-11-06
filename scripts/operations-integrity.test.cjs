@@ -66,3 +66,19 @@ test("civic navigation uses the canonical Observatory deployment hostname", () =
 test("module readiness is reachable from the persistent navigation", () => {
   assert.ok(DOC_NAV.some((item) => item.href === "/ops/readiness"));
 });
+
+test("operations errors recover without exposing exception details", () => {
+  const errorBoundary = fs.readFileSync(path.join(opsRoot, "error.tsx"), "utf8");
+  assert.match(errorBoundary, /^"use client";/);
+  assert.match(errorBoundary, /role="alert"/);
+  assert.match(errorBoundary, /onClick=\{reset\}/);
+  assert.match(errorBoundary, /No record was changed/);
+  assert.doesNotMatch(errorBoundary, /error\.message/);
+});
+
+test("operations loading state is announced accessibly", () => {
+  const loading = fs.readFileSync(path.join(opsRoot, "loading.tsx"), "utf8");
+  assert.match(loading, /aria-busy="true"/);
+  assert.match(loading, /aria-live="polite"/);
+  assert.match(loading, /Loading operations view/);
+});
