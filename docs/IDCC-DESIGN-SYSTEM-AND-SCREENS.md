@@ -23,7 +23,7 @@ Status: implementation specification for the private officer interface. This doc
 | Ink 950 | #202923 | Main text |
 | Ink 700 | #48544C | Secondary text |
 | Ink 600 | #626D65 | Metadata |
-| Gold 600 | #A7833F | Restrained accent and section eyebrow |
+| Gold 600 | #80621F | Restrained accent and section eyebrow |
 | Border | #E4E6DF | Dividers and card outlines |
 | Success | #28664A | Confirmed operational state only |
 | Warning | #93651D | Awaiting human action |
