@@ -13,7 +13,7 @@ require.extensions[".ts"] = (mod, filename) => {
 };
 
 const root = path.join(__dirname, "..");
-const oidc = require("../lib/google-oidc.ts");
+const oidc = require("../lib/oidc-primitives.ts");
 
 test("Google OIDC transaction uses independent high-entropy state, nonce and PKCE verifier", () => {
   const tx = oidc.createOidcTransaction();
