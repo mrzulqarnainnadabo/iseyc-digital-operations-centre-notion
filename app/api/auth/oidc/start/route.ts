@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { privateResponseHeaders } from "@/lib/private-response";
 import {
   createOidcTransaction,
   googleOidcConfigured,
@@ -29,7 +30,7 @@ export async function GET(req: NextRequest) {
   authorize.searchParams.set("prompt", "select_account");
 
   const response = NextResponse.redirect(authorize);
-  response.headers.set("Cache-Control", "no-store");
+  for (const [name, value] of privateResponseHeaders(response.headers)) response.headers.set(name, value);
   const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
