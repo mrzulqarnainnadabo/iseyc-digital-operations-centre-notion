@@ -444,3 +444,25 @@ test("sensitive DOC API handlers retain their authentication and CSRF guards", (
     }
   }
 });
+
+test("production responses include baseline browser security headers", async () => {
+  const configPath = require.resolve("../next.config.js");
+  const previousNodeEnv = process.env.NODE_ENV;
+  process.env.NODE_ENV = "production";
+  delete require.cache[configPath];
+  const config = require("../next.config.js");
+  const entries = await config.headers();
+  if (previousNodeEnv === undefined) delete process.env.NODE_ENV;
+  else process.env.NODE_ENV = previousNodeEnv;
+  delete require.cache[configPath];
+
+  const route = entries.find((entry) => entry.source === "/:path*");
+  assert.ok(route, "security headers should apply to all routes");
+  const headers = Object.fromEntries(route.headers.map(({ key, value }) => [key, value]));
+  assert.equal(headers["X-Content-Type-Options"], "nosniff");
+  assert.equal(headers["X-Frame-Options"], "DENY");
+  assert.equal(headers["Referrer-Policy"], "strict-origin-when-cross-origin");
+  assert.equal(headers["X-Permitted-Cross-Domain-Policies"], "none");
+  assert.equal(headers["Permissions-Policy"], "camera=(), microphone=(), geolocation=()");
+  assert.equal(headers["Strict-Transport-Security"], "max-age=31536000");
+});
