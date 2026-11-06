@@ -156,7 +156,9 @@ export function canDecideMembership(
   decision: MembershipDecision,
   now = new Date()
 ): boolean {
-  if (!context.googleSubject) return false;
+  // Every decision-maker, including the President, must authenticate as an
+  // approved, verified and currently active member.
+  if (!checkMemberAccess(context, now).allowed) return false;
 
   if (
     context.nationalPresidentGoogleSubject &&
@@ -165,18 +167,29 @@ export function canDecideMembership(
     return true;
   }
 
-  // Delegated authority is usable only by a currently approved, linked member.
-  if (!checkMemberAccess(context, now).allowed) return false;
+  return context.delegations.some((delegation) => {
+    // Fail closed on incomplete or malformed delegation records.
+    if (
+      !delegation.delegateGoogleSubject ||
+      !delegation.grantedByGoogleSubject ||
+      !delegation.effectiveFrom ||
+      !delegation.effectiveUntil ||
+      !Number.isFinite(Date.parse(delegation.effectiveFrom)) ||
+      !Number.isFinite(Date.parse(delegation.effectiveUntil)) ||
+      Date.parse(delegation.effectiveUntil) < Date.parse(delegation.effectiveFrom)
+    ) {
+      return false;
+    }
 
-  return context.delegations.some(
-    (delegation) =>
+    return (
       delegation.delegateGoogleSubject === context.googleSubject &&
       delegation.grantedByGoogleSubject ===
         context.nationalPresidentGoogleSubject &&
       delegation.decisionScopes.includes(decision) &&
       !delegation.revokedAt &&
       dateIsActive(now, delegation.effectiveFrom, delegation.effectiveUntil)
-  );
+    );
+  });
 }
 
 
