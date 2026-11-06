@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { HumanDecisionPanel } from "@/components/HumanDecisionPanel";
 import { useParams } from "next/navigation";
 
 type Meeting = {
@@ -128,11 +129,10 @@ export default function ReviewPage() {
       {error ? <p className="text-sm text-red-700" role="alert">{error}</p> : null}
       <div className="flex flex-wrap gap-2">
         <button type="button" disabled={pending || meeting.status === "In review"} onClick={() => void setStatus("In review")} className="min-h-[44px] rounded-xl border border-slate-300 px-4 text-sm font-medium disabled:opacity-50">
-          {pending ? "Updating…" : "Open review"}
+          {pending ? "Updating…" : "Move to In review"}
         </button>
-        <button type="button" disabled className="min-h-[44px] cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 px-4 text-sm font-semibold text-slate-500">Approval requires authorised officer access</button>
-        <button type="button" disabled className="min-h-[44px] cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 px-4 text-sm font-medium text-slate-500">Archiving requires authorised officer access</button>
       </div>
+      <HumanDecisionPanel disabledReason="Accept, Edit, Return and Reject are disabled for transitional shared-key sessions. Verified individual identity, scoped appointment permissions and durable audit logging are required before these actions can be enabled." />
     </div>
   );
 }
