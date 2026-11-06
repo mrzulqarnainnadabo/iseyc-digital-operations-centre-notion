@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { StatusBadge } from "@/components/StatusBadge";
 
 type Meeting = {
   id: string;
@@ -9,14 +10,6 @@ type Meeting = {
   status: string;
   conveningBody: string;
   meetingDate: string;
-};
-
-const statusClass: Record<string, string> = {
-  New: "border-sky-200 bg-sky-50 text-sky-900",
-  Draft: "border-slate-200 bg-slate-50 text-slate-700",
-  "In review": "border-amber-200 bg-amber-50 text-amber-900",
-  Approved: "border-emerald-200 bg-emerald-50 text-emerald-900",
-  Archived: "border-slate-200 bg-slate-100 text-slate-600",
 };
 
 export default function QueuePage() {
@@ -145,7 +138,7 @@ export default function QueuePage() {
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="font-semibold leading-5 text-ink-950">{meeting.title}</h3>
-                      <span className={`inline-flex min-h-[25px] items-center rounded-full border px-2.5 text-[11px] font-semibold ${statusClass[meeting.status] || "border-slate-200 bg-slate-50 text-slate-700"}`}>{meeting.status}</span>
+                      <StatusBadge status={meeting.status} />
                     </div>
                     <p className="mt-1 text-xs leading-5 text-ink-600">{meeting.conveningBody || "Convening body not supplied"} · {meeting.meetingDate || "Date not supplied"}</p>
                     <p className="mt-2 text-xs text-ink-600">Human decision required · Not an approved institutional record</p>
