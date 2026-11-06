@@ -54,3 +54,10 @@ The route-security test suite also checks that:
 - Meeting collection and detail reads authenticate before retrieving Notion records.
 
 These are source-order regression checks. They help detect accidental refactors that move data access ahead of a guard, but they do not replace runtime tests of the deployed framework and middleware.
+
+
+## Notion database configuration boundary
+
+The current meeting adapter now accepts only a canonical 32-hex-character Notion database ID from `NOTION_MEETINGS_DATABASE_ID`. It rejects malformed IDs and binds every meeting read/create/update operation to that named setting. A request-supplied or otherwise unbound database ID is not accepted by the adapter. The known Civic Mandate public database remains explicitly blocked.
+
+This is configuration integrity, not a complete Notion tenancy boundary: a deployment administrator could still point the environment variable at another valid Notion database. Before enabling restricted membership, personnel, finance or safeguarding records, create and verify dedicated restricted databases, their page sharing, workspace permissions and integration access. The application must not claim that syntactic ID validation proves Notion access isolation.
