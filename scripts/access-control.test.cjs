@@ -420,3 +420,27 @@ test("bounded JSON parser rejects invalid UTF-8 instead of replacement-decoding 
     ok: false, reason: "invalid_json"
   });
 });
+
+test("sensitive DOC API handlers retain their authentication and CSRF guards", () => {
+  const root = require("node:path").join(__dirname, "../app/api");
+  const contracts = [
+    ["auth/login/route.ts", ["POST"], ["isSameOriginRequest"], []],
+    ["auth/logout/route.ts", ["POST"], ["isSameOriginRequest"], []],
+    ["meetings/route.ts", ["GET", "POST"], ["isSameOriginRequest"], ["requireStaffSession"]],
+    ["meetings/[id]/route.ts", ["GET", "PATCH"], ["isSameOriginRequest"], ["requireStaffSession"]]
+  ];
+
+  for (const [relativePath, methods, csrfGuards, authGuards] of contracts) {
+    const source = fs.readFileSync(require("node:path").join(root, relativePath), "utf8");
+    for (const method of methods) {
+      assert.match(source, new RegExp(`export async function ${method}\\b`),
+        `${relativePath} must retain ${method}`);
+    }
+    for (const guard of csrfGuards) {
+      assert.ok(source.includes(guard), `${relativePath} must retain ${guard}`);
+    }
+    for (const guard of authGuards) {
+      assert.ok(source.includes(guard), `${relativePath} must retain ${guard}`);
+    }
+  }
+});
