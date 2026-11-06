@@ -7,7 +7,7 @@ The canonical ISEYC Digital Operations Centre (IDCC/DOC) implementation is **Nex
 This is a point-in-time engineering record, not a live deployment monitor.
 
 - Last previously verified production deployment source: `6158b85ac190dc655cb670910d87833103fc8316` (Vercel reported READY on 6 November 2026).
-- Mainline has since advanced; the latest inspected application mainline before this documentation update was `40d47b3bd0624eb0977bfcf326732a10885bf319`.
+- Mainline has advanced beyond that deployment source. The latest Vercel check on the current mainline reports a **build-rate-limit failure**; this does not establish whether an earlier deployment remains available or whether the latest code is live.
 - The latest mainline Vercel status is a **build-rate-limit failure**, not a verified successful deployment. No deployment of the later mainline security work is claimed.
 - Vercel project: `iseyc-digital-operations-centre-notion`.
 - Project domain: `https://iseyc-digital-operations-centre-not.vercel.app`.
