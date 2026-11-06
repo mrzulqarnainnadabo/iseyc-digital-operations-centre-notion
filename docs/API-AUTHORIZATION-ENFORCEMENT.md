@@ -145,3 +145,10 @@ The feature branch now contains an opt-in Google OpenID Connect authorization-co
 The flow is disabled unless `DOC_GOOGLE_CLIENT_ID`, `DOC_GOOGLE_CLIENT_SECRET` and a distinct `DOC_SESSION_SECRET` of at least 32 bytes are configured. No production environment variables have been changed. The Google OAuth client must register the exact callback URL `https://<DOC-host>/api/auth/oidc/callback` before the flow can be exercised.
 
 Still outstanding: trusted membership/appointment source, account-linking and recovery policy, per-person server sessions with revocation, permission checks on every protected route, durable audit persistence, and distributed rate limiting for the legacy shared-key endpoint. Do not treat this identity-verification slice as officer authentication or production access control.
+
+
+### Individual DOC PIN crypto primitive (partial implementation)
+
+The feature branch now includes `lib/pin-crypto.ts` with asynchronous scrypt hashing for exactly six-digit PINs, a per-record random salt, a separate server-side HMAC pepper (`DOC_PIN_PEPPER`), fixed verification parameters, malformed-record rejection and timing-safe derived-key comparison. Unit tests cover successful verification, wrong PIN, malformed values, and missing pepper configuration.
+
+This is a cryptographic primitive only. There is no PIN enrollment/challenge/recovery route, no PIN hash store, no distributed attempt limiter/lockout, no PIN audit events and no step-up integration. Do not enable PIN entry or onboard users until a restricted durable store and distributed rate-limit provider are selected, configured and tested. Never put the pepper or PIN hashes in Git, browser code, ordinary Notion pages or public responses.
