@@ -97,3 +97,19 @@ test("planned operational modules cannot present placeholders as live workflows"
     assert.match(source, /\/ops\/readiness/);
   }
 });
+
+
+test("institutional design tokens and reduced-motion accessibility are present", () => {
+  const css = fs.readFileSync(path.join(root, "app/globals.css"), "utf8");
+  const shell = fs.readFileSync(path.join(root, "components/DocShell.tsx"), "utf8");
+  const dashboard = fs.readFileSync(path.join(opsRoot, "page.tsx"), "utf8");
+  for (const token of ["--iseyc-forest-950", "--iseyc-cream-50", "--iseyc-gold-600", "--iseyc-border"]) {
+    assert.ok(css.includes(token), `Missing design token ${token}`);
+  }
+  assert.match(css, /prefers-reduced-motion/);
+  assert.match(shell, /aria-label="Mobile navigation"/);
+  assert.match(shell, /aria-label="Primary navigation"/);
+  assert.match(shell, /min-h-\[44px\]/);
+  assert.match(dashboard, /Not operational/);
+  assert.match(dashboard, /Published civic systems/);
+});
