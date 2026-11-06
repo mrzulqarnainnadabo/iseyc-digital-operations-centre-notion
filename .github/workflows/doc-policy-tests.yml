@@ -1,0 +1,34 @@
+name: DOC policy tests
+
+on:
+  pull_request:
+    paths:
+      - "lib/**"
+      - "app/api/**"
+      - "scripts/**"
+      - "docs/API-AUTHORIZATION-ENFORCEMENT.md"
+      - "package.json"
+      - ".github/workflows/doc-policy-tests.yml"
+  push:
+    branches:
+      - "feat/doc-public-member-officer-access"
+
+permissions:
+  contents: read
+
+jobs:
+  authorization-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: Run authorization policy tests
+        run: npm test
+      - name: Type-check application
+        run: npx tsc --noEmit
