@@ -7,12 +7,12 @@ export default function SeatBriefingPage() {
         <Link href="/ops" className="inline-flex min-h-[40px] items-center text-sm font-semibold text-forest-800 hover:underline">← Command home</Link>
         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Governance · Seat briefing</p>
         <h1 className="font-serif text-2xl text-forest-950 sm:text-3xl">Day-1 seat packet</h1>
-        <p className="text-sm leading-6 text-ink-600">A generic onboarding framework for an authorised office-holder. It does not appoint a person or assign a seat.</p>
+        
       </header>
 
       <section className="rounded-card border border-amber-200 bg-amber-50 p-4">
         <p className="text-sm font-semibold text-amber-950">No active appointment record is linked to this session</p>
-        <p className="mt-1 text-sm leading-5 text-amber-900">A personalised seat briefing can only be issued after a trusted appointment record establishes the seat, scope, effective dates and reporting line.</p>
+        
       </section>
 
       <section className="rounded-card border border-line bg-white p-5 shadow-card">
@@ -51,7 +51,7 @@ export default function SeatBriefingPage() {
       <section className="rounded-card border border-forest-900 bg-forest-950 p-5 text-white">
         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#d7c18f]">AI assistance boundary</p>
         <h2 className="mt-1 text-base font-semibold">AI is staff to the seat, never the seat-holder</h2>
-        <p className="mt-2 text-sm leading-5 text-white/75">AI may help organise information, summarise approved records or prepare drafts. It cannot approve, appoint, delegate authority, publish or claim to have contacted an institution.</p>
+        
       </section>
     </div>
   );
