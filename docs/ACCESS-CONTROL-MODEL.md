@@ -67,22 +67,34 @@ Do not infer privileged access from seniority, a title string, membership type o
 - Define secure PIN reset/recovery, session expiry/revocation and audit events before enabling the PIN flow.
 - Privileged users should enable Google account MFA.
 
-## 7. Membership governance is an implementation gate
+## 7. Membership governance and delegated administration
 
-Before membership-based access is enabled, ISEYC must formally designate:
-1. Who may approve ordinary membership applications.
-2. Who may suspend, expire or reinstate membership.
-3. Who may approve and revoke officer appointments.
-4. Who may grant privileged access and review that access.
-5. The authoritative register and evidence required for approval.
+The National President retains the full and final institutional authority over ISEYC membership governance, including the authority to approve or reject membership, suspend or reinstate members, and appoint or remove anyone assigned to administer the membership process.
 
-Do not invent approvers or infer these powers from the current appointment templates. Until the authority is designated and the register is permission-checked, do not onboard members or grant access based on incomplete records.
+The National President may appoint a Membership Administrator or other designated officer to carry out operational duties such as:
+- Receiving and checking applications for completeness.
+- Verifying submitted information and following up with applicants.
+- Maintaining the membership register and supporting records.
+- Preparing recommendations and decision briefs.
+- Communicating decisions after they have been authorised.
+- Administering access changes that have been explicitly approved.
+
+An appointment to administer the process does not, by itself, transfer final decision-making authority. The appointee must not independently approve, reject, suspend or reinstate membership unless the National President has expressly delegated that specific decision authority in a recorded written instrument. Any delegation must state its scope, duration, limits and revocation conditions. The National President retains ultimate oversight and may review, vary or revoke a delegation.
+
+The system must therefore distinguish:
+1. **Membership governance authority** — reserved to the National President, subject only to a specific recorded delegation.
+2. **Membership administration** — operational tasks assigned to an appointed administrator.
+3. **Membership decision record** — the actual authorised decision, decision-maker, date, reason and any delegation instrument relied upon.
+
+The membership register must record the decision-maker and authority basis for each approval, rejection, suspension and reinstatement. A staff member's ability to edit a register or process an application must never automatically grant the permission to make the underlying governance decision.
+
+Officer appointments and privileged access remain separate governance decisions. Do not infer those powers from membership administration duties.
 
 ## 8. Audit and lifecycle
 
-Record actor, target identity/member ID, action, timestamp, outcome and reason for membership approval, suspension, reinstatement, expiry, appointment change, permission grant/revocation, denied access and sensitive operations. Protect audit records from ordinary editing and avoid recording secrets or unnecessary personal data.
+Record actor, target identity/member ID, action, timestamp, outcome and reason for membership approval, rejection, suspension, reinstatement, expiry, appointment change, permission grant/revocation, denied access and sensitive operations. For delegated decisions, also record the delegation reference and scope. Protect audit records from ordinary editing and avoid recording secrets or unnecessary personal data.
 
-Suspending one member must revoke that member's access without affecting other members. Expired or revoked appointments must immediately remove the associated officer permissions while preserving valid membership.
+Suspending one member must revoke that member's access without affecting other members. Expired or revoked appointments must immediately remove the associated officer permissions while preserving valid membership. Revoking an administrator's appointment or delegation must remove the associated administrative permissions and must not erase historical decisions or audit records.
 
 ## 9. Required test matrix
 
@@ -93,6 +105,8 @@ Suspending one member must revoke that member's access without affecting other m
 - Approved member with expired appointment: member access only.
 - Department officer: only assigned department scope and delegated permissions.
 - Privileged officer: only explicitly granted privileged actions.
+- Membership Administrator: can perform assigned administrative tasks but cannot make reserved membership decisions without a recorded specific delegation.
+- Revoked administrator or expired delegation: administrative actions denied.
 - Revoked member or appointment: access denied after revocation/session invalidation.
 - Direct API calls: same authorization outcomes as the UI; no bypass by changing URLs or request payloads.
 
@@ -100,4 +114,4 @@ Suspending one member must revoke that member's access without affecting other m
 
 The current application still uses the shared `ISEYC_STAFF_KEY` gate. Google OIDC, membership records, appointment-based RBAC, individual PIN verification and the public/member/officer route split are not implemented. The existing security-hardening PR is a temporary shared-key improvement, not the final identity solution.
 
-This document is a design specification only. It does not itself create a membership database, grant access, establish governance authority or change production behavior.
+This document is a design specification only. It does not itself create a membership database, appoint an administrator, grant access, or change production behavior.
