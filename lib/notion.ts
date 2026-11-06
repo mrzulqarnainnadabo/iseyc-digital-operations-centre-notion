@@ -46,22 +46,41 @@ export async function listMeetings(): Promise<MeetingRecord[]> {
   const database_id = dbId("NOTION_MEETINGS_DATABASE_ID");
   if (!client || !database_id) return [];
   assertInternalDb(database_id);
-  const res = await client.databases.query({ database_id, page_size: 50 });
-  return res.results
-    .filter((r) => "properties" in r)
-    .map((page: any) => {
-      const props = page.properties;
-      return {
-        id: page.id,
-        title: textProp(props.Name) || textProp(props.Title) || "Untitled meeting",
-        status: textProp(props.Status) || "New",
-        conveningBody:
-          textProp(props["Convening body"]) || textProp(props.ConveningBody) || "—",
-        meetingDate: textProp(props["Meeting date"]) || textProp(props.Date) || "",
-        summary: textProp(props.Summary) || textProp(props.Notes) || "",
-        sensitivity: textProp(props.Sensitivity) || "Standard",
-      };
+  const pages: Array<{ id: string; properties: Record<string, unknown> }> = [];
+  let cursor: string | undefined;
+
+  // Notion caps page_size at 100. Follow every cursor so older records do not
+  // silently disappear from the operational meeting register.
+  do {
+    const res = await client.databases.query({
+      database_id,
+      page_size: 100,
+      ...(cursor ? { start_cursor: cursor } : {}),
     });
+    for (const result of res.results) {
+      if ("properties" in result) {
+        pages.push(result as { id: string; properties: Record<string, unknown> });
+      }
+    }
+    cursor = res.has_more ? res.next_cursor ?? undefined : undefined;
+    if (res.has_more && !cursor) {
+      throw new Error("Notion returned has_more without a next_cursor");
+    }
+  } while (cursor);
+
+  return pages.map((page) => {
+    const props = page.properties as Record<string, any>;
+    return {
+      id: page.id,
+      title: textProp(props.Name) || textProp(props.Title) || "Untitled meeting",
+      status: textProp(props.Status) || "New",
+      conveningBody:
+        textProp(props["Convening body"]) || textProp(props.ConveningBody) || "—",
+      meetingDate: textProp(props["Meeting date"]) || textProp(props.Date) || "",
+      summary: textProp(props.Summary) || textProp(props.Notes) || "",
+      sensitivity: textProp(props.Sensitivity) || "Standard",
+    };
+  });
 }
 
 export async function getMeeting(id: string): Promise<MeetingRecord | null> {
