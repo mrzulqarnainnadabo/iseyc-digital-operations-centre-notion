@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { StatusBadge } from "@/components/StatusBadge";
 
 const modules = [
   {
@@ -77,9 +78,7 @@ export default function ReadinessPage() {
           <article key={module.name} className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
             <div className="flex flex-wrap items-start justify-between gap-2">
               <h3 className="font-semibold text-slate-950">{module.name}</h3>
-              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700">
-                {module.state}
-              </span>
+              <StatusBadge status={module.state} />
             </div>
             <p className="mt-2 text-sm leading-6 text-slate-600">{module.detail}</p>
             <p className="mt-3 text-xs leading-5 text-slate-500">
