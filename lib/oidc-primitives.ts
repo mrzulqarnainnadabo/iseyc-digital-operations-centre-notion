@@ -6,9 +6,25 @@ export const OIDC_VERIFIER_COOKIE = "iseyc_doc_oidc_verifier";
 export const PENDING_IDENTITY_COOKIE = "iseyc_doc_identity_pending";
 const PENDING_TTL_SECONDS = 15 * 60;
 
+export function docAppOrigin(): string | null {
+  const raw = process.env.DOC_APP_URL?.trim();
+  if (!raw) return null;
+  try {
+    const url = new URL(raw);
+    if (
+      (process.env.NODE_ENV === "production" && url.protocol !== "https:") ||
+      !["https:", "http:"].includes(url.protocol) ||
+      url.username || url.password || url.pathname !== "/" || url.search || url.hash
+    ) return null;
+    return url.origin;
+  } catch {
+    return null;
+  }
+}
+
 export function googleOidcConfigured(): boolean {
   return Boolean(
-    process.env.DOC_GOOGLE_CLIENT_ID?.trim() &&
+    docAppOrigin() &&\n    process.env.DOC_GOOGLE_CLIENT_ID?.trim() &&
     process.env.DOC_GOOGLE_CLIENT_SECRET?.trim() &&
     process.env.DOC_SESSION_SECRET &&
     Buffer.byteLength(process.env.DOC_SESSION_SECRET) >= 32
