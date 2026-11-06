@@ -47,7 +47,7 @@ export function DocShell({ children }: { children: React.ReactNode }) {
       <aside className="hidden w-[264px] shrink-0 border-r border-line bg-white lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col">
         <div className="border-b border-line px-5 py-5">
           <div className="flex items-center gap-3">
-            <img src="/iseyc-seal.svg" alt="ISEYC seal" width="38" height="38" className="rounded-full border border-gold-600/50 bg-white object-contain" />
+            <img src="/iseyc-seal.svg" alt="ISEYC seal" width="38" height="38" className="rounded-full border border-gold-600 bg-white object-contain" />
             <div className="min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold-600">ISEYC</p>
               <p className="text-sm font-semibold leading-5 text-forest-950">Digital Operations Centre</p>
@@ -70,10 +70,10 @@ export function DocShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className="flex min-h-screen min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 border-b border-line bg-cream-50/95 backdrop-blur-sm">
+        <header className="sticky top-0 z-20 border-b border-line bg-cream-50 backdrop-blur-sm">
           <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
             <div className="flex min-w-0 items-center gap-3">
-              <img src="/iseyc-seal.svg" alt="" width="30" height="30" className="rounded-full border border-gold-600/40 bg-white object-contain lg:hidden" />
+              <img src="/iseyc-seal.svg" alt="" width="30" height="30" className="rounded-full border border-gold-600 bg-white object-contain lg:hidden" />
               <div className="min-w-0">
                 <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">ISEYC · Private operations</p>
                 <p className="truncate text-sm font-semibold text-forest-950 sm:text-base">Digital Operations Centre</p>
