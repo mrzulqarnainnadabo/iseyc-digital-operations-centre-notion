@@ -34,7 +34,12 @@ export default function QueuePage() {
     fetch("/api/meetings", { cache: "no-store", signal: controller.signal })
       .then(async (res) => {
         const data: unknown = await res.json();
-        if (!res.ok) throw new Error("The meeting queue could not be loaded.");
+        if (!res.ok) {
+          const message = data && typeof data === "object" && typeof (data as { error?: unknown }).error === "string"
+            ? (data as { error: string }).error
+            : "The meeting queue could not be loaded.";
+          throw new Error(message);
+        }
         if (!data || typeof data !== "object" || !Array.isArray((data as { meetings?: unknown }).meetings)) {
           throw new Error("The meeting queue returned an unexpected response.");
         }
@@ -42,7 +47,7 @@ export default function QueuePage() {
       })
       .catch((cause: unknown) => {
         if (cause instanceof Error && cause.name === "AbortError") return;
-        setError("The meeting queue is temporarily unavailable. Try again.");
+        setError(cause instanceof Error ? cause.message : "The meeting queue is temporarily unavailable. Try again.");
       })
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
