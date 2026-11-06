@@ -1,88 +1,120 @@
-# Officer Appointment & Role Register — Implementation Specification
+# Officer Appointment & Role Register — Integration Specification
 
-Status: schema and governance specification only. No officer appointment data is loaded or inferred by this application.
+Status: existing Notion register identified and inspected; application integration is not implemented. No appointment data has been invented or activated.
 
-## Purpose
+## Existing authoritative Notion source
 
-The Appointment & Role Register is the authoritative restricted source for whether a person currently occupies an institutional seat, the term of that appointment, its department scope and its explicitly delegated permissions. It is separate from the Membership Register: membership does not create an appointment, and an appointment does not override membership status.
+The existing database must be reused. Do not create a duplicate Appointment & Role Register.
 
-## Proposed Notion properties
+- Notion database: **IDCC — Appointment & Role Register**
+- Database page: `b9750d94-400f-4393-ad11-0e6a501c0ccd`
+- Data source: `collection://c689c101-c875-4048-adc9-b1d54731d3be`
+- Parent: ISEYC Digital Operations Centre
+- Verified query result: **11 records**, all with status **Template**, and **0 named appointees**.
+- The database description says it records role scope and access boundaries but does not itself grant system permissions.
 
-| Property | Type | Required | Meaning |
-| --- | --- | --- | --- |
-| Appointment ID | Title | Yes | Stable internal appointment record identifier |
-| Officer Name | Rich text | Yes | Human's confirmed display name |
-| Google OIDC Subject | Rich text | Yes after identity linking | Immutable identity-provider subject |
-| Seat / Role | Select | Yes | Exact formally approved seat or role |
-| Department ID | Rich text | Conditional | Immutable department identifier for department scope |
-| Department Name | Select | Conditional | Display label; not the security key |
-| Appointment Status | Status or Select | Yes | Active, Inactive, Expired, Revoked |
-| Scope Type | Select | Yes | Global or Department |
-| Permissions | Multi-select | Yes | Exact identifiers from `lib/doc-permissions.ts` |
-| Effective From | Date | Yes | Appointment start |
-| Effective Until | Date | Yes | Appointment end or review date |
-| Appointed By Subject | Rich text | Yes | Verified identity of appointing authority |
-| Authority Reference | URL or Rich text | Yes | Formal appointment instrument / resolution reference |
-| Appointment Evidence | Files or URL | Conditional | Restricted evidence of appointment |
-| Revoked At | Date | Conditional | Revocation timestamp |
-| Revocation Reason | Rich text | Conditional | Concise reason / authority reference |
-| Last Access Review | Date | Yes | Most recent access-scope review |
-| Record Created | Created time | Automatic | Notion metadata |
-| Last Edited | Last edited time | Automatic | Notion metadata |
+This register currently contains role templates only. It is not evidence that any named person has been appointed or is active.
 
-Do not use Notion page sharing, database views, or filters as authorization controls. Verify the integration's workspace and page access independently. Do not store OAuth secrets, PINs, session tokens, recovery codes or peppers in this register.
+## Current schema observed
 
-## Scope rules
+| Existing property | Current type / options | Integration meaning |
+| --- | --- | --- |
+| Office / Role | Title | Role template / formal office label |
+| Appointee Name | Text | Blank on all 11 current template rows |
+| Appointment Status | Select: Template, Proposed, Approved, Active, On Leave, Ended | Only Active can be considered for access, after date and instrument checks |
+| Department / Office | Select: Presidential Office, Education & Capacity Building, Health & Well-being, Software & Technology, Civic Department, Cross-institutional, Advisory | Display taxonomy; not a stable security identifier |
+| Role Category | Select: Presidential Council, Department Head, Special Adviser, Other Appointee, Contributor | Classification only; not permission |
+| Access Tier | Select: Public, Internal, Restricted, Highly Restricted | Broad classification only; not sufficient for action-level RBAC |
+| Appointment Instrument | URL | Formal appointment evidence reference |
+| Start Date / End Date | Date | Appointment validity window |
+| Review Date | Date | Access / appointment review |
+| Decision Authority | Text | Human-readable authority note; not a machine permission |
+| Authority Limits | Text | Human-readable boundary; not a machine permission |
+| Responsibilities | Text | Role description |
+| Role Purpose | Text | Role description |
+| Reports To | Text | Reporting line |
+| Official Email | Email | Contact field; not durable identity key |
+| Backup Role | Text | Continuity note |
+| Created / Updated | System timestamps | Notion metadata |
 
-- Global scope is an explicit appointment attribute, not inferred from a title or seniority.
-- Department scope requires an immutable Department ID.
-- A department appointment must never authorize a different department.
-- A missing, malformed or unknown scope denies access.
-- A global appointment can reach department resources only when the record explicitly declares Global scope and the permission is present.
-- Permission identifiers must match the closed vocabulary in `lib/doc-permissions.ts`. Unknown strings are rejected.
-- A title such as "Director", "President", "Secretary" or "Coordinator" grants no permissions by itself.
+## Current schema gaps — do not infer permissions
 
-## National President authority
+The existing source does not currently expose:
+- Immutable Google OIDC subject.
+- Explicit permission identifiers from the closed application permission vocabulary.
+- Explicit global versus department scope.
+- Immutable department identifier.
+- Appointing authority's verified OIDC subject.
+- Revocation timestamp and reason as structured fields.
+- Append-only appointment/permission change audit events.
 
-The National President remains the final institutional authority for membership governance and appointment/delegation policy. The active National President identity must be established by one current, verified appointment record with explicit Global scope and the appropriate governance authority. Zero or multiple matching active records must fail closed for privileged membership decisions; never choose the first matching record.
+The existing Access Tier, Role Category, Office / Role, Decision Authority and Authority Limits fields must not be parsed as a substitute for explicit permission grants.
 
-The appointment record is evidence of an approved human appointment, not an automated appointment action. No record should be created until the appointment has actually been made and the authority reference exists.
+## Required extension proposal
 
-## Required audit events
+After the existing identity/access decision draft is approved, extend the existing data source with these fields:
 
-Appointment creation, amendment, renewal, expiry, revocation, permission changes and scope changes must create a separate append-only audit event containing:
-- Event ID and timestamp
-- Target Appointment ID
-- Authenticated actor's Google OIDC subject
-- Previous and new status, scope and permission set
-- Authority basis and reference
-- Reason
-- Result of the access/session invalidation action
+| Proposed property | Notion type | Purpose |
+| --- | --- | --- |
+| Google OIDC Subject | Rich text | Stable identity link; populated only after personal Google sign-in and explicit account linking |
+| Permission IDs | Multi-select | Exact values from `lib/doc-permissions.ts`; reject unknown options |
+| Scope Type | Select | Global or Department |
+| Department ID | Rich text | Immutable department scope key when Scope Type is Department |
+| Appointed By Subject | Rich text | Verified identity of appointing authority |
+| Revoked At | Date | Structured revocation timestamp |
+| Revocation Reason | Rich text | Concise authority reference / reason |
+| Last Access Review | Date | Last review of access necessity |
 
-The audit actor must come from the verified server-side identity. Never accept it from the browser. Ordinary appointment records must not be used as their own audit trail.
+Do not change the database schema or add person/identity data until the founder-approved governance and identity design is final. The existing Notion page records the Google identity + personal six-digit PIN direction, but the PIN storage and distributed rate-limiter providers remain unresolved.
 
-## Server enforcement
+## Status mapping rules
 
-1. Verify the Google OIDC identity and link it to one Approved, active membership record.
-2. Load the appointment records for that exact OIDC subject from the restricted register.
-3. Check Active status and effective dates on every protected request.
-4. Check the exact permission and server-derived resource scope.
-5. Deny if the membership or appointment source is unconfigured, unavailable, malformed, ambiguous or stale.
-6. Apply the same checks to API routes, server actions and server-rendered pages.
-7. Invalidate the affected session/permission cache on revocation; do not wait for UI navigation to update.
-8. Record all successful and denied privileged actions in the append-only audit store.
+- `Template`: never an appointment; deny.
+- `Proposed`: not approved; deny.
+- `Approved`: approved in principle but not active; deny until activation date and formal record are confirmed.
+- `Active`: candidate for access only when Start Date is valid, End Date has not passed, Appointment Instrument is present and verified, identity subject is explicitly linked, and permission/scope data is valid.
+- `On Leave`: deny officer access while leave is active.
+- `Ended`: deny officer access.
+- A revoked appointment must be denied immediately after the authoritative revocation is observed; a structured Revoked state/field is still required.
+
+Missing or malformed status, dates, identity link, instrument, scope or permission data must fail closed.
+
+## Department identifier reconciliation
+
+The existing Notion select options use **Software & Technology** and **Civic Department**. The current IDCC screen specification uses **Digital Systems & Technology** and **Civic Affairs**. Do not silently compare display labels or rename historical values during access checks.
+
+Before RBAC activation, establish immutable department IDs and an approved alias/display-label mapping. The UI may show the current approved display names, but the server must compare stable identifiers.
+
+## Access enforcement contract
+
+1. Verify the user's own Google identity using OIDC. Do not accept email or display name as the stable identity.
+2. Require a separately approved and active membership record.
+3. Match the immutable Google subject to exactly one active appointment record.
+4. Check appointment status, start/end dates, instrument, exact permission and server-derived resource scope on every protected request.
+5. Department scope must match the resource's immutable department ID exactly. Global scope must be explicit.
+6. If zero or multiple active appointments ambiguously claim the same exclusive seat, deny the privileged action and raise a review condition.
+7. Do not grant access from Notion views, page sharing, role titles or Access Tier alone.
+8. Record appointment, permission and scope changes in a separate append-only audit store.
+9. Revoke sessions or re-check authoritative status promptly after suspension, leave, expiry or revocation.
+
+## Audit requirements
+
+Use a separate append-only Appointment & Access Audit Log or an approved durable audit mechanism. Capture actor subject, target appointment, action, previous/new state, permission and scope changes, authority reference, reason, timestamp, and whether session invalidation succeeded. Do not treat the editable appointment row as its own audit trail.
+
+## Current application state
+
+The feature branch contains Google OIDC identity verification only. The resulting 15-minute pending-identity proof is not accepted as a DOC session and grants no access. Appointment-to-identity mapping and officer RBAC are not implemented. The existing appointment data source is not configured in the Next.js application.
 
 ## Activation checklist
 
-- [ ] Founder confirms the exact seat/role vocabulary and department identifiers.
-- [ ] Founder verifies appointment instruments and authority for every actual seat holder.
-- [ ] Create the restricted Appointment & Role Register.
-- [ ] Create a separate append-only Appointment & Access Audit Log.
-- [ ] Link Notion integration with minimum required access only.
-- [ ] Confirm no duplicate active appointments for a single seat where exclusivity is required.
-- [ ] Confirm all scopes and permissions are explicit and valid.
-- [ ] Add real verified OIDC subjects only after each person completes sign-in and identity linking.
-- [ ] Run the complete appointment, scope, revocation and cross-resource authorization test matrix.
-- [ ] Complete authenticated browser QA before enabling officer routes.
+- [ ] Founder approves the existing appointment schema extension and canonical department identifiers.
+- [ ] Existing Notion integration access is verified and restricted to required databases.
+- [ ] Membership source and approval authority are defined.
+- [ ] Actual appointments and authority instruments are confirmed by humans.
+- [ ] Google OIDC subjects are linked only after each person signs in with their own personal Google account.
+- [ ] Permission IDs and scopes are explicitly approved; no role-title inference.
+- [ ] Session revocation and append-only audit are implemented.
+- [ ] Direct API, cross-department, expiry, leave and revocation tests pass.
+- [ ] Authenticated mobile and desktop QA passes before officer onboarding.
 
-No names, appointments, office occupancy, department heads or national coverage are to be populated from assumptions or placeholder values.
+No names, appointments, seat occupancy, department heads or national coverage are to be populated from assumptions or placeholder values.
