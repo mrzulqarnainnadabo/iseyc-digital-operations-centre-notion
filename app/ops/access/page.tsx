@@ -26,8 +26,8 @@ const controls = [
 const departments = [
   "Education & Capacity Building",
   "Health & Well-being",
-  "Software & Technology",
-  "Civic Department",
+  "Digital Systems & Technology",
+  "Civic Affairs",
 ];
 
 export default function Page() {
