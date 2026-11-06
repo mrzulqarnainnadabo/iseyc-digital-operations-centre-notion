@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { privateResponseHeaders } from "@/lib/private-response";
+import { privateJson, privateResponseHeaders } from "@/lib/private-response";
 import {
   createOidcTransaction,
   docAppOrigin,
@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   const origin = docAppOrigin();
   if (!origin || !googleOidcConfigured()) {
-    return NextResponse.redirect(new URL("/login?oidc=unavailable", origin || req.nextUrl.origin));
+    return privateJson({ ok: false, error: "Google sign-in is not configured." }, { status: 503 });
   }
 
   const { state, nonce, verifier, challenge } = createOidcTransaction();
