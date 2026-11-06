@@ -13,6 +13,7 @@ export const DOC_NAV: NavItem[] = [
   { label: "Shared Communications · CoS", href: "/ops/media", group: "Shared function" },
   { label: "Chamber", href: "/ops/chamber", group: "Module slots" },
   { label: "Actions", href: "/ops/actions", group: "Module slots" },
+  { label: "Day-1 seat briefing", href: "/ops/seat", group: "Governance" },
   { label: "Officer access", href: "/ops/access", group: "Governance" },
   { label: "Module readiness", href: "/ops/readiness", group: "Governance" },
   { label: "Civic Mandate", href: "https://2027-street-mandate.vercel.app", group: "Published civic systems", external: true },
