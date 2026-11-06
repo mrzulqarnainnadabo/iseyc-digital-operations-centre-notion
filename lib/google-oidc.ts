@@ -27,8 +27,13 @@ export async function verifyGoogleIdToken(
     issuer: GOOGLE_ISSUERS,
     audience: clientId,
     requiredClaims: ["sub", "iss", "aud", "exp", "iat", "nonce", "email", "email_verified"],
+    maxTokenAge: "10m",
     clockTolerance: 5,
   });
+
+  if (Array.isArray(payload.aud) && payload.aud.length > 1 && payload.azp !== clientId) {
+    throw new Error("Google ID token authorized party does not match");
+  }
 
   if (
     typeof payload.sub !== "string" ||
