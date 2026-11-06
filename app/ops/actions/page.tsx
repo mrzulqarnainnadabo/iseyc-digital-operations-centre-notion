@@ -10,7 +10,7 @@ export default function Page() {
           <h1 className="font-serif text-2xl text-forest-950 sm:text-3xl">Action register</h1>
           <StatusBadge status="Not operational" />
         </div>
-        <p className="text-sm leading-6 text-ink-600">A future register for actions arising from approved Council and institutional decisions.</p>
+        
       </header>
       <section className="rounded-card border border-amber-200 bg-amber-50 p-4" role="status">
         <p className="text-sm font-semibold text-amber-950">No action workflow is connected</p>
@@ -26,7 +26,7 @@ export default function Page() {
           <li>Retain a dated history of assignment, changes, review and closure.</li>
         </ol>
       </section>
-      <Link href="/ops/readiness" className="inline-flex min-h-[44px] items-center text-sm font-semibold text-forest-800 hover:underline">Review module dependencies →</Link>
+      <Link href="/ops/readiness" className="inline-flex min-h-[44px] items-center text-sm font-semibold text-forest-800 hover:underline">Readiness</Link>
     </div>
   );
 }
