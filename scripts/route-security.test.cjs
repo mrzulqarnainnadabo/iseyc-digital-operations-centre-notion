@@ -25,9 +25,24 @@ const contracts = {
     required: ["isSameOriginRequest", "SESSION_COOKIE", "privateJson"],
     forbidden: []
   },
+  "auth/oidc/start/route.ts": {
+    methods: ["GET"],
+    required: ["googleOidcConfigured", "createOidcTransaction", "privateResponseHeaders"],
+    forbidden: []
+  },
+  "auth/oidc/callback/route.ts": {
+    methods: ["GET"],
+    required: ["googleOidcConfigured", "safeEqual", "verifyGoogleIdToken", "signPendingIdentity", "privateJson", "privateResponseHeaders"],
+    forbidden: []
+  },
+  "auth/oidc/status/route.ts": {
+    methods: ["GET"],
+    required: ["privateJson", "verifyPendingIdentity", "accessGranted: false"],
+    forbidden: []
+  },
   "meetings/route.ts": {
     methods: ["GET", "POST"],
-    required: ["requireStaffSession", "privateJson", "legacySessionCanReadMeeting", "legacySessionCanCreateMeeting"],
+    required: ["requireStaffSession", "privateJson", "configFlags", "legacySessionCanReadMeeting", "legacySessionCanCreateMeeting"],
     forbidden: []
   },
   "meetings/[id]/route.ts": {
@@ -69,8 +84,8 @@ test("no DOC API route is implicitly treated as public", () => {
   for (const route of routes) {
     const source = fs.readFileSync(path.join(apiRoot, route), "utf8");
     assert.ok(
-      source.includes("privateJson(") || source.includes("PUBLIC_API_ROUTE:"),
-      `${route} must be private by default or explicitly documented as public`
+      source.includes("privateJson(") || source.includes("privateResponseHeaders(") || source.includes("PUBLIC_API_ROUTE:"),
+      `${route} must use private no-store response handling or be explicitly documented as public`
     );
   }
 });
@@ -98,10 +113,11 @@ test("state-changing DOC routes enforce origin and session checks before parsing
   assertInOrder(patchBody, ["isSameOriginRequest(req)", "requireStaffSession()", "readBoundedJson(req", "getMeeting(id)", "setMeetingStatus(id"], "meeting PATCH");
 });
 
-test("protected meeting reads authenticate before accessing Notion records", () => {
+test("protected meeting reads authenticate and fail closed when Notion is not configured", () => {
   const collection = fs.readFileSync(path.join(apiRoot, "meetings/route.ts"), "utf8");
   const getBody = collection.slice(collection.indexOf("export async function GET"));
-  assertInOrder(getBody, ["requireStaffSession()", "listMeetings()"], "meeting GET");
+  assertInOrder(getBody, ["requireStaffSession()", "configFlags()", "listMeetings()"], "meeting GET");
+  assert.match(getBody, /The Notion Meetings source is not configured/);
 
   const detail = fs.readFileSync(path.join(apiRoot, "meetings/[id]/route.ts"), "utf8");
   const getDetail = detail.slice(detail.indexOf("export async function GET"));

@@ -16,6 +16,8 @@ export type MembershipRecord = {
   effectiveUntil?: string | null;
 };
 export type AppointmentRecord = {
+  /** Immutable OIDC subject explicitly linked to this appointment by the trusted adapter. */
+  googleSubject: string;
   status: "Active" | "Inactive" | "Expired" | "Revoked";
   role: string;
   permissions: string[];
@@ -110,7 +112,8 @@ export function hasOfficerPermission(
   if (!validResourceScope) return false;
 
   return context.appointments.some((raw) => {
-    if (!isRecord(raw) || raw.status !== "Active" || !Array.isArray(raw.permissions) ||
+    if (!isRecord(raw) || raw.googleSubject !== context.googleSubject ||
+        raw.status !== "Active" || !Array.isArray(raw.permissions) ||
         !raw.permissions.every((item) => typeof item === "string") ||
         !isRecord(raw.scope)) return false;
 

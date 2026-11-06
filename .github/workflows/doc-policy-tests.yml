@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - "lib/**"
+      - "app/**"
+      - "components/**"
+      - "tailwind.config.js"
+      - "docs/IDCC-DESIGN-SYSTEM-AND-SCREENS.md"
       - "app/api/**"
       - "scripts/**"
       - "docs/API-AUTHORIZATION-ENFORCEMENT.md"
@@ -32,3 +36,5 @@ jobs:
         run: npm test
       - name: Type-check application
         run: npx tsc --noEmit
+      - name: Build production application
+        run: npm run build

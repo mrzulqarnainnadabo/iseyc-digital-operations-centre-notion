@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { HumanDecisionPanel } from "@/components/HumanDecisionPanel";
+import { StatusBadge } from "@/components/StatusBadge";
 
 type Meeting = {
   id: string;
@@ -32,12 +34,9 @@ export default function ReviewPage() {
     }
     setLoading(true);
     try {
-      const res = await fetch(`/api/meetings/${encodeURIComponent(id)}`, {
-        cache: "no-store",
-        signal,
-      });
-      const data: unknown = await res.json();
-      if (!res.ok) throw new Error("This record is unavailable or you do not have access.");
+      const response = await fetch(`/api/meetings/${encodeURIComponent(id)}`, { cache: "no-store", signal });
+      const data: unknown = await response.json();
+      if (!response.ok) throw new Error("This record is unavailable or you do not have access.");
       if (!data || typeof data !== "object" || !(data as { meeting?: unknown }).meeting) {
         throw new Error("The record returned an unexpected response.");
       }
@@ -58,20 +57,20 @@ export default function ReviewPage() {
     return () => controller.abort();
   }, [load, reloadKey]);
 
-  async function setStatus(status: string) {
+  async function setStatus(status: "In review") {
     if (pending) return;
     setPending(true);
     setError(null);
     try {
-      const res = await fetch(`/api/meetings/${encodeURIComponent(id)}`, {
+      const response = await fetch(`/api/meetings/${encodeURIComponent(id)}`, {
         method: "PATCH",
         cache: "no-store",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
-      const data: unknown = await res.json();
-      if (!res.ok) {
-        setError("The requested status change is not authorised or could not be completed.");
+      const data: unknown = await response.json();
+      if (!response.ok) {
+        setError("The requested workflow change is not authorised or could not be completed.");
         return;
       }
       if (!data || typeof data !== "object" || !(data as { meeting?: unknown }).meeting) {
@@ -86,53 +85,61 @@ export default function ReviewPage() {
     }
   }
 
-  if (loading && !meeting) return <p className="text-sm text-slate-500" role="status">Loading record…</p>;
+  if (loading && !meeting) return <div className="mx-auto max-w-2xl rounded-card border border-line bg-white p-5" role="status" aria-live="polite"><div className="h-4 w-32 animate-pulse rounded bg-slate-200" /><div className="mt-3 h-3 w-3/4 animate-pulse rounded bg-slate-100" /><p className="sr-only">Loading meeting record</p></div>;
 
   if (error && !meeting) {
     return (
-      <div className="space-y-3">
-        <Link href="/ops/queue" className="text-sm text-emerald-800">← Queue</Link>
-        <p className="text-slate-600" role="alert">{error}</p>
-        <button type="button" onClick={() => setReloadKey((value) => value + 1)} className="min-h-[44px] rounded-xl border border-slate-300 px-4 text-sm font-semibold">
-          Try again
-        </button>
+      <div className="mx-auto max-w-2xl space-y-3">
+        <Link href="/ops/queue" className="inline-flex min-h-[40px] items-center text-sm font-semibold text-forest-800">← Approval queue</Link>
+        <div className="rounded-card border border-amber-200 bg-amber-50 p-4" role="alert">
+          <p className="text-sm text-amber-950">{error}</p>
+          <button type="button" onClick={() => setReloadKey((value) => value + 1)} className="mt-2 min-h-[44px] font-semibold text-amber-950 underline">Try again</button>
+        </div>
       </div>
     );
   }
 
-  if (!meeting) return <p className="text-sm text-slate-500">Record unavailable.</p>;
+  if (!meeting) return <p className="text-sm text-ink-600">Record unavailable.</p>;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-5">
+    <div className="mx-auto max-w-3xl space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Link href="/ops/queue" className="text-sm text-emerald-800 hover:underline">← Return to queue</Link>
-        <button type="button" onClick={() => setReloadKey((value) => value + 1)} disabled={loading || pending} className="min-h-[40px] rounded-lg border border-slate-300 px-3 text-sm disabled:opacity-50">
-          {loading ? "Refreshing…" : "Refresh record"}
-        </button>
+        <Link href="/ops/queue" className="inline-flex min-h-[40px] items-center text-sm font-semibold text-forest-800 hover:underline">← Return to queue</Link>
+        <button type="button" onClick={() => setReloadKey((value) => value + 1)} disabled={loading || pending} className="min-h-[44px] rounded-control border border-line bg-white px-3 text-sm font-semibold text-ink-700 disabled:opacity-50">{loading ? "Refreshing…" : "Refresh record"}</button>
       </div>
-      <div>
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Controlled review</p>
-        <h2 className="mt-1 font-serif text-2xl text-slate-950">{meeting.title}</h2>
-        <p className="mt-2 text-sm text-slate-600">Approval is a human governance action, not an automated status change.</p>
-      </div>
-      <dl className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-5 sm:grid-cols-2">
-        <div><dt className="text-xs uppercase text-slate-400">Status</dt><dd className="font-medium">{meeting.status}</dd></div>
-        <div><dt className="text-xs uppercase text-slate-400">Sensitivity</dt><dd className="font-medium">{meeting.sensitivity}</dd></div>
-        <div><dt className="text-xs uppercase text-slate-400">Convening body</dt><dd className="font-medium">{meeting.conveningBody}</dd></div>
-        <div><dt className="text-xs uppercase text-slate-400">Meeting date</dt><dd className="font-medium">{meeting.meetingDate || "—"}</dd></div>
+
+      <header>
+        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Controlled human review</p>
+        <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
+          <h1 className="font-serif text-2xl text-forest-950 sm:text-3xl">{meeting.title}</h1>
+          <StatusBadge status={meeting.status} />
+        </div>
+        <p className="mt-2 text-sm leading-6 text-ink-600">This record remains a submission until an authorised human decision is recorded.</p>
+      </header>
+
+      <dl className="grid gap-4 rounded-card border border-line bg-white p-5 shadow-card sm:grid-cols-2">
+        <div><dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-ink-600">Sensitivity</dt><dd className="mt-1 text-sm font-semibold text-ink-950">{meeting.sensitivity}</dd></div>
+        <div><dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-ink-600">Convening body</dt><dd className="mt-1 text-sm font-semibold text-ink-950">{meeting.conveningBody || "Not supplied"}</dd></div>
+        <div><dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-ink-600">Meeting date</dt><dd className="mt-1 text-sm font-semibold text-ink-950">{meeting.meetingDate || "Not supplied"}</dd></div>
+        <div><dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-ink-600">Record source</dt><dd className="mt-1 text-sm font-semibold text-ink-950">Notion · Meetings</dd></div>
         <div className="sm:col-span-2">
-          <dt className="text-xs uppercase text-slate-400">Summary</dt>
-          <dd className="mt-1 whitespace-pre-wrap text-sm text-slate-700">{meeting.summary || "—"}</dd>
+          <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-ink-600">Summary / notes</dt>
+          <dd className="mt-2 whitespace-pre-wrap text-sm leading-6 text-ink-700">{meeting.summary || "No summary supplied."}</dd>
         </div>
       </dl>
-      {error ? <p className="text-sm text-red-700" role="alert">{error}</p> : null}
-      <div className="flex flex-wrap gap-2">
-        <button type="button" disabled={pending || meeting.status === "In review"} onClick={() => void setStatus("In review")} className="min-h-[44px] rounded-xl border border-slate-300 px-4 text-sm font-medium disabled:opacity-50">
-          {pending ? "Updating…" : "Open review"}
+
+      {error ? <p className="rounded-control border border-red-200 bg-red-50 p-3 text-sm text-red-800" role="alert">{error}</p> : null}
+
+      <section className="rounded-card border border-line bg-white p-4">
+        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Permitted transitional action</p>
+        <h2 className="mt-1 text-sm font-semibold text-forest-950">Move record into review</h2>
+        <p className="mt-1 text-sm leading-5 text-ink-600">This changes the workflow state to In review. It does not approve the record.</p>
+        <button type="button" disabled={pending || meeting.status === "In review"} onClick={() => void setStatus("In review")} className="mt-3 inline-flex min-h-[44px] items-center rounded-control border border-forest-900 px-4 text-sm font-semibold text-forest-900 disabled:cursor-not-allowed disabled:opacity-50">
+          {pending ? "Updating…" : meeting.status === "In review" ? "Already in review" : "Move to In review"}
         </button>
-        <button type="button" disabled className="min-h-[44px] cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 px-4 text-sm font-semibold text-slate-500">Approval requires authorised officer access</button>
-        <button type="button" disabled className="min-h-[44px] cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 px-4 text-sm font-medium text-slate-500">Archiving requires authorised officer access</button>
-      </div>
+      </section>
+
+      <HumanDecisionPanel disabledReason="Accept, Edit, Return and Reject are disabled for transitional shared-key sessions. Verified individual identity, scoped appointment permissions and durable audit logging are required before these decisions can be enabled." />
     </div>
   );
 }

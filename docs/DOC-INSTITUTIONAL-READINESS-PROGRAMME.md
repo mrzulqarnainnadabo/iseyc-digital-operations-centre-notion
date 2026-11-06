@@ -33,7 +33,7 @@ This document is the execution ledger for the Digital Operations Centre (DOC). I
 
 ### Not implemented — do not describe as operational
 
-- Individual Google OpenID Connect sign-in and verified identity linking.
+- Google OpenID Connect identity verification is implemented on the review branch: authorization-code flow, PKCE, state/nonce checks, issuer/audience/signature/expiry/verified-email validation, and a short-lived pending-identity proof. This is identity verification only; it does not create an operations session or establish membership.
 - A restricted, authoritative membership register and a secure data adapter for membership records.
 - Actual membership records, membership categories, or an appointed Membership Administrator.
 - Live server-side appointment and delegation loading.
@@ -48,14 +48,14 @@ This document is the execution ledger for the Digital Operations Centre (DOC). I
 
 ### Workstream A — identity and session architecture
 
-1. Implement OIDC authorization-code flow with PKCE, state and nonce validation.
-2. Validate issuer, audience, signature, expiry, nonce, state and verified-email claims.
-3. Persist immutable Google OIDC subject as the identity key; email is a verified contact attribute, not the primary key.
-4. Create server-side session records with rotation, expiry, revocation and secure cookie settings.
-5. Keep provider secrets and signing keys in encrypted deployment secrets; never commit or store them in Notion.
-6. Add negative tests for callback replay, mismatched state/nonce, wrong audience, expired tokens and unverified email.
+1. COMPLETE ON REVIEW BRANCH: OIDC authorization-code flow with PKCE, state and nonce validation.
+2. COMPLETE ON REVIEW BRANCH: issuer, audience, signature, expiry, nonce, state and verified-email claim validation.
+3. PARTIAL: immutable Google OIDC subject is carried in a short-lived signed pending-identity proof; trusted account linking to an approved membership record is not implemented.
+4. NOT IMPLEMENTED: individual server-side session records with rotation, expiry and central revocation. The pending-identity proof is not an operations session.
+5. FOUNDER/INFRASTRUCTURE: keep provider secrets and signing keys in encrypted deployment secrets; no credentials are committed or stored in Notion.
+6. PARTIAL: unit/source regression tests cover OIDC transaction properties and identity-proof boundaries; live provider callback, replay integration and authenticated browser tests remain outstanding.
 
-Exit gate: identity cannot be spoofed from browser-supplied fields; sessions can be revoked centrally; tests pass. Provider client ID, secret, callback URL and approved configuration are required before live sign-in can be enabled.
+Exit gate: trusted membership linking, individual session issuance/revocation, provider-backed integration tests and authenticated browser QA must pass. Google client ID, secret, canonical callback configuration and founder approval are required before live sign-in can be enabled. OIDC verification alone never grants DOC access.
 
 ### Workstream B — membership and governance records
 
