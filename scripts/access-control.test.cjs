@@ -41,12 +41,13 @@ test("appointment grants only its explicit permission", () => {
   const c = context({ appointments: [{
     status: "Active", role: "Secretary General", permissions: ["meetings.read"]
   }] });
-  assert.equal(policy.hasOfficerPermission(c, "meetings.read", now), true);
-  assert.equal(policy.hasOfficerPermission(c, "meetings.approve", now), false);
+  assert.equal(policy.hasOfficerPermission(c, "meetings.read", now, { type: "global" }), true);
+  assert.equal(policy.hasOfficerPermission(c, "meetings.approve", now, { type: "global" }), false);
 });
 test("membership administrator cannot decide without delegation", () => {
   const c = context({ appointments: [{
     status: "Active", role: "Membership Administrator",
+    scope: { type: "global" },
     permissions: ["membership.records.manage"]
   }] });
   assert.equal(policy.canAdministerMembershipRecords(c, now), true);
@@ -113,7 +114,7 @@ test("malformed appointment entries and permission fields fail closed", () => {
   const c = context({ appointments: [null, { status: "Active" }, {
     status: "Active", permissions: "meetings.approve"
   }] });
-  assert.equal(policy.hasOfficerPermission(c, "meetings.approve", now), false);
+  assert.equal(policy.hasOfficerPermission(c, "meetings.approve", now, { type: "global" }), false);
 });
 test("invalid authorization context and invalid clock fail closed", () => {
   assert.equal(policy.checkMemberAccess(null, now).allowed, false);
@@ -152,8 +153,8 @@ test("future and expired appointments do not grant officer access", () => {
     status: "Active", role: "Officer", permissions: ["meetings.read"],
     effectiveUntil: "2026-11-01T00:00:00.000Z"
   }] });
-  assert.equal(policy.hasOfficerPermission(future, "meetings.read", now), false);
-  assert.equal(policy.hasOfficerPermission(expired, "meetings.read", now), false);
+  assert.equal(policy.hasOfficerPermission(future, "meetings.read", now, { type: "global" }), false);
+  assert.equal(policy.hasOfficerPermission(expired, "meetings.read", now, { type: "global" }), false);
 });
 test("unknown or malformed permission values never grant access", () => {
   const c = context({ appointments: [{
@@ -233,6 +234,7 @@ test("dashboard aggregates exclude restricted and unclassified meetings", () => 
 test("membership administrator may read records but cannot decide", () => {
   const c = context({ appointments: [{
     status: "Active", role: "Membership Administrator",
+    scope: { type: "global" },
     permissions: ["membership.records.manage"]
   }] });
   assert.equal(policy.canReadMembershipRecord(c, "another-member", now), true);
@@ -267,10 +269,12 @@ test("President identity alone does not grant record administration", () => {
 test("revoked or expired appointment cannot administer membership records", () => {
   const revoked = context({ appointments: [{
     status: "Revoked", role: "Membership Administrator",
+    scope: { type: "global" },
     permissions: ["membership.records.manage"]
   }] });
   const expired = context({ appointments: [{
     status: "Active", role: "Membership Administrator",
+    scope: { type: "global" },
     permissions: ["membership.records.manage"],
     effectiveUntil: "2026-11-01T00:00:00.000Z"
   }] });
@@ -350,7 +354,7 @@ test("unknown permission identifiers cannot be granted by an appointment", () =>
   const c = context({ appointments: [{
     status: "Active", role: "Officer", permissions: ["superuser.all"]
   }] });
-  assert.equal(policy.hasOfficerPermission(c, "superuser.all", now), false);
+  assert.equal(policy.hasOfficerPermission(c, "superuser.all", now, { type: "global" }), false);
 });
 
 function collectRouteFiles(directory) {
@@ -465,4 +469,55 @@ test("production responses include baseline browser security headers", async () 
   assert.equal(headers["X-Permitted-Cross-Domain-Policies"], "none");
   assert.equal(headers["Permissions-Policy"], "camera=(), microphone=(), geolocation=()");
   assert.equal(headers["Strict-Transport-Security"], "max-age=31536000");
+});
+
+test("department appointment is limited to its assigned department", () => {
+  const c = context({ appointments: [{
+    status: "Active", role: "Department Head",
+    scope: { type: "department", departmentId: "health" },
+    permissions: ["department.manage", "meetings.read"]
+  }] });
+  assert.equal(policy.hasOfficerPermission(c, "department.manage", now,
+    { type: "department", departmentId: "health" }), true);
+  assert.equal(policy.hasOfficerPermission(c, "department.manage", now,
+    { type: "department", departmentId: "education" }), false);
+  assert.equal(policy.hasOfficerPermission(c, "department.manage", now,
+    { type: "global" }), false);
+});
+
+test("department appointment cannot be used when resource scope is omitted", () => {
+  const c = context({ appointments: [{
+    status: "Active", role: "Department Head",
+    scope: { type: "department", departmentId: "health" },
+    permissions: ["department.manage"]
+  }] });
+  assert.equal(policy.hasOfficerPermission(c, "department.manage", now), false);
+});
+
+test("appointment without an explicit scope fails closed", () => {
+  const c = context({ appointments: [{
+    status: "Active", role: "Officer", permissions: ["meetings.read"]
+  }] });
+  assert.equal(policy.hasOfficerPermission(c, "meetings.read", now,
+    { type: "global" }), false);
+});
+
+test("explicit global appointment may access a department resource", () => {
+  const c = context({ appointments: [{
+    status: "Active", role: "National Officer",
+    scope: { type: "global" },
+    permissions: ["department.read"]
+  }] });
+  assert.equal(policy.hasOfficerPermission(c, "department.read", now,
+    { type: "department", departmentId: "civic" }), true);
+});
+
+test("malformed department scope fails closed", () => {
+  const c = context({ appointments: [{
+    status: "Active", role: "Department Head",
+    scope: { type: "department", departmentId: "" },
+    permissions: ["department.manage"]
+  }] });
+  assert.equal(policy.hasOfficerPermission(c, "department.manage", now,
+    { type: "department", departmentId: "health" }), false);
 });
