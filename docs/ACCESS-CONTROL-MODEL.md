@@ -115,3 +115,14 @@ Suspending one member must revoke that member's access without affecting other m
 The current application still uses the shared `ISEYC_STAFF_KEY` gate. Google OIDC, membership records, appointment-based RBAC, individual PIN verification and the public/member/officer route split are not implemented. The existing security-hardening PR is a temporary shared-key improvement, not the final identity solution.
 
 This document is a design specification only. It does not itself create a membership database, appoint an administrator, grant access, or change production behavior.
+
+
+## 11. Appointment scope is mandatory
+
+Every active officer appointment must carry an explicit server-trusted scope:
+- global — an institution-wide appointment whose authority has been explicitly approved and recorded.
+- department — an appointment bound to one immutable department identifier.
+
+A department-scoped appointment is valid only when the protected resource handler supplies the target department identifier and it exactly matches the appointment. Missing resource scope, missing appointment scope, malformed scope or a different department must be denied. Never infer scope from a role title, department label supplied by the browser, or an absent field.
+
+A global appointment may act on department resources only when the trusted appointment record explicitly declares global scope. This is not an automatic property of a Council title or seniority. Resource handlers must derive target department identifiers from the server-side record being accessed, not from untrusted request claims.
