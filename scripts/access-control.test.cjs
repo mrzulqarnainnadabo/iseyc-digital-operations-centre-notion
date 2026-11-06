@@ -1,0 +1,94 @@
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const ts = require("typescript");
+require.extensions[".ts"] = (mod, filename) => {
+  const source = fs.readFileSync(filename, "utf8");
+  const js = ts.transpileModule(source, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS }
+  }).outputText;
+  mod._compile(js, filename);
+};
+const policy = require("../lib/access-control.ts");
+const now = new Date("2026-11-06T12:00:00.000Z");
+const context = (extra = {}) => ({
+  googleSubject: "member",
+  membership: {
+    status: "Approved",
+    googleSubject: "member",
+    emailVerified: true,
+    effectiveFrom: "2026-01-01T00:00:00.000Z",
+    effectiveUntil: "2027-01-01T00:00:00.000Z"
+  },
+  appointments: [],
+  delegations: [],
+  nationalPresidentGoogleSubject: "president",
+  ...extra
+});
+
+test("approved verified linked active member is admitted", () => {
+  assert.deepEqual(policy.checkMemberAccess(context(), now), { allowed: true });
+});
+test("missing membership is denied", () => {
+  assert.equal(policy.checkMemberAccess(context({ membership: null }), now).allowed, false);
+});
+test("membership alone does not grant officer permissions", () => {
+  assert.equal(policy.hasOfficerPermission(context(), "meetings.approve", now), false);
+});
+test("appointment grants only its explicit permission", () => {
+  const c = context({ appointments: [{
+    status: "Active", role: "Secretary General", permissions: ["meetings.read"]
+  }] });
+  assert.equal(policy.hasOfficerPermission(c, "meetings.read", now), true);
+  assert.equal(policy.hasOfficerPermission(c, "meetings.approve", now), false);
+});
+test("membership administrator cannot decide without delegation", () => {
+  const c = context({ appointments: [{
+    status: "Active", role: "Membership Administrator",
+    permissions: ["membership.records.manage"]
+  }] });
+  assert.equal(policy.canAdministerMembershipRecords(c, now), true);
+  assert.equal(policy.canDecideMembership(c, "approve", now), false);
+});
+test("President cannot bypass membership verification", () => {
+  const c = context({ googleSubject: "president", membership: null });
+  assert.equal(policy.canDecideMembership(c, "approve", now), false);
+});
+test("President with active membership can decide and manage delegations", () => {
+  const c = context({
+    googleSubject: "president",
+    membership: {
+      status: "Approved", googleSubject: "president", emailVerified: true,
+      effectiveFrom: "2026-01-01T00:00:00.000Z",
+      effectiveUntil: "2027-01-01T00:00:00.000Z"
+    }
+  });
+  assert.equal(policy.canDecideMembership(c, "approve", now), true);
+  assert.equal(policy.canManageMembershipDelegations(c, now), true);
+});
+test("delegate receives only current explicit decision scope", () => {
+  const c = context({ delegations: [{
+    delegateGoogleSubject: "member", grantedByGoogleSubject: "president",
+    decisionScopes: ["approve"], effectiveFrom: "2026-10-01T00:00:00.000Z",
+    effectiveUntil: "2026-12-01T00:00:00.000Z"
+  }] });
+  assert.equal(policy.canDecideMembership(c, "approve", now), true);
+  assert.equal(policy.canDecideMembership(c, "suspend", now), false);
+});
+test("revoked delegation is denied", () => {
+  const c = context({ delegations: [{
+    delegateGoogleSubject: "member", grantedByGoogleSubject: "president",
+    decisionScopes: ["approve"], effectiveFrom: "2026-10-01T00:00:00.000Z",
+    effectiveUntil: "2026-12-01T00:00:00.000Z",
+    revokedAt: "2026-11-01T00:00:00.000Z"
+  }] });
+  assert.equal(policy.canDecideMembership(c, "approve", now), false);
+});
+test("member can read own record but not another member's", () => {
+  assert.equal(policy.canReadMembershipRecord(context(), "member", now), true);
+  assert.equal(policy.canReadMembershipRecord(context(), "other", now), false);
+});
+test("governance actor must match authenticated subject", () => {
+  assert.equal(policy.canAttributeGovernanceAction(context(), "member"), true);
+  assert.equal(policy.canAttributeGovernanceAction(context(), "imposter"), false);
+});
