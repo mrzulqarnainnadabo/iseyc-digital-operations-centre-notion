@@ -15,7 +15,12 @@ on:
       - ".github/workflows/doc-policy-tests.yml"
   push:
     branches:
-      - "feat/doc-public-member-officer-access"
+      - "main"
+  workflow_dispatch:
+
+concurrency:
+  group: doc-policy-tests-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -23,6 +28,7 @@ permissions:
 jobs:
   authorization-policy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
