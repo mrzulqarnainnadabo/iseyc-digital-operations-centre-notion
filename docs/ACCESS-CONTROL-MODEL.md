@@ -112,7 +112,7 @@ Suspending one member must revoke that member's access without affecting other m
 
 ## 10. Current implementation status
 
-The current application still uses the shared `ISEYC_STAFF_KEY` gate. Google OIDC, membership records, appointment-based RBAC, individual PIN verification and the public/member/officer route split are not implemented. The existing security-hardening PR is a temporary shared-key improvement, not the final identity solution.
+The current application still retains the transitional `ISEYC_STAFF_KEY` gate. An opt-in Google OIDC identity-verification flow has now been implemented on the feature branch, including state, nonce, PKCE, issuer/audience/signature checks and a pinned canonical application origin. It is disabled until provider credentials and the canonical DOC host are configured. The verified Google subject is held only in a short-lived pending-identity proof that does not grant access to `/ops` or any API. Trusted membership records, appointment-based RBAC, durable session revocation, individual PIN verification, audit persistence and the complete public/member/officer route split remain unimplemented. The shared-key path remains transitional and is not the final identity solution.
 
 This document is a design specification only. It does not itself create a membership database, appoint an administrator, grant access, or change production behavior.
 
