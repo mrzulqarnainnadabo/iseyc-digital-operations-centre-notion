@@ -523,3 +523,86 @@ test("malformed department scope fails closed", () => {
   assert.equal(policy.hasOfficerPermission(c, "department.manage", now,
     { type: "department", departmentId: "health" }), false);
 });
+
+
+const auth = require("../lib/auth.ts");
+const { createHmac, randomBytes } = require("node:crypto");
+
+test("signed staff sessions accept valid tokens and reject tampering", () => {
+  const previous = process.env.ISEYC_STAFF_KEY;
+  process.env.ISEYC_STAFF_KEY = "test-only-key-with-sufficient-entropy";
+  try {
+    const token = auth.signSession(process.env.ISEYC_STAFF_KEY);
+    assert.equal(auth.verifySessionToken(token), true);
+    const parts = token.split(".");
+    parts[2] = "0".repeat(64);
+    assert.equal(auth.verifySessionToken(parts.join(".")), false);
+    assert.equal(auth.verifySessionToken(token + ".extra"), false);
+  } finally {
+    if (previous === undefined) delete process.env.ISEYC_STAFF_KEY;
+    else process.env.ISEYC_STAFF_KEY = previous;
+  }
+});
+
+test("signed staff sessions reject malformed nonce and signature encodings", () => {
+  const previous = process.env.ISEYC_STAFF_KEY;
+  const secret = "test-only-key-with-sufficient-entropy";
+  process.env.ISEYC_STAFF_KEY = secret;
+  try {
+    const issuedAt = Math.floor(Date.now() / 1000);
+    const sign = (nonce) => {
+      const payload = `${issuedAt}.${nonce}`;
+      const signature = createHmac("sha256", secret)
+        .update(`doc-session:${payload}`).digest("hex");
+      return `${payload}.${signature}`;
+    };
+    assert.equal(auth.verifySessionToken(sign("short")), false);
+    assert.equal(auth.verifySessionToken(sign("!").padEnd(22, "!")), false);
+    const validNonce = randomBytes(16).toString("base64url");
+    const malformedSignature = `${issuedAt}.${validNonce}.${"A".repeat(64)}`;
+    assert.equal(auth.verifySessionToken(malformedSignature), false);
+  } finally {
+    if (previous === undefined) delete process.env.ISEYC_STAFF_KEY;
+    else process.env.ISEYC_STAFF_KEY = previous;
+  }
+});
+
+test("signed staff sessions reject expired and implausibly future timestamps", () => {
+  const previous = process.env.ISEYC_STAFF_KEY;
+  const secret = "test-only-key-with-sufficient-entropy";
+  process.env.ISEYC_STAFF_KEY = secret;
+  try {
+    const nonce = randomBytes(16).toString("base64url");
+    const signedAt = (timestamp) => {
+      const payload = `${timestamp}.${nonce}`;
+      const signature = createHmac("sha256", secret)
+        .update(`doc-session:${payload}`).digest("hex");
+      return `${payload}.${signature}`;
+    };
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    assert.equal(auth.verifySessionToken(signedAt(nowSeconds - 13 * 60 * 60)), false);
+    assert.equal(auth.verifySessionToken(signedAt(nowSeconds + 120)), false);
+    assert.equal(auth.verifySessionToken(signedAt(nowSeconds + 30)), true);
+  } finally {
+    if (previous === undefined) delete process.env.ISEYC_STAFF_KEY;
+    else process.env.ISEYC_STAFF_KEY = previous;
+  }
+});
+
+test("every operational page inherits the authenticated operations layout", () => {
+  const root = require("node:path").join(__dirname, "../app/ops");
+  const layout = fs.readFileSync(require("node:path").join(root, "layout.tsx"), "utf8");
+  assert.ok(layout.includes("requireStaffSession"), "operations layout must verify staff session");
+  assert.ok(layout.includes('redirect("/login")'), "unauthenticated operations visits must redirect");
+  const pages = [];
+  const walk = (directory) => {
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      const full = require("node:path").join(directory, entry.name);
+      if (entry.isDirectory() && entry.name !== "api") walk(full);
+      else if (entry.isFile() && entry.name === "page.tsx") pages.push(full);
+    }
+  };
+  walk(root);
+  assert.ok(pages.length > 0, "operations page inventory should not be empty");
+  assert.ok(pages.every((page) => page.startsWith(root)), "all operations pages must be inside the protected route group");
+});
