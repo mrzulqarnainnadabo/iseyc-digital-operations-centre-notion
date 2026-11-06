@@ -101,10 +101,7 @@ export default function QueuePage() {
           <ErrorState message={error} onRetry={() => setReloadKey((value) => value + 1)} />
         ) : !visibleMeetings.length ? (
           <EmptyState
-            title={meetings.length ? "No records match this filter." : "No items awaiting review."}
-            description={meetings.length ? "Choose another status to see other records." : "The connected meeting register returned no visible Standard records. This does not mean there are no institutional matters outside this register."}
-            actionHref={!meetings.length ? "/ops/intake" : undefined}
-            actionLabel={!meetings.length ? "Create meeting intake" : undefined}
+            title={meetings.length ? "No matching items" : "No items"}
           />
         ) : (
           <ul className="space-y-2">
@@ -127,10 +124,7 @@ export default function QueuePage() {
         )}
       </section>
 
-      <section className="rounded-card border border-line bg-white p-4">
-        <p className="text-sm font-semibold text-forest-950">Decision controls are restricted</p>
-        <p className="mt-1 text-sm leading-5 text-ink-600">Accept, edit, return and reject controls remain unavailable to transitional shared-key sessions. They require verified individual identity, explicit appointment scope, permission checks and a durable audit record. This interface will not simulate those decisions.</p>
-      </section>
+      <p className="text-xs text-ink-600" role="status">Decision actions unavailable · Authority not connected</p>
     </div>
   );
 }
