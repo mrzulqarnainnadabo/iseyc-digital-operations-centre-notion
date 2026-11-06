@@ -50,7 +50,7 @@ test("every operations page is covered by the authenticated operations layout", 
 
 test("civic navigation uses the canonical Observatory deployment hostname", () => {
   const observatoryLinks = DOC_NAV.filter((item) =>
-    item.label.includes("Observatory") || item.label.endsWith("Department")
+    item.label.includes("Observatory") || item.group === "Departments"
   );
   assert.ok(observatoryLinks.length >= 5);
   for (const item of observatoryLinks) {
