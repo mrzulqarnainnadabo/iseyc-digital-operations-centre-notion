@@ -25,6 +25,21 @@ const contracts = {
     required: ["isSameOriginRequest", "SESSION_COOKIE", "privateJson"],
     forbidden: []
   },
+  "auth/oidc/start/route.ts": {
+    methods: ["GET"],
+    required: ["googleOidcConfigured", "createOidcTransaction", "privateResponseHeaders"],
+    forbidden: []
+  },
+  "auth/oidc/callback/route.ts": {
+    methods: ["GET"],
+    required: ["googleOidcConfigured", "safeEqual", "verifyGoogleIdToken", "signPendingIdentity", "privateResponseHeaders"],
+    forbidden: []
+  },
+  "auth/oidc/status/route.ts": {
+    methods: ["GET"],
+    required: ["privateJson", "verifyPendingIdentity", "accessGranted: false"],
+    forbidden: []
+  },
   "meetings/route.ts": {
     methods: ["GET", "POST"],
     required: ["requireStaffSession", "privateJson", "configFlags", "legacySessionCanReadMeeting", "legacySessionCanCreateMeeting"],
