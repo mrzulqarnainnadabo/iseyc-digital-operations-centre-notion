@@ -6,7 +6,7 @@ Proper DOC product on **Notion + Vercel** (Supabase removed by design).
 
 Institutional Digital Operations Centre:
 
-1. Officer sign-in (staff key → session)
+1. Transitional shared-key access plus opt-in Google OIDC identity verification (Google identity alone does not grant member or officer access)
 2. Command Brief
 3. **Meeting intake → queue → human approve** (Notion)
 4. Chamber / Media / Actions module slots (same pattern next)
@@ -24,3 +24,10 @@ Institutional Digital Operations Centre:
 - Not the thin Command Hub shell
 - Not Supabase
 - Not a public campaign site
+
+
+## Individual identity verification (opt-in, not access authorisation)
+
+The feature branch includes a Google OpenID Connect identity-verification flow. It is disabled unless `DOC_GOOGLE_CLIENT_ID`, `DOC_GOOGLE_CLIENT_SECRET` and a separate `DOC_SESSION_SECRET` (at least 32 bytes) are configured. Register the exact callback URL `https://<DOC-host>/api/auth/oidc/callback` in the Google OAuth client.
+
+Google identity verification alone does **not** grant access to the command desk. The flow creates a short-lived pending-identity proof only; the operations layout and APIs do not accept that proof as a session. Trusted ISEYC membership, current appointment, scoped permissions, revocation and durable audit integration remain release gates. No production environment settings are changed by this repository work.

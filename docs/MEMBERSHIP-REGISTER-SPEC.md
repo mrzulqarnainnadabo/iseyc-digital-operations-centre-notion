@@ -1,6 +1,6 @@
 # Membership Register — Data and Permission Specification
 
-Status: schema specification only. The register has not yet been created or connected to the DOC application.
+Status: schema specification only. No dedicated membership register was found in the inspected Notion DOC workspace, and no membership database is connected to the application. The Field Register Desk is an unrelated event RSVP / activities / participants workspace and must not be repurposed as a membership register.
 
 ## Governance owner
 
@@ -104,3 +104,27 @@ A verified active member may receive only a minimal membership summary for their
 The National President and an appointed Membership Administrator may access the restricted operational register only through server-side authorization. A Membership Administrator's access is limited to intake, verification, record maintenance and recommendations; it does not grant decision authority. Any API returning membership records must apply this rule independently of UI navigation and must emit a minimal response DTO.
 
 Audit events must identify the authenticated actor from the verified server session. The actor identity must not be accepted from a browser-supplied request field.
+
+
+## Notion workspace discovery — 6 November 2026
+
+A targeted search of the connected Notion workspace did not identify a dedicated ISEYC Membership Register or member-identity data source.
+
+The similarly named **ISEYC Field Register Desk** is for a separate foundation's event RSVPs, programme activities and participants. It is not an ISEYC membership register and must not be repurposed for member sign-in, membership approval or DOC authorization.
+
+The existing **IDCC — Appointment & Role Register** contains 11 role-template rows; all 11 are in Template status and none has an appointee name. It is not a membership source. Do not treat a role template as an appointment or membership record.
+
+Therefore, the membership source remains absent. The DOC must fail closed for Google identities until a dedicated restricted membership source is approved, created, permissioned and populated by authorised humans.
+
+## Confirmed identity direction and separate PIN gate
+
+The current Notion identity/access decision draft records the National President's direction:
+- Each person uses their own personal Google account; shared Gmail accounts are not acceptable.
+- An institutional Workspace email domain is not required.
+- Google OIDC verifies identity; the immutable Google subject is the durable identity key.
+- Membership approval and appointment mapping are separate from Google authentication.
+- An individual six-digit DOC PIN is intended as an additional DOC factor, not a substitute for Google MFA.
+
+The PIN implementation remains blocked on a restricted PIN-hash store, a server-side pepper held in encrypted deployment secrets, distributed rate limiting/lockout, recovery policy and audit events. Do not store raw PINs or put PIN hashes in an ordinary membership register. The implementation provider has not been selected or configured.
+
+The current code branch only verifies Google identity and issues a short-lived pending-identity proof. It does not create membership, grant DOC access, or complete the PIN challenge.

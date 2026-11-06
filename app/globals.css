@@ -1,10 +1,38 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-:root { color-scheme: light; scroll-behavior: smooth; }
-body { @apply bg-[#f7f3e9] text-[#16201b] antialiased; }
-::selection { background: #c4a35a; color: #072a20; }
+
+:root {
+  color-scheme: light;
+  --iseyc-forest-950: #123b2f;
+  --iseyc-forest-900: #123b2f;
+  --iseyc-forest-800: #194b3b;
+  --iseyc-forest-100: #e8f0ea;
+  --iseyc-cream-50: #faf9f5;
+  --iseyc-white: #ffffff;
+  --iseyc-ink-950: #202923;
+  --iseyc-ink-700: #626d65;
+  --iseyc-ink-600: #626d65;
+  --iseyc-gold-600: #a7833f;
+  --iseyc-border: #e4e6df;
+  --iseyc-success: #28664a;
+  --iseyc-warning: #93651d;
+  --iseyc-danger: #a43d37;
+  --radius-card: 12px;
+  --radius-control: 9px;
+  --shadow-card: 0 1px 2px rgb(16 47 38 / 5%), 0 8px 24px rgb(16 47 38 / 4%);
+}
+html { scroll-behavior: smooth; }
+body { @apply antialiased; background: var(--iseyc-cream-50); color: var(--iseyc-ink-950); }
+::selection { background: #d8c49a; color: var(--iseyc-forest-950); }
+:focus-visible { outline: 3px solid #b68e48; outline-offset: 3px; }
+button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
 @media (prefers-reduced-motion: reduce) {
-  :root { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

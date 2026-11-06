@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { privateJson } from "@/lib/private-response";
 import { requireStaffSession } from "@/lib/auth";
 import { isSameOriginRequest, readBoundedJson } from "@/lib/request-security";
-import { createMeeting, listMeetings } from "@/lib/notion";
+import { configFlags, createMeeting, listMeetings } from "@/lib/notion";
 import { legacySessionCanCreateMeeting, legacySessionCanReadMeeting } from "@/lib/legacy-session-boundary";
 
 export const runtime = "nodejs";
@@ -11,6 +11,14 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   if (!(await requireStaffSession())) {
     return privateJson({ ok: false, error: "Unauthorized" }, { status: 401 });
+  }
+
+  const flags = configFlags();
+  if (!flags.token || !flags.meetings) {
+    return privateJson(
+      { ok: false, error: "The Notion Meetings source is not configured." },
+      { status: 503 }
+    );
   }
 
   try {

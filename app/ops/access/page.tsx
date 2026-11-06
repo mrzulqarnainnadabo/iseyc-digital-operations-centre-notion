@@ -2,9 +2,9 @@ import Link from "next/link";
 
 const controls = [
   {
-    title: "Individual identity",
-    state: "Not implemented",
-    description: "Personal Google sign-in and verified identity linking are not yet available.",
+    title: "Google identity verification",
+    state: "Implemented · not configured",
+    description: "The feature branch includes Google OIDC verification. Provider credentials are not configured, and verified identity does not grant membership or officer access.",
   },
   {
     title: "Membership register",
@@ -21,13 +21,18 @@ const controls = [
     state: "Not enabled",
     description: "Membership decisions remain reserved to the National President unless a specific written delegation is recorded.",
   },
+  {
+    title: "Individual DOC PIN",
+    state: "Crypto primitive only",
+    description: "Scrypt hashing and verification are implemented in code. Enrollment, restricted storage, distributed lockout, recovery, audit and step-up routes are not connected.",
+  },
 ];
 
 const departments = [
   "Education & Capacity Building",
   "Health & Well-being",
-  "Software & Technology",
-  "Civic Department",
+  "Digital Systems & Technology",
+  "Civic Affairs",
 ];
 
 export default function Page() {
