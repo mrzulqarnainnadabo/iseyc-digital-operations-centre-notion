@@ -32,3 +32,5 @@ jobs:
         run: npm test
       - name: Type-check application
         run: npx tsc --noEmit
+      - name: Build production application
+        run: npm run build
