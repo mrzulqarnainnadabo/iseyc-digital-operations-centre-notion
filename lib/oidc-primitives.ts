@@ -6,6 +6,11 @@ export const OIDC_VERIFIER_COOKIE = "iseyc_doc_oidc_verifier";
 export const PENDING_IDENTITY_COOKIE = "iseyc_doc_identity_pending";
 const PENDING_TTL_SECONDS = 15 * 60;
 
+function validIdentityClaims(subject: unknown, email: unknown): subject is string {
+  return typeof subject === "string" && subject.length > 0 && subject.length <= 255 &&
+    typeof email === "string" && email.length <= 254 && /^[^\\s@]+@[^\\s@]+$/.test(email);
+}
+
 export function docAppOrigin(): string | null {
   const raw = process.env.DOC_APP_URL?.trim();
   if (!raw) return null;
@@ -52,7 +57,7 @@ export function safeEqual(left: string, right: string): boolean {
  */
 export function signPendingIdentity(subject: string, email: string): string {
   const secret = process.env.DOC_IDENTITY_PROOF_SECRET;
-  if (!secret || Buffer.byteLength(secret) < 32 || !subject || !email || !email.includes("@")) {
+  if (!secret || Buffer.byteLength(secret) < 32 || !validIdentityClaims(subject, email)) {
     throw new Error("Pending identity signing is not configured");
   }
   const issuedAt = Math.floor(Date.now() / 1000);
@@ -80,8 +85,7 @@ export function readPendingIdentity(token: string | undefined): PendingIdentity 
       sub?: unknown; email?: unknown; iat?: unknown; exp?: unknown;
     };
     const now = Math.floor(Date.now() / 1000);
-    return typeof payload.sub === "string" && payload.sub.length > 0 &&
-      typeof payload.email === "string" && payload.email.includes("@") &&
+    return validIdentityClaims(payload.sub, payload.email) &&
       Number.isSafeInteger(payload.iat) && Number.isSafeInteger(payload.exp) &&
       Number(payload.iat) <= now + 30 && Number(payload.exp) > now &&
       Number(payload.exp) - Number(payload.iat) <= PENDING_TTL_SECONDS
