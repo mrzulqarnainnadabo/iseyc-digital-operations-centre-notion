@@ -37,7 +37,7 @@ export default async function DepartmentDeskPage({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="font-serif text-2xl text-forest-950 sm:text-3xl">{record.name}</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-600">{record.remit}</p>
+            
           </div>
           <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-ink-700">Not operational</span>
         </div>
@@ -66,7 +66,7 @@ export default async function DepartmentDeskPage({
       <section className="rounded-card border border-line bg-white p-4 shadow-card">
         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Published public references</p>
         <h2 className="mt-1 text-base font-semibold text-forest-950">External civic systems</h2>
-        <p className="mt-1 text-sm leading-5 text-ink-600">Only published public information is linked. Internal submissions and department deliberations remain private.</p>
+        
         <div className="mt-3 flex flex-wrap gap-2">
           <a href="https://2027-street-mandate.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center rounded-control border border-line px-3 text-sm font-semibold text-forest-800">Civic Mandate ↗</a>
           <a href="https://iseyc-civic-brain.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center rounded-control border border-line px-3 text-sm font-semibold text-forest-800">Civic Brain ↗</a>
