@@ -6,7 +6,7 @@ Proper DOC product on **Notion + Vercel** (Supabase removed by design).
 
 Institutional Digital Operations Centre:
 
-1. Officer sign-in (staff key → session)
+1. Transitional shared-key access plus opt-in Google OIDC identity verification (Google identity alone does not grant member or officer access)
 2. Command Brief
 3. **Meeting intake → queue → human approve** (Notion)
 4. Chamber / Media / Actions module slots (same pattern next)
