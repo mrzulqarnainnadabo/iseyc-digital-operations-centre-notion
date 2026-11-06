@@ -126,12 +126,35 @@ export default async function CommandBriefPage() {
         </Link>
       </section>
 
-      <section className="rounded-card border border-line bg-forest-100/70 p-4 sm:p-5">
+      <section aria-labelledby="environment-heading" className="rounded-card border border-line bg-white p-4">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Configuration indicators</p>
+          <h2 id="environment-heading" className="mt-1 text-sm font-semibold text-forest-950">Environment configuration</h2>
+          <p className="mt-1 text-xs leading-5 text-ink-600">These indicators confirm only that environment values are present. They do not verify database connectivity, permissions or workflow readiness.</p>
+        </div>
+        <ul className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+          {([
+            ["Staff key", flags.staffKey],
+            ["Notion token", flags.token],
+            ["Meetings database", flags.meetings],
+            ["Media database", flags.media],
+            ["Chamber database", flags.chamber],
+            ["Actions database", flags.actions],
+          ] as const).map(([label, configured]) => (
+            <li key={label} className="flex min-h-[40px] items-center justify-between rounded-control border border-line px-3">
+              <span className="text-ink-700">{label}</span>
+              <span className={configured ? "font-semibold text-forest-800" : "text-ink-600"}>{configured ? "Configured" : "Not configured"}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="rounded-card border border-line bg-forest-100 p-4 sm:p-5">
         <p className="text-sm font-semibold text-forest-950">Published civic systems</p>
         <p className="mt-1 text-sm leading-5 text-ink-700">These links open their public surfaces. They do not expose private submissions or internal officer records.</p>
         <div className="mt-3 flex flex-wrap gap-2">
-          <a href="https://2027-street-mandate.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center rounded-control border border-forest-900/20 bg-white px-3 text-sm font-semibold text-forest-900">Civic Mandate ↗</a>
-          <a href="https://iseyc-civic-brain.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center rounded-control border border-forest-900/20 bg-white px-3 text-sm font-semibold text-forest-900">Civic Brain ↗</a>
+          <a href="https://2027-street-mandate.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center rounded-control border border-forest-900 bg-white px-3 text-sm font-semibold text-forest-900">Civic Mandate ↗</a>
+          <a href="https://iseyc-civic-brain.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center rounded-control border border-forest-900 bg-white px-3 text-sm font-semibold text-forest-900">Civic Brain ↗</a>
         </div>
       </section>
     </div>
