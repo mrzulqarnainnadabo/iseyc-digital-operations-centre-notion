@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { privateResponseHeaders } from "@/lib/private-response";
 import {
   googleOidcConfigured,
   OIDC_NONCE_COOKIE,
@@ -21,7 +22,7 @@ function clearTransactionCookies(response: NextResponse) {
 
 function loginRedirect(origin: string, result: string) {
   const response = NextResponse.redirect(new URL(`/login?oidc=${result}`, origin));
-  response.headers.set("Cache-Control", "no-store");
+  for (const [name, value] of privateResponseHeaders(response.headers)) response.headers.set(name, value);
   clearTransactionCookies(response);
   return response;
 }
