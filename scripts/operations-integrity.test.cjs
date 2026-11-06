@@ -113,3 +113,46 @@ test("institutional design tokens and reduced-motion accessibility are present",
   assert.match(dashboard, /Not operational/);
   assert.match(dashboard, /Published civic systems/);
 });
+
+
+test("department desks and Day-1 packet do not imply staffing or appointments", () => {
+  const department = fs.readFileSync(path.join(opsRoot, "departments/[department]/page.tsx"), "utf8");
+  const seat = fs.readFileSync(path.join(opsRoot, "seat/page.tsx"), "utf8");
+  assert.match(department, /Not operational/);
+  assert.match(department, /task register not connected/i);
+  assert.match(department, /does not imply that a department head or staff member has been appointed/i);
+  for (const name of [
+    "Education & Capacity Building",
+    "Health & Well-being",
+    "Digital Systems & Technology",
+    "Civic Affairs"
+  ]) assert.ok(department.includes(name));
+  assert.match(seat, /No active appointment record is linked to this session/);
+  assert.match(seat, /generic onboarding framework/i);
+  assert.match(seat, /AI is staff to the seat, never the seat-holder/);
+});
+
+test("AI draft and human decision components preserve the authority boundary", () => {
+  const ai = fs.readFileSync(path.join(root, "components/AIDraftBanner.tsx"), "utf8");
+  const decisions = fs.readFileSync(path.join(root, "components/HumanDecisionPanel.tsx"), "utf8");
+  const status = fs.readFileSync(path.join(root, "components/StatusBadge.tsx"), "utf8");
+  assert.match(ai, /AI draft — not an institutional decision/);
+  assert.match(decisions, /Accept/);
+  assert.match(decisions, /Edit/);
+  assert.match(decisions, /Return/);
+  assert.match(decisions, /Reject/);
+  assert.match(decisions, /disabled/);
+  assert.match(decisions, /scoped appointment permissions/);
+  for (const label of ["Operational", "Partial", "Not operational", "Published", "Draft", "Awaiting human review", "Verified"]) {
+    assert.ok(status.includes(label), `Missing status style: ${label}`);
+  }
+});
+
+test("public gate remains a private access gate with published-only links", () => {
+  const gate = fs.readFileSync(path.join(root, "app/page.tsx"), "utf8");
+  assert.match(gate, /Private institutional workspace/);
+  assert.match(gate, /Authorised access is required/);
+  assert.match(gate, /Civic Mandate/);
+  assert.match(gate, /Civic Brain/);
+  assert.doesNotMatch(gate, /members nationwide|national impact|campaign/i);
+});
