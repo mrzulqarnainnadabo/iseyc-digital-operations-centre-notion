@@ -95,6 +95,8 @@ test("Google OIDC callback validates state, PKCE, nonce, issuer, audience and ve
   assert.match(callback, /verifyGoogleIdToken/);
   assert.match(helper, /issuer: GOOGLE_ISSUERS/);
   assert.match(helper, /audience: clientId/);
+  assert.match(helper, /maxTokenAge: "10m"/);
+  assert.match(helper, /payload\\.azp !== clientId/);
   assert.match(helper, /payload\.email_verified !== true/);
   assert.match(helper, /payload\.nonce/);
 });
