@@ -128,3 +128,20 @@ DOC database identifiers are canonicalized by removing UUID hyphens and lowercas
 The meeting status adapter independently retrieves the target page immediately before mutation and verifies that its parent database is the configured internal Meetings database. Route-level session, same-origin, sensitivity and transition checks remain required; this adapter-level parent check is defence in depth, not a substitute for authorization.
 
 Regression tests cover uppercase/hyphenated variants of the blocked public database ID and ensure the status adapter verifies the database parent before calling the Notion update API.
+
+
+## Google OIDC identity verification (implemented, not yet enabled)
+
+The feature branch now contains an opt-in Google OpenID Connect authorization-code flow with:
+- Independent random state and nonce values.
+- PKCE using S256.
+- Short-lived, HttpOnly, SameSite=Lax transaction cookies.
+- Server-side code exchange over HTTPS.
+- Google JWKS signature verification with issuer, audience, expiry, nonce and verified-email checks.
+- A short-lived, signed identity-pending cookie containing only the provider subject.
+
+**Critical boundary:** the pending identity cookie is not accepted by `requireStaffSession`, does not open `/ops`, does not grant member access, and does not carry an appointment or permission. The status endpoint explicitly returns `accessGranted: false`. Google proves control of an identity; ISEYC must still match that subject to a trusted, active membership record and separately verify any current appointment and scope.
+
+The flow is disabled unless `DOC_GOOGLE_CLIENT_ID`, `DOC_GOOGLE_CLIENT_SECRET` and a distinct `DOC_SESSION_SECRET` of at least 32 bytes are configured. No production environment variables have been changed. The Google OAuth client must register the exact callback URL `https://<DOC-host>/api/auth/oidc/callback` before the flow can be exercised.
+
+Still outstanding: trusted membership/appointment source, account-linking and recovery policy, per-person server sessions with revocation, permission checks on every protected route, durable audit persistence, and distributed rate limiting for the legacy shared-key endpoint. Do not treat this identity-verification slice as officer authentication or production access control.
