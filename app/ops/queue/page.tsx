@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { StatusBadge } from "@/components/StatusBadge";
+import { EmptyState, ErrorState, LoadingState } from "@/components/QueueStates";
 
 type Meeting = {
   id: string;
@@ -23,11 +24,10 @@ export default function QueuePage() {
     const controller = new AbortController();
     setLoading(true);
     setError(null);
-
     fetch("/api/meetings", { cache: "no-store", signal: controller.signal })
-      .then(async (res) => {
-        const data: unknown = await res.json();
-        if (!res.ok) {
+      .then(async (response) => {
+        const data: unknown = await response.json();
+        if (!response.ok) {
           const message = data && typeof data === "object" && typeof (data as { error?: unknown }).error === "string"
             ? (data as { error: string }).error
             : "The meeting queue could not be loaded.";
@@ -45,7 +45,6 @@ export default function QueuePage() {
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
       });
-
     return () => controller.abort();
   }, [reloadKey]);
 
@@ -64,9 +63,7 @@ export default function QueuePage() {
           <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-600">A single review surface for records submitted to the Notion-backed meeting workflow. A queue item is not an institutional decision.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => setReloadKey((value) => value + 1)} disabled={loading} className="inline-flex min-h-[44px] items-center rounded-control border border-line bg-white px-4 text-sm font-semibold text-ink-700 disabled:opacity-50">
-            {loading ? "Refreshing…" : "Refresh queue"}
-          </button>
+          <button type="button" onClick={() => setReloadKey((value) => value + 1)} disabled={loading} className="inline-flex min-h-[44px] items-center rounded-control border border-line bg-white px-4 text-sm font-semibold text-ink-700 disabled:opacity-50">{loading ? "Refreshing…" : "Refresh queue"}</button>
           <Link href="/ops/intake" className="inline-flex min-h-[44px] items-center rounded-control bg-forest-900 px-4 text-sm font-semibold text-white hover:bg-forest-800">New intake</Link>
         </div>
       </header>
@@ -84,7 +81,7 @@ export default function QueuePage() {
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-3" aria-label="Queue summary">
         <div className="rounded-card border border-line bg-white p-4">
           <p className="text-xs text-ink-600">Records loaded</p>
-          <p className="mt-1 font-serif text-2xl tabular-nums">{loading ? "—" : error ? "—" : meetings.length}</p>
+          <p className="mt-1 font-serif text-2xl tabular-nums">{loading || error ? "—" : meetings.length}</p>
         </div>
         <div className="rounded-card border border-line bg-white p-4">
           <p className="text-xs text-ink-600">Awaiting review</p>
@@ -103,33 +100,22 @@ export default function QueuePage() {
           <label className="flex min-h-[44px] items-center gap-2 text-sm text-ink-700">
             <span className="sr-only">Filter records by status</span>
             <select value={filter} onChange={(event) => setFilter(event.target.value)} className="min-h-[44px] rounded-control border border-line bg-white px-3 text-sm">
-              <option>All</option>
-              <option>New</option>
-              <option>Draft</option>
-              <option>In review</option>
-              <option>Approved</option>
-              <option>Archived</option>
+              <option>All</option><option>New</option><option>Draft</option><option>In review</option><option>Approved</option><option>Archived</option>
             </select>
           </label>
         </div>
 
         {loading ? (
-          <div className="rounded-card border border-line bg-white p-5" role="status">
-            <div className="h-4 w-36 animate-pulse rounded bg-slate-200" />
-            <div className="mt-3 h-3 w-3/4 animate-pulse rounded bg-slate-100" />
-            <div className="mt-5 h-12 rounded-control bg-slate-100" />
-          </div>
+          <LoadingState label="Loading approval queue" />
         ) : error ? (
-          <div className="rounded-card border border-amber-200 bg-amber-50 p-4" role="alert">
-            <p className="text-sm text-amber-950">{error}</p>
-            <button type="button" onClick={() => setReloadKey((value) => value + 1)} className="mt-3 min-h-[44px] font-semibold text-amber-950 underline">Retry</button>
-          </div>
+          <ErrorState message={error} onRetry={() => setReloadKey((value) => value + 1)} />
         ) : !visibleMeetings.length ? (
-          <div className="rounded-card border border-dashed border-line bg-white px-5 py-10 text-center">
-            <p className="font-semibold text-ink-950">{meetings.length ? "No records match this filter." : "No items awaiting review."}</p>
-            <p className="mx-auto mt-2 max-w-md text-sm leading-5 text-ink-600">{meetings.length ? "Choose another status to see other records." : "The connected meeting register returned no visible Standard records. This does not mean there are no institutional matters outside this register."}</p>
-            {!meetings.length ? <Link href="/ops/intake" className="mt-4 inline-flex min-h-[44px] items-center rounded-control bg-forest-900 px-4 text-sm font-semibold text-white">Create meeting intake</Link> : null}
-          </div>
+          <EmptyState
+            title={meetings.length ? "No records match this filter." : "No items awaiting review."}
+            description={meetings.length ? "Choose another status to see other records." : "The connected meeting register returned no visible Standard records. This does not mean there are no institutional matters outside this register."}
+            actionHref={!meetings.length ? "/ops/intake" : undefined}
+            actionLabel={!meetings.length ? "Create meeting intake" : undefined}
+          />
         ) : (
           <ul className="space-y-2">
             {visibleMeetings.map((meeting) => (
