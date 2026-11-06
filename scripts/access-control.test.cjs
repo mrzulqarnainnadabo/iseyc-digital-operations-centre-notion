@@ -198,8 +198,8 @@ test("legacy shared session cannot create restricted meetings", () => {
 });
 test("legacy shared session cannot approve meeting records", () => {
   assert.equal(legacyBoundary.legacySessionCanSetMeetingStatus("In review"), true);
-  assert.equal(legacyBoundary.legacySessionCanSetMeetingStatus("Archived"), true);
-  assert.equal(legacyBoundary.legacySessionCanSetMeetingStatus("Draft"), true);
+  assert.equal(legacyBoundary.legacySessionCanSetMeetingStatus("Archived"), false);
+  assert.equal(legacyBoundary.legacySessionCanSetMeetingStatus("Draft"), false);
   assert.equal(legacyBoundary.legacySessionCanSetMeetingStatus("Approved"), false);
   assert.equal(legacyBoundary.legacySessionCanSetMeetingStatus("unknown"), false);
 });
