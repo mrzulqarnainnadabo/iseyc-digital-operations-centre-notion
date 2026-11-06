@@ -69,8 +69,8 @@ test("no DOC API route is implicitly treated as public", () => {
   for (const route of routes) {
     const source = fs.readFileSync(path.join(apiRoot, route), "utf8");
     assert.ok(
-      source.includes("privateJson(") || source.includes("PUBLIC_API_ROUTE:"),
-      `${route} must be private by default or explicitly documented as public`
+      source.includes("privateJson(") || source.includes("privateResponseHeaders(") || source.includes("PUBLIC_API_ROUTE:"),
+      `${route} must use private no-store response handling or be explicitly documented as public`
     );
   }
 });
