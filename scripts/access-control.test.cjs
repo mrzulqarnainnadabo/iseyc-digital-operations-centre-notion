@@ -140,3 +140,45 @@ test("empty or non-string audit identities are denied", () => {
   assert.equal(policy.canAttributeGovernanceAction(context(), ""), false);
   assert.equal(policy.canAttributeGovernanceAction(context(), null), false);
 });
+
+test("future and expired appointments do not grant officer access", () => {
+  const future = context({ appointments: [{
+    status: "Active", role: "Officer", permissions: ["meetings.read"],
+    effectiveFrom: "2026-12-01T00:00:00.000Z"
+  }] });
+  const expired = context({ appointments: [{
+    status: "Active", role: "Officer", permissions: ["meetings.read"],
+    effectiveUntil: "2026-11-01T00:00:00.000Z"
+  }] });
+  assert.equal(policy.hasOfficerPermission(future, "meetings.read", now), false);
+  assert.equal(policy.hasOfficerPermission(expired, "meetings.read", now), false);
+});
+test("unknown or malformed permission values never grant access", () => {
+  const c = context({ appointments: [{
+    status: "Active", role: "Officer", permissions: ["meetings.read", null]
+  }] });
+  assert.equal(policy.hasOfficerPermission(c, "meetings.read", now), false);
+});
+test("membership outside effective dates is denied", () => {
+  const future = context({ membership: {
+    status: "Approved", googleSubject: "member", emailVerified: true,
+    effectiveFrom: "2026-12-01T00:00:00.000Z"
+  } });
+  const expired = context({ membership: {
+    status: "Approved", googleSubject: "member", emailVerified: true,
+    effectiveUntil: "2026-11-01T00:00:00.000Z"
+  } });
+  assert.equal(policy.checkMemberAccess(future, now).allowed, false);
+  assert.equal(policy.checkMemberAccess(expired, now).allowed, false);
+});
+test("malformed membership record fails closed without throwing", () => {
+  assert.equal(policy.checkMemberAccess(context({ membership: "Approved" }), now).allowed, false);
+});
+test("a delegate cannot decide after the delegation end date", () => {
+  const c = context({ delegations: [{
+    delegateGoogleSubject: "member", grantedByGoogleSubject: "president",
+    decisionScopes: ["approve"], effectiveFrom: "2026-10-01T00:00:00.000Z",
+    effectiveUntil: "2026-11-01T00:00:00.000Z"
+  }] });
+  assert.equal(policy.canDecideMembership(c, "approve", now), false);
+});
