@@ -37,8 +37,9 @@ test("missing membership is denied", () => {
 test("membership alone does not grant officer permissions", () => {
   assert.equal(policy.hasOfficerPermission(context(), "meetings.approve", now), false);
 });
-test("appointment grants only its explicit permission", () => {
+test("appointment grants only its explicit permission when bound to the authenticated subject", () => {
   const c = context({ appointments: [{
+    googleSubject: "member",
     status: "Active", role: "Secretary General",
     scope: { type: "global" },
     permissions: ["meetings.read"]
@@ -46,8 +47,27 @@ test("appointment grants only its explicit permission", () => {
   assert.equal(policy.hasOfficerPermission(c, "meetings.read", now, { type: "global" }), true);
   assert.equal(policy.hasOfficerPermission(c, "meetings.approve", now, { type: "global" }), false);
 });
+test("appointment linked to another Google subject cannot grant permissions", () => {
+  const c = context({ appointments: [{
+    googleSubject: "different-member",
+    status: "Active", role: "Officer",
+    scope: { type: "global" },
+    permissions: ["meetings.read"]
+  }] });
+  assert.equal(policy.hasOfficerPermission(c, "meetings.read", now, { type: "global" }), false);
+});
+test("appointment missing an explicit Google subject binding is denied", () => {
+  const c = context({ appointments: [{
+    status: "Active", role: "Officer",
+    scope: { type: "global" },
+    permissions: ["meetings.read"]
+  }] });
+  assert.equal(policy.hasOfficerPermission(c, "meetings.read", now, { type: "global" }), false);
+});
+
 test("membership administrator cannot decide without delegation", () => {
   const c = context({ appointments: [{
+    googleSubject: "member",
     status: "Active", role: "Membership Administrator",
     scope: { type: "global" },
     permissions: ["membership.records.manage"]
@@ -148,10 +168,12 @@ test("empty or non-string audit identities are denied", () => {
 
 test("future and expired appointments do not grant officer access", () => {
   const future = context({ appointments: [{
+    googleSubject: "member",
     status: "Active", role: "Officer", permissions: ["meetings.read"],
     effectiveFrom: "2026-12-01T00:00:00.000Z"
   }] });
   const expired = context({ appointments: [{
+    googleSubject: "member",
     status: "Active", role: "Officer", permissions: ["meetings.read"],
     effectiveUntil: "2026-11-01T00:00:00.000Z"
   }] });
@@ -160,6 +182,7 @@ test("future and expired appointments do not grant officer access", () => {
 });
 test("unknown or malformed permission values never grant access", () => {
   const c = context({ appointments: [{
+    googleSubject: "member",
     status: "Active", role: "Officer", permissions: ["meetings.read", null]
   }] });
   assert.equal(policy.hasOfficerPermission(c, "meetings.read", now), false);
@@ -235,6 +258,7 @@ test("dashboard aggregates exclude restricted and unclassified meetings", () => 
 
 test("membership administrator may read records but cannot decide", () => {
   const c = context({ appointments: [{
+    googleSubject: "member",
     status: "Active", role: "Membership Administrator",
     scope: { type: "global" },
     permissions: ["membership.records.manage"]
@@ -270,11 +294,13 @@ test("President identity alone does not grant record administration", () => {
 
 test("revoked or expired appointment cannot administer membership records", () => {
   const revoked = context({ appointments: [{
+    googleSubject: "member",
     status: "Revoked", role: "Membership Administrator",
     scope: { type: "global" },
     permissions: ["membership.records.manage"]
   }] });
   const expired = context({ appointments: [{
+    googleSubject: "member",
     status: "Active", role: "Membership Administrator",
     scope: { type: "global" },
     permissions: ["membership.records.manage"],
@@ -354,6 +380,7 @@ test("closed DOC permission catalogue accepts only declared capabilities", () =>
 
 test("unknown permission identifiers cannot be granted by an appointment", () => {
   const c = context({ appointments: [{
+    googleSubject: "member",
     status: "Active", role: "Officer", permissions: ["superuser.all"]
   }] });
   assert.equal(policy.hasOfficerPermission(c, "superuser.all", now, { type: "global" }), false);
@@ -475,6 +502,7 @@ test("production responses include baseline browser security headers", async () 
 
 test("department appointment is limited to its assigned department", () => {
   const c = context({ appointments: [{
+    googleSubject: "member",
     status: "Active", role: "Department Head",
     scope: { type: "department", departmentId: "health" },
     permissions: ["department.manage", "meetings.read"]
@@ -489,6 +517,7 @@ test("department appointment is limited to its assigned department", () => {
 
 test("department appointment cannot be used when resource scope is omitted", () => {
   const c = context({ appointments: [{
+    googleSubject: "member",
     status: "Active", role: "Department Head",
     scope: { type: "department", departmentId: "health" },
     permissions: ["department.manage"]
@@ -498,6 +527,7 @@ test("department appointment cannot be used when resource scope is omitted", () 
 
 test("appointment without an explicit scope fails closed", () => {
   const c = context({ appointments: [{
+    googleSubject: "member",
     status: "Active", role: "Officer", permissions: ["meetings.read"]
   }] });
   assert.equal(policy.hasOfficerPermission(c, "meetings.read", now,
@@ -506,6 +536,7 @@ test("appointment without an explicit scope fails closed", () => {
 
 test("explicit global appointment may access a department resource", () => {
   const c = context({ appointments: [{
+    googleSubject: "member",
     status: "Active", role: "National Officer",
     scope: { type: "global" },
     permissions: ["department.read"]
@@ -516,6 +547,7 @@ test("explicit global appointment may access a department resource", () => {
 
 test("malformed department scope fails closed", () => {
   const c = context({ appointments: [{
+    googleSubject: "member",
     status: "Active", role: "Department Head",
     scope: { type: "department", departmentId: "" },
     permissions: ["department.manage"]
@@ -706,6 +738,7 @@ test("membership effective-date boundaries are inclusive and malformed dates den
 
 test("department appointments cannot cross department boundaries", () => {
   const c = context({ appointments: [{
+    googleSubject: "member",
     status: "Active", role: "Department Officer",
     scope: { type: "department", departmentId: "health" },
     permissions: ["department.manage"]
