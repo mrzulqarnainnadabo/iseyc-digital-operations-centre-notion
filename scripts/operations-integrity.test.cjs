@@ -82,3 +82,17 @@ test("operations loading state is announced accessibly", () => {
   assert.match(loading, /aria-live="polite"/);
   assert.match(loading, /Loading operations view/);
 });
+
+test("planned operational modules cannot present placeholders as live workflows", () => {
+  const modules = [
+    ["actions", /Not operational — no action records are being managed here/],
+    ["chamber", /Not operational — no Chamber sessions or resolutions are recorded here/],
+    ["media", /Not operational — no editorial or publishing workflow is connected/]
+  ];
+  for (const [name, warning] of modules) {
+    const source = fs.readFileSync(path.join(opsRoot, name, "page.tsx"), "utf8");
+    assert.match(source, warning, `${name} must state its non-operational status`);
+    assert.match(source, /Required workflow before launch/);
+    assert.match(source, /\/ops\/readiness/);
+  }
+});
