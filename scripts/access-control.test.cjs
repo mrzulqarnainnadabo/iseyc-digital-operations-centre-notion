@@ -39,7 +39,9 @@ test("membership alone does not grant officer permissions", () => {
 });
 test("appointment grants only its explicit permission", () => {
   const c = context({ appointments: [{
-    status: "Active", role: "Secretary General", permissions: ["meetings.read"]
+    status: "Active", role: "Secretary General",
+    scope: { type: "global" },
+    permissions: ["meetings.read"]
   }] });
   assert.equal(policy.hasOfficerPermission(c, "meetings.read", now, { type: "global" }), true);
   assert.equal(policy.hasOfficerPermission(c, "meetings.approve", now, { type: "global" }), false);
