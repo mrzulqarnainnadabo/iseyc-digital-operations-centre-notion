@@ -6,7 +6,7 @@ import {
   signSession,
   staffKeyConfigured,
 } from "@/lib/auth";
-import { isSameOriginRequest } from "@/lib/request-security";
+import { isSameOriginRequest, readBoundedJson } from "@/lib/request-security";
 import { readStaffKeyInput } from "@/lib/login-input";
 
 export const runtime = "nodejs";
@@ -23,14 +23,13 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let body: unknown;
-  try {
-    body = await req.json();
-  } catch {
-    return privateJson({ ok: false, error: "Invalid JSON" }, { status: 400 });
+  const parsed = await readBoundedJson(req, 2_048);
+  if (!parsed.ok) {
+    const status = parsed.reason === "too_large" ? 413 : parsed.reason === "content_type" ? 415 : 400;
+    return privateJson({ ok: false, error: "Invalid sign-in request." }, { status });
   }
 
-  const key = readStaffKeyInput(body);
+  const key = readStaffKeyInput(parsed.value);
   if (!key || !isValidStaffKey(key)) {
     return privateJson({ ok: false, error: "Invalid staff key" }, { status: 401 });
   }
