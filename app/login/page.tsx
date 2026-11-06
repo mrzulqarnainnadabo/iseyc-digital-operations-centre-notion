@@ -9,6 +9,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [identityNotice, setIdentityNotice] = useState<string | null>(null);
+  const [oidcConfigured, setOidcConfigured] = useState(false);
 
   useEffect(() => {
     const result = new URLSearchParams(window.location.search).get("oidc");
@@ -19,8 +20,10 @@ export default function LoginPage() {
     }
     fetch("/api/auth/oidc/status", { cache: "no-store" })
       .then((response) => response.json())
-      .then((data: { identityVerified?: boolean; message?: string }) => {
+      .then((data: { providerConfigured?: boolean; identityVerified?: boolean; message?: string }) => {
+        setOidcConfigured(data.providerConfigured === true);
         if (data.identityVerified && typeof data.message === "string") setIdentityNotice(data.message);
+        else if (data.providerConfigured !== true && result !== "failed") setIdentityNotice("Google sign-in is not configured yet. Identity provider credentials and the canonical DOC host still need to be set up.");
       })
       .catch(() => undefined);
   }, []);
@@ -70,9 +73,13 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-2">
-            <a href="/api/auth/oidc/start" className="inline-flex min-h-[48px] w-full items-center justify-center rounded-control border border-forest-900 bg-white px-4 text-sm font-semibold text-forest-900 hover:bg-forest-100">
-              Continue with Google identity
-            </a>
+            {oidcConfigured ? (
+              <a href="/api/auth/oidc/start" className="inline-flex min-h-[48px] w-full items-center justify-center rounded-control border border-forest-900 bg-white px-4 text-sm font-semibold text-forest-900 hover:bg-forest-100">
+                Continue with Google identity
+              </a>
+            ) : (
+              <p className="rounded-control border border-line bg-cream-50 px-3 py-3 text-sm text-ink-700">Google identity sign-in · Setup pending</p>
+            )}
             <p className="text-xs leading-5 text-ink-600">Google verifies identity only. Membership and appointment checks are separate and are not yet connected.</p>
             {identityNotice ? <p role="status" className="rounded-control border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-950">{identityNotice}</p> : null}
           </div>
