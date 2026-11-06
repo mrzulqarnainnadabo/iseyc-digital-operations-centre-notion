@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireStaffSession } from "@/lib/auth";
 import { isSameOriginRequest } from "@/lib/request-security";
 import { createMeeting, listMeetings } from "@/lib/notion";
+import { legacySessionCanCreateMeeting, legacySessionCanReadMeeting } from "@/lib/legacy-session-boundary";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,7 +13,9 @@ export async function GET() {
   }
 
   try {
-    const meetings = await listMeetings();
+    const meetings = (await listMeetings()).filter((meeting) =>
+      legacySessionCanReadMeeting(meeting.sensitivity)
+    );
     return NextResponse.json({ ok: true, meetings });
   } catch {
     return NextResponse.json(
@@ -44,11 +47,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 });
   }
 
-  const title = (body.title || "").trim();
+  const title = (typeof body.title === "string" ? body.title : "").trim();
   if (title.length < 5) {
     return NextResponse.json(
       { ok: false, error: "Title must be at least 5 characters." },
       { status: 400 }
+    );
+  }
+
+  const sensitivity = body.sensitivity === "Restricted" ? "Restricted" : "Standard";
+  if (!legacySessionCanCreateMeeting(sensitivity)) {
+    return NextResponse.json(
+      { ok: false, error: "Restricted meeting intake requires individually authorised officer access." },
+      { status: 403 }
     );
   }
 
@@ -58,7 +69,7 @@ export async function POST(req: NextRequest) {
       conveningBody: (body.conveningBody || "").trim(),
       meetingDate: (body.meetingDate || "").trim(),
       summary: (body.summary || "").trim(),
-      sensitivity: body.sensitivity === "Restricted" ? "Restricted" : "Standard",
+      sensitivity,
     });
     return NextResponse.json({ ok: true, id: created.id });
   } catch {
