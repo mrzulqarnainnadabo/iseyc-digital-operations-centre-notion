@@ -652,3 +652,93 @@ test("meeting status adapter revalidates configured database parent before writi
   assert.ok(implementation.includes("canonicalNotionId(page.parent.database_id) !== database_id"));
   assert.ok(implementation.indexOf("client.pages.retrieve") < implementation.indexOf("client.pages.update"));
 });
+
+test("every non-approved membership lifecycle state is denied", () => {
+  for (const status of ["Pending", "Rejected", "Suspended", "Expired", "Revoked", "Unknown", "", null]) {
+    const member = { ...context().membership, status };
+    assert.equal(
+      policy.checkMemberAccess(context({ membership: member }), now).allowed,
+      false,
+      `membership status ${String(status)} must be denied`
+    );
+  }
+});
+
+test("identity binding requires the exact immutable subject and verified email", () => {
+  assert.equal(
+    policy.checkMemberAccess(context({ membership: { ...context().membership, googleSubject: "different-subject" } }), now).allowed,
+    false
+  );
+  assert.equal(
+    policy.checkMemberAccess(context({ membership: { ...context().membership, emailVerified: false } }), now).allowed,
+    false
+  );
+});
+
+test("membership effective-date boundaries are inclusive and malformed dates deny", () => {
+  const startsNow = { ...context().membership, effectiveFrom: now.toISOString() };
+  const endsNow = { ...context().membership, effectiveUntil: now.toISOString() };
+  assert.equal(policy.checkMemberAccess(context({ membership: startsNow }), now).allowed, true);
+  assert.equal(policy.checkMemberAccess(context({ membership: endsNow }), now).allowed, true);
+  for (const badDate of ["not-a-date", "", 123, {}]) {
+    const malformed = { ...context().membership, effectiveFrom: badDate };
+    assert.equal(policy.checkMemberAccess(context({ membership: malformed }), now).allowed, false);
+  }
+});
+
+test("department appointments cannot cross department boundaries", () => {
+  const c = context({ appointments: [{
+    status: "Active", role: "Department Officer",
+    scope: { type: "department", departmentId: "health" },
+    permissions: ["department.manage"]
+  }] });
+  assert.equal(policy.hasOfficerPermission(c, "department.manage", now, { type: "department", departmentId: "health" }), true);
+  for (const scope of [
+    { type: "department", departmentId: "education" },
+    { type: "global" },
+    { type: "department", departmentId: "" },
+    null
+  ]) {
+    assert.equal(policy.hasOfficerPermission(c, "department.manage", now, scope), false);
+  }
+});
+
+test("inactive, expired, revoked and unknown appointment states grant no permissions", () => {
+  for (const status of ["Inactive", "Expired", "Revoked", "Pending", "Unknown", null]) {
+    const c = context({ appointments: [{
+      status, role: "Officer", scope: { type: "global" }, permissions: ["meetings.read"]
+    }] });
+    assert.equal(
+      policy.hasOfficerPermission(c, "meetings.read", now, { type: "global" }),
+      false,
+      `appointment status ${String(status)} must be denied`
+    );
+  }
+});
+
+test("President authority remains tied to the configured President subject", () => {
+  const president = context({
+    googleSubject: "president",
+    membership: {
+      status: "Approved", googleSubject: "president", emailVerified: true,
+      effectiveFrom: "2026-01-01T00:00:00.000Z",
+      effectiveUntil: "2027-01-01T00:00:00.000Z"
+    }
+  });
+  assert.equal(policy.canManageMembershipDelegations(president, now), true);
+  assert.equal(policy.canManageMembershipDelegations(context(), now), false);
+  assert.equal(policy.canDecideMembership(context({ nationalPresidentGoogleSubject: null }), "approve", now), false);
+});
+
+test("delegation cannot be self-issued or granted by a non-President", () => {
+  for (const grantor of ["member", "another-officer", "", null]) {
+    const c = context({ delegations: [{
+      delegateGoogleSubject: "member",
+      grantedByGoogleSubject: grantor,
+      decisionScopes: ["approve"],
+      effectiveFrom: "2026-10-01T00:00:00.000Z",
+      effectiveUntil: "2026-12-01T00:00:00.000Z"
+    }] });
+    assert.equal(policy.canDecideMembership(c, "approve", now), false);
+  }
+});
