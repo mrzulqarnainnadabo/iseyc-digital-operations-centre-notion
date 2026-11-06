@@ -61,7 +61,7 @@ export default function LoginPage() {
           <img src="/iseyc-seal.svg" alt="ISEYC seal" width="42" height="42" className="rounded-full border border-gold-600 bg-white object-contain" />
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold-600">ISEYC</p>
-            <p className="text-sm font-semibold text-forest-950">Digital Operations Centre</p>
+            <p className="max-w-[245px] text-xs font-semibold leading-4 text-forest-950">Initiative for Sustainable Evolution for Youth and Community</p>
           </div>
         </header>
 
@@ -69,13 +69,13 @@ export default function LoginPage() {
           <div>
             <span className="inline-flex min-h-[26px] items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 text-[11px] font-semibold text-amber-900">Temporary access method</span>
             <h1 className="mt-3 font-serif text-2xl text-forest-950">Officer access</h1>
-            <p className="mt-2 text-sm leading-6 text-ink-600">Sign in to the private institutional workspace.</p>
+            
           </div>
 
           <div className="space-y-2">
             {oidcConfigured ? (
               <a href="/api/auth/oidc/start" className="inline-flex min-h-[48px] w-full items-center justify-center rounded-control border border-forest-900 bg-white px-4 text-sm font-semibold text-forest-900 hover:bg-forest-100">
-                Continue with Google identity
+                Sign in with Google
               </a>
             ) : (
               <p className="rounded-control border border-line bg-cream-50 px-3 py-3 text-sm text-ink-700">Google identity sign-in · Setup pending</p>
@@ -112,7 +112,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="mt-4 text-center text-xs leading-5 text-ink-600">Private institutional interface · Non-partisan · Human authority remains final</p>
+        <p className="mt-4 text-center text-xs text-ink-600">Private · ISEYC</p>
       </div>
     </main>
   );
