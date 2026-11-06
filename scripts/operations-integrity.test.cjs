@@ -19,9 +19,7 @@ const opsRoot = path.join(root, "app/ops");
 function collectPages(directory, prefix = "/ops") {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const absolute = path.join(directory, entry.name);
-    if (entry.isDirectory()) {
-      return collectPages(absolute, prefix + "/" + entry.name);
-    }
+    if (entry.isDirectory()) return collectPages(absolute, prefix + "/" + entry.name);
     return entry.name === "page.tsx" ? [prefix] : [];
   });
 }
@@ -31,10 +29,7 @@ test("every internal operations navigation link resolves to a real page", () => 
   const internal = DOC_NAV.filter((item) => !item.external);
   assert.ok(internal.length > 0, "operations navigation should not be empty");
   for (const item of internal) {
-    assert.ok(
-      pages.has(item.href),
-      `Navigation item "${item.label}" points to missing route ${item.href}`
-    );
+    assert.ok(pages.has(item.href), `Navigation item "${item.label}" points to missing route ${item.href}`);
   }
 });
 
@@ -48,19 +43,25 @@ test("every operations page is covered by the authenticated operations layout", 
   assert.ok(pages.length >= 6, "route inventory should include the current operations modules");
 });
 
-test("civic navigation uses the canonical Observatory deployment hostname", () => {
-  const observatoryLinks = DOC_NAV.filter((item) =>
-    item.label.includes("Observatory") || item.group === "Departments"
-  );
-  assert.ok(observatoryLinks.length >= 5);
-  for (const item of observatoryLinks) {
-    assert.match(item.href, /^https:\/\/iseyc-civic-intelligence-observatory\.vercel\.app(?:\/|$)/);
-  }
-  assert.equal(
-    DOC_NAV.some((item) => item.href.includes("civic-intelligence-observator.vercel.app")),
-    false,
-    "the retired misspelled deployment hostname must not return"
-  );
+test("external navigation is restricted to the two published civic products", () => {
+  const external = DOC_NAV.filter((item) => item.external);
+  assert.deepEqual(external.map((item) => item.label).sort(), ["Civic Brain", "Civic Mandate"]);
+  assert.ok(external.every((item) => item.href.startsWith("https://")));
+  assert.ok(external.every((item) => !/operators|admin|submission|member/i.test(item.href)));
+});
+
+test("command home defines exactly four departments and keeps Communications as a shared function", () => {
+  const source = fs.readFileSync(path.join(opsRoot, "page.tsx"), "utf8");
+  for (const name of [
+    "Education & Capacity Building",
+    "Health & Well-being",
+    "Digital Systems & Technology",
+    "Civic Affairs"
+  ]) assert.ok(source.includes(name), `Missing department: ${name}`);
+  assert.match(source, /Shared function · not a fifth department/);
+  assert.match(source, /Communications coordination/);
+  assert.match(source, /Seat occupancy not connected/);
+  assert.doesNotMatch(source, /National coverage|members nationwide|appointed department head/i);
 });
 
 test("module readiness is reachable from the persistent navigation", () => {
