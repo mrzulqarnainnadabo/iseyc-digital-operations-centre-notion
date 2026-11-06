@@ -170,3 +170,10 @@ The application now configures baseline response headers for all routes:
 - Production-only HSTS with a one-year max age and deliberately no `includeSubDomains`, because the application is hosted on shared infrastructure.
 
 A regression test checks the production header configuration. A Content Security Policy has not been added yet; it requires a separate audit of scripts, styles, fonts, image origins and any future Google OIDC integration to avoid a falsely restrictive or ineffective policy.
+
+
+### Operational interface truthfulness
+
+The Officer Access page no longer implies that a Notion roster is a future-ready access-control mechanism. It now explicitly identifies the shared-key gate as transitional, shows identity/membership/appointment/delegation as not implemented or not connected, states the President's decision authority, and lists the four departments without implying that any department head has been appointed.
+
+The meeting intake now presents Standard sensitivity as the only available transitional option, explains why Restricted submissions are unavailable, enforces field length limits in the interface and exposes submission errors as accessible alerts. The server remains authoritative and independently validates all fields.
