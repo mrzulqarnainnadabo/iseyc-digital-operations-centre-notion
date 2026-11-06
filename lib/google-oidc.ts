@@ -11,6 +11,7 @@ export {
   safeEqual,
   signPendingIdentity,
   verifyPendingIdentity,
+  readPendingIdentity,
 } from "@/lib/oidc-primitives";
 
 const GOOGLE_ISSUERS = ["https://accounts.google.com", "accounts.google.com"];
@@ -19,7 +20,7 @@ const GOOGLE_JWKS = createRemoteJWKSet(new URL("https://www.googleapis.com/oauth
 export async function verifyGoogleIdToken(
   token: string,
   expectedNonce: string
-): Promise<{ subject: string }> {
+): Promise<{ subject: string; email: string }> {
   const clientId = process.env.DOC_GOOGLE_CLIENT_ID?.trim();
   if (!clientId) throw new Error("Google identity is not configured");
 
@@ -47,5 +48,5 @@ export async function verifyGoogleIdToken(
     throw new Error("Google identity claims are incomplete or unverified");
   }
 
-  return { subject: payload.sub };
+  return { subject: payload.sub, email: payload.email.trim().toLowerCase() };
 }
