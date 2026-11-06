@@ -1,12 +1,13 @@
 import { NextRequest } from "next/server";
 import { privateJson } from "@/lib/private-response";
-import { PENDING_IDENTITY_COOKIE, verifyPendingIdentity } from "@/lib/google-oidc";
+import { googleOidcConfigured, PENDING_IDENTITY_COOKIE, verifyPendingIdentity } from "@/lib/google-oidc";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   const identityVerified = verifyPendingIdentity(req.cookies.get(PENDING_IDENTITY_COOKIE)?.value);
   return privateJson({
+    providerConfigured: googleOidcConfigured(),
     identityVerified,
     accessGranted: false,
     message: identityVerified
