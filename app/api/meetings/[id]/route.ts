@@ -42,19 +42,23 @@ export async function PATCH(
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: { status?: string };
+  let body: unknown;
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 });
   }
 
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return NextResponse.json({ ok: false, error: "Invalid request body" }, { status: 400 });
+  }
+  const input = body as Record<string, unknown>;
   const allowed = ["In review", "Approved", "Archived", "Draft"] as const;
-  if (!allowed.includes(body.status as (typeof allowed)[number])) {
+  if (!allowed.includes(input.status as (typeof allowed)[number])) {
     return NextResponse.json({ ok: false, error: "Invalid status" }, { status: 400 });
   }
 
-  if (!legacySessionCanSetMeetingStatus(body.status)) {
+  if (!legacySessionCanSetMeetingStatus(input.status)) {
     return NextResponse.json(
       { ok: false, error: "Approval requires individually authorised officer access." },
       { status: 403 }
@@ -67,7 +71,7 @@ export async function PATCH(
     if (!existing || !legacySessionCanReadMeeting(existing.sensitivity)) {
       return NextResponse.json({ ok: false, error: "Not found" }, { status: 404 });
     }
-    await setMeetingStatus(id, body.status as (typeof allowed)[number]);
+    await setMeetingStatus(id, input.status as (typeof allowed)[number]);
     const meeting = await getMeeting(id);
     if (!meeting || !legacySessionCanReadMeeting(meeting.sensitivity)) {
       return NextResponse.json({ ok: false, error: "Not found" }, { status: 404 });
