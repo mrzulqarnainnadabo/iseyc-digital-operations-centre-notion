@@ -112,17 +112,17 @@ export default async function CommandBriefPage() {
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2">
-        <Link href="/ops/queue" className="group rounded-card border border-line bg-white p-5 shadow-card hover:border-forest-800">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Human review</p>
-          <h2 className="mt-1 text-base font-semibold text-forest-950">Open approval queue</h2>
-          <p className="mt-1 text-sm text-ink-600">Review meeting records and inspect their current workflow state.</p>
-          <span className="mt-4 inline-flex min-h-[44px] items-center text-sm font-semibold text-forest-800">Open queue →</span>
+        <Link href="/ops/queue" className="group rounded-card border border-forest-900 bg-forest-900 p-5 shadow-card hover:bg-forest-800">
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#d7c18f]">Primary action · human review</p>
+          <h2 className="mt-1 text-base font-semibold text-white">Open approval queue</h2>
+          <p className="mt-1 text-sm text-white/75">Review meeting records and inspect their current workflow state.</p>
+          <span className="mt-4 inline-flex min-h-[44px] items-center text-sm font-semibold text-white">Open queue →</span>
         </Link>
         <Link href="/ops/intake" className="group rounded-card border border-line bg-white p-5 shadow-card hover:border-forest-800">
           <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Notion workflow</p>
           <h2 className="mt-1 text-base font-semibold text-forest-950">Submit meeting intake</h2>
           <p className="mt-1 text-sm text-ink-600">Create a Standard meeting record for controlled review.</p>
-          <span className="mt-4 inline-flex min-h-[44px] items-center text-sm font-semibold text-forest-800">Start intake →</span>
+          <span className="mt-4 inline-flex min-h-[44px] items-center rounded-control border border-line px-3 text-sm font-semibold text-forest-800">Start intake →</span>
         </Link>
       </section>
 
