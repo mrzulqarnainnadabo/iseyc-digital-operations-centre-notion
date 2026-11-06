@@ -92,3 +92,17 @@ test("governance actor must match authenticated subject", () => {
   assert.equal(policy.canAttributeGovernanceAction(context(), "member"), true);
   assert.equal(policy.canAttributeGovernanceAction(context(), "imposter"), false);
 });
+
+test("malformed delegation without decision scopes is denied safely", () => {
+  const c = context({ delegations: [{
+    delegateGoogleSubject: "member",
+    grantedByGoogleSubject: "president",
+    effectiveFrom: "2026-10-01T00:00:00.000Z",
+    effectiveUntil: "2026-12-01T00:00:00.000Z"
+  }] });
+  assert.equal(policy.canDecideMembership(c, "approve", now), false);
+});
+test("malformed appointment collection fails closed", () => {
+  const c = context({ appointments: null });
+  assert.equal(policy.hasOfficerPermission(c, "meetings.read", now), false);
+});
