@@ -2,9 +2,9 @@ import Link from "next/link";
 
 const controls = [
   {
-    title: "Individual identity",
-    state: "Not implemented",
-    description: "Personal Google sign-in and verified identity linking are not yet available.",
+    title: "Google identity verification",
+    state: "Implemented · not configured",
+    description: "The feature branch includes Google OIDC verification. Provider credentials are not configured, and verified identity does not grant membership or officer access.",
   },
   {
     title: "Membership register",
