@@ -19,6 +19,8 @@ test("DOC PIN uses salted scrypt and verifies only the matching six-digit value"
   process.env.DOC_PIN_PEPPER = "test-only-doc-pin-pepper-with-more-than-32-bytes";
   try {
     const encoded = await pin.hashDocPin("042719");
+    const secondEncoded = await pin.hashDocPin("042719");
+    assert.notEqual(encoded, secondEncoded, "each PIN hash must use an independent random salt");
     assert.match(encoded, /^scrypt\$32768\$8\$1\$[A-Za-z0-9_-]{22}\$[A-Za-z0-9_-]{43}$/);
     assert.equal(encoded.includes("042719"), false);
     assert.equal(await pin.verifyDocPin("042719", encoded), true);
