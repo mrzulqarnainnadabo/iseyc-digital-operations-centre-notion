@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -8,6 +8,22 @@ export default function LoginPage() {
   const [key, setKey] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [identityNotice, setIdentityNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    const result = new URLSearchParams(window.location.search).get("oidc");
+    if (result === "unavailable") {
+      setIdentityNotice("Google sign-in is not configured yet. No production identity settings have been changed.");
+    } else if (result === "failed") {
+      setIdentityNotice("Google could not verify this sign-in. Try again or contact the system administrator.");
+    }
+    fetch("/api/auth/oidc/status", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data: { identityVerified?: boolean; message?: string }) => {
+        if (data.identityVerified && typeof data.message === "string") setIdentityNotice(data.message);
+      })
+      .catch(() => undefined);
+  }, []);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -51,6 +67,14 @@ export default function LoginPage() {
             <span className="inline-flex min-h-[26px] items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 text-[11px] font-semibold text-amber-900">Temporary access method</span>
             <h1 className="mt-3 font-serif text-2xl text-forest-950">Officer access</h1>
             <p className="mt-2 text-sm leading-6 text-ink-600">Sign in to the private institutional workspace.</p>
+          </div>
+
+          <div className="space-y-2">
+            <a href="/api/auth/oidc/start" className="inline-flex min-h-[48px] w-full items-center justify-center rounded-control border border-forest-900 bg-white px-4 text-sm font-semibold text-forest-900 hover:bg-forest-100">
+              Continue with Google identity
+            </a>
+            <p className="text-xs leading-5 text-ink-600">Google verifies identity only. Membership and appointment checks are separate and are not yet connected.</p>
+            {identityNotice ? <p role="status" className="rounded-control border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-950">{identityNotice}</p> : null}
           </div>
 
           <div className="rounded-control border border-amber-200 bg-amber-50 p-3">
