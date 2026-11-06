@@ -619,3 +619,36 @@ test("readiness register distinguishes placeholders from implemented workflows",
   assert.ok(dashboard.includes("do not verify database connectivity"));
   assert.ok(dashboard.includes('href="/ops/readiness"'));
 });
+
+
+const notionAdapter = require("../lib/notion.ts");
+
+test("Notion database IDs are canonicalized before security comparisons", () => {
+  const previous = process.env.TEST_NOTION_DATABASE_ID;
+  process.env.TEST_NOTION_DATABASE_ID = "19B213D5-5BFC-4CE8-A653-A05147CBBE2A";
+  try {
+    assert.equal(notionAdapter.dbId("TEST_NOTION_DATABASE_ID"), "19b213d55bfc4ce8a653a05147cbbe2a");
+    assert.throws(
+      () => notionAdapter.assertInternalDb("19B213D5-5BFC-4CE8-A653-A05147CBBE2A"),
+      /Civic Mandate public database/
+    );
+    assert.throws(
+      () => notionAdapter.assertInternalDb("19b213d55bfc4ce8a653a05147cbbe2a"),
+      /Civic Mandate public database/
+    );
+  } finally {
+    if (previous === undefined) delete process.env.TEST_NOTION_DATABASE_ID;
+    else process.env.TEST_NOTION_DATABASE_ID = previous;
+  }
+});
+
+test("meeting status adapter revalidates configured database parent before writing", () => {
+  const source = fs.readFileSync(require("node:path").join(__dirname, "../lib/notion.ts"), "utf8");
+  const start = source.indexOf("export async function setMeetingStatus(");
+  const end = source.indexOf("\nexport function configFlags()", start);
+  assert.ok(start >= 0 && end > start, "status adapter should be present");
+  const implementation = source.slice(start, end);
+  assert.ok(implementation.includes('client.pages.retrieve({ page_id: id })'));
+  assert.ok(implementation.includes("canonicalNotionId(page.parent.database_id) !== database_id"));
+  assert.ok(implementation.indexOf("client.pages.retrieve") < implementation.indexOf("client.pages.update"));
+});
