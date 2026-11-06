@@ -78,17 +78,19 @@ export async function listMeetings(): Promise<MeetingRecord[]> {
         textProp(props["Convening body"]) || textProp(props.ConveningBody) || "—",
       meetingDate: textProp(props["Meeting date"]) || textProp(props.Date) || "",
       summary: textProp(props.Summary) || textProp(props.Notes) || "",
-      sensitivity: textProp(props.Sensitivity) || "Standard",
+      sensitivity: textProp(props.Sensitivity) || "Unclassified",
     };
   });
 }
 
 export async function getMeeting(id: string): Promise<MeetingRecord | null> {
   const client = notion();
-  if (!client) return null;
+  const database_id = dbId("NOTION_MEETINGS_DATABASE_ID");
+  if (!client || !database_id) return null;
+  assertInternalDb(database_id);
   try {
     const page: any = await client.pages.retrieve({ page_id: id });
-    if (!("properties" in page)) return null;
+    if (!("properties" in page) || page.parent?.database_id !== database_id) return null;
     const props = page.properties;
     return {
       id: page.id,
