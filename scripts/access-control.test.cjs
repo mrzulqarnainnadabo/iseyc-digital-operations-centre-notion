@@ -373,3 +373,50 @@ test("every DOC API route declares private caching or an explicit public classif
     );
   }
 });
+
+test("bounded JSON parser rejects oversized declared content before reading the body", async () => {
+  const request = new Request("https://doc.example/api", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Length": "4096"
+    },
+    body: "{}"
+  });
+  assert.deepEqual(await requestSecurity.readBoundedJson(request, 32), {
+    ok: false, reason: "too_large"
+  });
+});
+
+test("bounded JSON parser enforces the limit while streaming chunked bodies", async () => {
+  let cancelled = false;
+  const stream = new ReadableStream({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode('{"note":"'));
+      controller.enqueue(new TextEncoder().encode("x".repeat(64)));
+      controller.enqueue(new TextEncoder().encode('"}'));
+    },
+    cancel() { cancelled = true; }
+  });
+  const request = new Request("https://doc.example/api", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: stream,
+    duplex: "half"
+  });
+  assert.deepEqual(await requestSecurity.readBoundedJson(request, 32), {
+    ok: false, reason: "too_large"
+  });
+  assert.equal(cancelled, true);
+});
+
+test("bounded JSON parser rejects invalid UTF-8 instead of replacement-decoding it", async () => {
+  const request = new Request("https://doc.example/api", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: new Uint8Array([0x7b, 0x22, 0x78, 0x22, 0x3a, 0xff, 0x7d])
+  });
+  assert.deepEqual(await requestSecurity.readBoundedJson(request), {
+    ok: false, reason: "invalid_json"
+  });
+});
