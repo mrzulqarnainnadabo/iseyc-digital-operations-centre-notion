@@ -16,7 +16,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 function clearTransactionCookies(response: NextResponse) {
-  for (const name of [OIDC_STATE_COOKIE, OIDC_NONCE_COOKIE, OIDC_VERIFIER_COOKIE]) {
+  for (const name of [OIDC_STATE_COOKIE, OIDC_NONCE_COOKIE, OIDC_VERIFIER_COOKIE, PENDING_IDENTITY_COOKIE]) {
     response.cookies.set(name, "", { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 0 });
   }
 }
