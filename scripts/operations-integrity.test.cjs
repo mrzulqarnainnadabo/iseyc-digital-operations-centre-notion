@@ -54,7 +54,7 @@ test("civic navigation uses the canonical Observatory deployment hostname", () =
   );
   assert.ok(observatoryLinks.length >= 5);
   for (const item of observatoryLinks) {
-    assert.match(item.href, /^https:\/\/iseyc-civic-intelligence-observatory\.vercel\.app\//);
+    assert.match(item.href, /^https:\/\/iseyc-civic-intelligence-observatory\.vercel\.app(?:\/|$)/);
   }
   assert.equal(
     DOC_NAV.some((item) => item.href.includes("civic-intelligence-observator.vercel.app")),
