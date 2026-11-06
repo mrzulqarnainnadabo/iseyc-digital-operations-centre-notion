@@ -6,10 +6,10 @@ Status: design and review document. This is not evidence that individual identit
 
 | Route | Current gate | Risk / limitation |
 |---|---|---|
-| GET /api/meetings | Shared staff session | Any holder of the shared session can list all meetings |
-| POST /api/meetings | Same-origin + shared staff session | No distinct meeting-create permission or actor-bound audit |
-| GET /api/meetings/[id] | Shared staff session | No per-record sensitivity or scope check |
-| PATCH /api/meetings/[id] | Same-origin + shared staff session | Any shared-session holder can set In review, Approved, Archived or Draft |
+| GET /api/meetings | Shared staff session + Standard sensitivity filter | Legacy session sees only explicitly Standard records; not individual member authorization |
+| POST /api/meetings | Same-origin + shared staff session + explicit Standard sensitivity | Legacy session can create Standard submissions only; no actor-bound audit |
+| GET /api/meetings/[id] | Shared staff session + Standard sensitivity + Meetings database parent check | No individual identity or appointment scope |
+| PATCH /api/meetings/[id] | Same-origin + shared staff session + Standard sensitivity + limited transition | Legacy session may move Standard records to In review only; approval, archive and draft transitions are denied |
 | POST /api/auth/login | Shared staff key | No personal Google OIDC identity |
 | POST /api/auth/logout | Same-origin | Clears the shared session cookie |
 
@@ -56,9 +56,11 @@ Until individual Google identity and trusted appointment records are implemented
 
 - Meeting list and detail reads expose only records explicitly marked `Standard`; restricted, missing or unknown sensitivity values are denied.
 - Restricted meeting intake is rejected by the API.
-- The legacy session cannot transition a meeting to `Approved`.
+- The legacy session may move a Standard meeting to `In review` only; `Approved`, `Archived` and `Draft` transitions are denied until individual authorization exists.
+- Meeting intake requires an explicit `Standard` sensitivity value. Missing or unknown values are rejected rather than coerced to Standard.
+- The review interface disables both approval and archive actions for the legacy session.
 - The interface disables the approval action and explains that individually authorised officer access is required.
-- The legacy session may continue to read standard meeting records and create standard meeting submissions; this is not individual member access or role-based authorization.
+- The legacy session may continue to read standard meeting records, create explicitly Standard submissions and move them to `In review`; this is not individual member access or role-based authorization.
 
 These controls reduce exposure while the legacy gate exists. They do not provide per-person accountability, officer identity, approval authority, record-level permissions for other DOC modules, or a durable audit trail. They must not be represented as the final authorization system.
 
