@@ -200,3 +200,14 @@ A protected `/ops/readiness` page now gives staff a single, explicit inventory o
 The Command Brief links to this register. Environment indicators on the dashboard now say **Configured / Not configured**, not Ready / Missing, and explain that environment-variable presence does not prove database connectivity, integration permissions or end-to-end workflow readiness.
 
 A regression test checks that the readiness page preserves the not-ready warnings and that dashboard language does not turn configuration presence into an operational claim. The readiness page is a transparency and governance aid; it does not itself implement the listed workflows or grant access.
+
+
+### API route register and placeholder containment
+
+The review branch now contains `docs/ROUTE-SECURITY-REGISTER.md`, a route-by-route inventory of the current API methods, authentication gates, request limits, sensitivity boundaries and known transitional limitations.
+
+A new CI test, `scripts/route-security.test.cjs`, compares the actual `app/api` route tree with the reviewed inventory and checks each route's expected HTTP methods and security markers. An unreviewed route addition or method-surface change fails the test until the security contract is updated. This is a source-level change-control guard, not proof of runtime authorization.
+
+The Digital Chamber, Action Register and Media & Content Command pages now explicitly state that they are not operational. Each page explains what it does not currently do, lists the required workflow before launch, and links to Module Readiness. Regression tests prevent these planned modules from losing their non-operational warnings.
+
+No new operational records, member data, appointments or publication workflows were fabricated. The system remains a review-branch build and the production release decision remains NO-GO.
