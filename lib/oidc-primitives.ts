@@ -6,9 +6,9 @@ export const OIDC_VERIFIER_COOKIE = "iseyc_doc_oidc_verifier";
 export const PENDING_IDENTITY_COOKIE = "iseyc_doc_identity_pending";
 const PENDING_TTL_SECONDS = 15 * 60;
 
-function validIdentityClaims(subject: unknown, email: unknown): subject is string {
+function validIdentityClaims(subject: unknown, email: unknown): boolean {
   return typeof subject === "string" && subject.length > 0 && subject.length <= 255 &&
-    typeof email === "string" && email.length <= 254 && /^[^\\s@]+@[^\\s@]+$/.test(email);
+    typeof email === "string" && email.length <= 254 && /^[^\s@]+@[^\s@]+$/.test(email);
 }
 
 export function docAppOrigin(): string | null {
@@ -89,7 +89,7 @@ export function readPendingIdentity(token: string | undefined): PendingIdentity 
       Number.isSafeInteger(payload.iat) && Number.isSafeInteger(payload.exp) &&
       Number(payload.iat) <= now + 30 && Number(payload.exp) > now &&
       Number(payload.exp) - Number(payload.iat) <= PENDING_TTL_SECONDS
-      ? { subject: payload.sub, email: payload.email }
+      ? { subject: payload.sub as string, email: payload.email as string }
       : null;
   } catch {
     return null;
