@@ -23,6 +23,13 @@ test("Google OIDC transaction uses independent high-entropy state, nonce and PKC
   assert.ok(tx.challenge.length >= 43);
   assert.notEqual(tx.state, tx.nonce);
   assert.notEqual(tx.verifier, tx.challenge);
+  const prior = process.env.DOC_APP_URL;
+  process.env.DOC_APP_URL = "https://doc.example";
+  assert.equal(oidc.docAppOrigin(), "https://doc.example");
+  process.env.DOC_APP_URL = "https://doc.example/unexpected-path";
+  assert.equal(oidc.docAppOrigin(), null);
+  if (prior === undefined) delete process.env.DOC_APP_URL;
+  else process.env.DOC_APP_URL = prior;
 });
 
 test("Google OIDC is disabled unless client credentials and a 32-byte session secret exist", () => {
