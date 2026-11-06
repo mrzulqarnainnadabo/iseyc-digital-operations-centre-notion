@@ -142,3 +142,18 @@ Exit gate: workflows are usable end-to-end by the correct role, with evidence an
 - A closed DOC permission vocabulary is now defined in `lib/doc-permissions.ts`. It defines capability identifiers only; it does not grant access. Runtime policy rejects unknown permission strings even if they appear in a supplied appointment payload.
 - The policy test suite now checks that every API route either uses the private no-store response helper or carries an explicit `PUBLIC_API_ROUTE:` classification and rationale. This is a guard against silently adding an unclassified API endpoint.
 - Tests cover the closed permission vocabulary and unknown-permission denial.
+
+
+### Streaming request limits and route guard regression coverage
+
+The bounded JSON reader was strengthened to count bytes while consuming the request stream. It rejects an oversized declared Content-Length early, but also enforces the ceiling on actual streamed chunks when Content-Length is absent or inaccurate. It cancels the stream once the configured byte limit is exceeded and rejects invalid UTF-8 rather than silently replacement-decoding it.
+
+The regression suite now checks:
+- Early rejection of an oversized declared Content-Length.
+- Actual streamed-body limits for chunked requests.
+- Stream cancellation on overflow.
+- Invalid UTF-8 rejection.
+- Retention of same-origin checks on every current mutation endpoint.
+- Retention of staff-session checks on protected meeting read/write endpoints.
+
+These checks are source-level regression safeguards, not a substitute for end-to-end security testing against a running deployment.
