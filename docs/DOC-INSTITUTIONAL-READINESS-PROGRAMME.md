@@ -177,3 +177,17 @@ A regression test checks the production header configuration. A Content Security
 The Officer Access page no longer implies that a Notion roster is a future-ready access-control mechanism. It now explicitly identifies the shared-key gate as transitional, shows identity/membership/appointment/delegation as not implemented or not connected, states the President's decision authority, and lists the four departments without implying that any department head has been appointed.
 
 The meeting intake now presents Standard sensitivity as the only available transitional option, explains why Restricted submissions are unavailable, enforces field length limits in the interface and exposes submission errors as accessible alerts. The server remains authoritative and independently validates all fields.
+
+
+### Explicit appointment scope and regression verification
+
+Officer permission checks now require both an explicit resource scope supplied by the protected server-side handler and an explicit scope on the trusted appointment:
+- Department scope is bound to one department identifier and cannot be used against another department.
+- An appointment without scope is denied.
+- A department appointment cannot satisfy a global-resource request.
+- A global appointment can act across department resources only when global scope is explicitly recorded.
+- The Membership Administrator record-maintenance check uses an explicit global resource scope; it remains separate from membership decision authority.
+
+The first CI attempt exposed outdated test fixtures that lacked the newly mandatory scope. Those fixtures were corrected rather than weakening the policy. The latest run for commit `301144868ed02cef907afcf24ebf029908636c54` passed all 53 policy tests and the TypeScript check.
+
+This remains a policy primitive only. No trusted appointment adapter or department-scoped API integration is live yet.
