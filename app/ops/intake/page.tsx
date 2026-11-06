@@ -68,7 +68,7 @@ export default function IntakePage() {
           <label className="text-sm font-medium" htmlFor="sens">Sensitivity</label>
           <select id="sens" value={sensitivity} onChange={(e) => setSensitivity(e.target.value)} className="mt-1 min-h-[48px] w-full rounded-xl border border-slate-300 px-3">
             <option>Standard</option>
-            <option>Restricted</option>
+            <option disabled>Restricted — individual officer access required</option>
           </select>
         </div>
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
