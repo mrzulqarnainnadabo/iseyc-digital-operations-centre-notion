@@ -187,7 +187,9 @@ test("a delegate cannot decide after the delegation end date", () => {
 test("legacy shared session can read only standard meetings", () => {
   assert.equal(legacyBoundary.legacySessionCanReadMeeting("Standard"), true);
   assert.equal(legacyBoundary.legacySessionCanReadMeeting("Restricted"), false);
-  assert.equal(legacyBoundary.legacySessionCanReadMeeting(undefined), true);
+  assert.equal(legacyBoundary.legacySessionCanReadMeeting(undefined), false);
+  assert.equal(legacyBoundary.legacySessionCanReadMeeting(null), false);
+  assert.equal(legacyBoundary.legacySessionCanReadMeeting("Unclassified"), false);
 });
 test("legacy shared session cannot create restricted meetings", () => {
   assert.equal(legacyBoundary.legacySessionCanCreateMeeting("Standard"), true);
