@@ -191,3 +191,12 @@ Officer permission checks now require both an explicit resource scope supplied b
 The first CI attempt exposed outdated test fixtures that lacked the newly mandatory scope. Those fixtures were corrected rather than weakening the policy. The latest run for commit `301144868ed02cef907afcf24ebf029908636c54` passed all 53 policy tests and the TypeScript check.
 
 This remains a policy primitive only. No trusted appointment adapter or department-scoped API integration is live yet.
+
+
+### Operational module readiness register
+
+A protected `/ops/readiness` page now gives staff a single, explicit inventory of current module capability, limitations and dependencies. It records the meeting workflow as limited, membership as not connected, officer access as policy-foundation-only, and Digital Chamber, Action Register and Media & Content Command as placeholders. It also records audit/security operations as not implemented.
+
+The Command Brief links to this register. Environment indicators on the dashboard now say **Configured / Not configured**, not Ready / Missing, and explain that environment-variable presence does not prove database connectivity, integration permissions or end-to-end workflow readiness.
+
+A regression test checks that the readiness page preserves the not-ready warnings and that dashboard language does not turn configuration presence into an operational claim. The readiness page is a transparency and governance aid; it does not itself implement the listed workflows or grant access.
