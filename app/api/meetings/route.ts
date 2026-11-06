@@ -46,13 +46,26 @@ export async function POST(req: NextRequest) {
     return privateJson({ ok: false, error: "Invalid request body" }, { status: 400 });
   }
   const input = body as Record<string, unknown>;
+  const allowedFields = ["title", "conveningBody", "meetingDate", "summary", "sensitivity"];
+  if (Object.keys(input).some((key) => !allowedFields.includes(key))) {
+    return privateJson({ ok: false, error: "Unexpected meeting fields." }, { status: 400 });
+  }
+
   const asText = (value: unknown) => typeof value === "string" ? value.trim() : "";
   const title = asText(input.title);
-  if (title.length < 5) {
-    return privateJson(
-      { ok: false, error: "Title must be at least 5 characters." },
-      { status: 400 }
-    );
+  const conveningBody = asText(input.conveningBody);
+  const meetingDate = asText(input.meetingDate);
+  const summary = asText(input.summary);
+  if (title.length < 5 || title.length > 200) {
+    return privateJson({ ok: false, error: "Meeting title must be between 5 and 200 characters." }, { status: 400 });
+  }
+  if (conveningBody.length > 200 || summary.length > 1900) {
+    return privateJson({ ok: false, error: "Meeting details exceed the allowed length." }, { status: 400 });
+  }
+  if (meetingDate && (!/^\\d{4}-\\d{2}-\\d{2}$/.test(meetingDate) ||
+      Number.isNaN(Date.parse(`${meetingDate}T00:00:00.000Z`)) ||
+      new Date(`${meetingDate}T00:00:00.000Z`).toISOString().slice(0, 10) !== meetingDate)) {
+    return privateJson({ ok: false, error: "Meeting date must be a valid calendar date." }, { status: 400 });
   }
 
   // Do not coerce missing or unknown values to Standard: that would let a
@@ -74,9 +87,9 @@ export async function POST(req: NextRequest) {
   try {
     const created = await createMeeting({
       title,
-      conveningBody: asText(input.conveningBody),
-      meetingDate: asText(input.meetingDate),
-      summary: asText(input.summary),
+      conveningBody,
+      meetingDate,
+      summary,
       sensitivity,
     });
     return privateJson({ ok: true, id: created.id });
