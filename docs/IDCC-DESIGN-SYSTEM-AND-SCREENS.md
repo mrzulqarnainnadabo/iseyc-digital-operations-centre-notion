@@ -65,11 +65,11 @@ Primary viewport: 390px wide; support 360–430px without horizontal page overfl
 
 ### 1. Sign-in / session gate
 
-Structure: centered single-column card, no public marketing hero. ISEYC seal and product name; "Private officer access"; short explanation of access limitations; labelled identity input; one primary "Continue" action; safe error area; small footer with non-partisan and privacy notice.
+Structure: centered single-column card, no public marketing hero. ISEYC seal and product name; "Private officer access"; short explanation of access limitations; Google identity action only when OIDC provider configuration is ready; clearly separated transitional staff-key fallback while it remains enabled; safe status/error area; small footer with non-partisan and privacy notice.
 
-Preferred state: individual identity sign-in backed by verified identity provider. Transitional fallback, if retained, must be labelled "Temporary staff-key access — shared identity; restricted permissions" and must not imply individual accountability. Do not describe a shared key as verified personal identity.
+Preferred state: each person signs in with their own personal Google account. Google OIDC verifies the immutable subject and verified email; it does not itself grant ISEYC membership or office. The server must match the subject to an approved active membership record and a separately active appointment before opening officer routes. The intended six-digit personal DOC PIN is a later additional factor/step-up check; do not display or accept a PIN until secure storage, distributed rate limiting, recovery and audit are implemented. Transitional fallback, if retained, must be labelled "Temporary staff-key access — shared identity; restricted permissions" and must not imply individual accountability. Do not describe a shared key as verified personal identity.
 
-States: loading button; invalid credentials message; network error with retry; session expired state. Never echo submitted credentials or reveal which account exists.
+States: provider not configured; Google redirect/loading; invalid or expired identity response; identity verified but membership/appointment authorisation unavailable; PIN required only after the PIN flow is activated; network error with retry; session expired/revoked. Never echo credentials, tokens, PINs or reveal whether an account exists.
 
 ### 2. Command home
 
