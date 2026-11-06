@@ -51,10 +51,10 @@ export function DocShell({ children }: { children: React.ReactNode }) {
             <img src="/iseyc-seal.svg" alt="ISEYC seal" width="38" height="38" className="rounded-full border border-gold-600 bg-white object-contain" />
             <div className="min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold-600">ISEYC</p>
-              <p className="text-sm font-semibold leading-5 text-forest-950">Digital Operations Centre</p>
+              <p className="text-sm font-semibold leading-5 text-forest-950">Initiative for Sustainable Evolution for Youth and Community</p>
             </div>
           </div>
-          <p className="mt-3 text-xs text-ink-600">Private institutional workspace</p>
+          
         </div>
         <nav aria-label="Primary navigation" className="min-h-0 flex-1 space-y-5 overflow-y-auto px-3 py-5">
           {navGroups.map(({ group, items }) => (
@@ -66,7 +66,7 @@ export function DocShell({ children }: { children: React.ReactNode }) {
         </nav>
         <div className="border-t border-line px-5 py-4">
           <button type="button" onClick={logout} className="min-h-[44px] text-sm font-semibold text-forest-800 hover:text-forest-950">Sign out</button>
-          <p className="mt-2 text-xs leading-5 text-ink-600">Seats are human. Institutional decisions require authorised human review.</p>
+          
         </div>
       </aside>
 
@@ -92,7 +92,7 @@ export function DocShell({ children }: { children: React.ReactNode }) {
         </main>
         <footer className="border-t border-line bg-white/70 px-4 py-4 sm:px-6 lg:px-8">
           <div className="mx-auto flex max-w-7xl flex-col gap-2 text-xs text-ink-600 sm:flex-row sm:items-center sm:justify-between">
-            <p>Empowering Youth, Shaping Communities · Non-partisan institutional operations</p>
+            <p>Initiative for Sustainable Evolution for Youth and Community</p>
             <nav aria-label="Institutional references" className="flex flex-wrap gap-x-4 gap-y-2">
               <a className="min-h-[32px] inline-flex items-center underline-offset-2 hover:text-forest-800 hover:underline" href="https://2027-street-mandate.vercel.app/methodology" target="_blank" rel="noopener noreferrer">Mandate methodology ↗</a>
               <a className="min-h-[32px] inline-flex items-center underline-offset-2 hover:text-forest-800 hover:underline" href="mailto:iseycglobal@gmail.com">Contact ISEYC</a>
