@@ -44,7 +44,7 @@ export default function IntakePage() {
         <Link href="/ops/queue" className="inline-flex min-h-[40px] items-center text-sm font-semibold text-forest-800 hover:underline">← Approval queue</Link>
         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Notion-backed workflow · intake</p>
         <h1 className="font-serif text-2xl text-forest-950 sm:text-3xl">New meeting intake</h1>
-        <p className="text-sm leading-6 text-ink-600">Create a Standard meeting record for human review. Submission does not approve the record or create an institutional decision.</p>
+        
       </header>
 
       <section className="rounded-card border border-amber-200 bg-amber-50 p-4">
@@ -56,7 +56,7 @@ export default function IntakePage() {
         <div>
           <label className="block text-sm font-semibold text-ink-950" htmlFor="title">Meeting title <span className="text-red-700">*</span></label>
           <input id="title" required minLength={5} maxLength={200} autoComplete="off" value={title} onChange={(event) => setTitle(event.target.value)} className="mt-2 min-h-[48px] w-full rounded-control border border-line px-3 text-base" />
-          <p className="mt-1 text-xs text-ink-600">5–200 characters.</p>
+          
         </div>
         <div>
           <label className="block text-sm font-semibold text-ink-950" htmlFor="body">Convening body</label>
@@ -69,15 +69,15 @@ export default function IntakePage() {
         <div>
           <label className="block text-sm font-semibold text-ink-950" htmlFor="summary">Summary / notes</label>
           <textarea id="summary" rows={5} maxLength={1900} value={summary} onChange={(event) => setSummary(event.target.value)} className="mt-2 w-full rounded-control border border-line px-3 py-2 text-base leading-6" />
-          <p className="mt-1 text-xs text-ink-600">Do not include restricted personal, safeguarding or disciplinary information in this Standard intake.</p>
+          
         </div>
         <div className="rounded-control border border-line bg-cream-50 p-3">
           <p className="text-sm font-semibold text-ink-950">Sensitivity: Standard</p>
-          <p className="mt-1 text-xs leading-5 text-ink-600">This intake is limited to Standard records. The server enforces the same restriction; changing the client request cannot grant higher access.</p>
+          
         </div>
         {error ? <p role="alert" aria-live="assertive" className="rounded-control border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p> : null}
         <button type="submit" disabled={pending || title.trim().length < 5} className="inline-flex min-h-[48px] w-full items-center justify-center rounded-control bg-forest-900 px-4 text-sm font-semibold text-white hover:bg-forest-800 disabled:cursor-not-allowed disabled:opacity-50">
-          {pending ? "Submitting…" : "Submit for human review"}
+          {pending ? "Submitting…" : "Submit"}
         </button>
       </form>
     </div>
