@@ -1,6 +1,6 @@
 # Membership Register — Data and Permission Specification
 
-Status: schema specification only. The register has not yet been created or connected to the DOC application.
+Status: schema specification only. No dedicated membership register was found in the inspected Notion DOC workspace, and no membership database is connected to the application. The Field Register Desk is an unrelated event RSVP / activities / participants workspace and must not be repurposed as a membership register.
 
 ## Governance owner
 
