@@ -8,6 +8,14 @@ export function legacySessionCanReadMeeting(sensitivity: unknown): boolean {
   return sensitivity === "Standard";
 }
 
+export function filterLegacyVisibleMeetings<T extends { sensitivity?: unknown }>(
+  meetings: T[]
+): T[] {
+  return meetings.filter((meeting) =>
+    legacySessionCanReadMeeting(meeting.sensitivity)
+  );
+}
+
 export function legacySessionCanCreateMeeting(sensitivity: unknown): boolean {
   return sensitivity === "Standard";
 }
