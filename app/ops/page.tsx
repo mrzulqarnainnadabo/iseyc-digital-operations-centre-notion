@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { configFlags, listMeetings } from "@/lib/notion";
-import { legacySessionCanReadMeeting } from "@/lib/legacy-session-boundary";
+import { filterLegacyVisibleMeetings } from "@/lib/legacy-session-boundary";
 
 export const dynamic = "force-dynamic";
 
@@ -13,9 +13,7 @@ export default async function CommandBriefPage() {
       // Keep dashboard aggregates inside the same Standard-only boundary as
       // the legacy-session meeting API. Restricted and unclassified records
       // must not influence counts visible to a shared-key session.
-      meetings = (await listMeetings()).filter((meeting) =>
-        legacySessionCanReadMeeting(meeting.sensitivity)
-      );
+      meetings = filterLegacyVisibleMeetings(await listMeetings());
     } catch {
       // Do not surface raw Notion/API exception details in the DOC interface.
       listError = "Unable to load the Standard meeting summary.";
