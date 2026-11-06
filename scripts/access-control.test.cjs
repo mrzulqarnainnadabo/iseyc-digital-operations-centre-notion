@@ -228,3 +228,61 @@ test("dashboard aggregates exclude restricted and unclassified meetings", () => 
   assert.deepEqual(visible.map((record) => record.id), ["standard"]);
   assert.equal(visible.length, 1);
 });
+
+
+test("membership administrator may read records but cannot decide", () => {
+  const c = context({ appointments: [{
+    status: "Active", role: "Membership Administrator",
+    permissions: ["membership.records.manage"]
+  }] });
+  assert.equal(policy.canReadMembershipRecord(c, "another-member", now), true);
+  assert.equal(policy.canDecideMembership(c, "approve", now), false);
+});
+
+test("ordinary member cannot read another member's record", () => {
+  const c = context();
+  assert.equal(policy.canReadMembershipRecord(c, "another-member", now), false);
+});
+
+test("unverified or inactive member cannot read even their own record", () => {
+  const unverified = context({ membership: {
+    status: "Approved", googleSubject: "member", emailVerified: false
+  } });
+  const suspended = context({ membership: {
+    status: "Suspended", googleSubject: "member", emailVerified: true
+  } });
+  assert.equal(policy.canReadMembershipRecord(unverified, "member", now), false);
+  assert.equal(policy.canReadMembershipRecord(suspended, "member", now), false);
+});
+
+test("President identity alone does not grant record administration", () => {
+  const c = context({
+    googleSubject: "president",
+    membership: { status: "Suspended", googleSubject: "president", emailVerified: true }
+  });
+  assert.equal(policy.canAdministerMembershipRecords(c, now), false);
+  assert.equal(policy.canReadMembershipRecord(c, "another-member", now), false);
+});
+
+test("revoked or expired appointment cannot administer membership records", () => {
+  const revoked = context({ appointments: [{
+    status: "Revoked", role: "Membership Administrator",
+    permissions: ["membership.records.manage"]
+  }] });
+  const expired = context({ appointments: [{
+    status: "Active", role: "Membership Administrator",
+    permissions: ["membership.records.manage"],
+    effectiveUntil: "2026-11-01T00:00:00.000Z"
+  }] });
+  assert.equal(policy.canAdministerMembershipRecords(revoked, now), false);
+  assert.equal(policy.canAdministerMembershipRecords(expired, now), false);
+});
+
+test("delegation from anyone other than the recorded President is denied", () => {
+  const c = context({ delegations: [{
+    delegateGoogleSubject: "member", grantedByGoogleSubject: "another-officer",
+    decisionScopes: ["approve"], effectiveFrom: "2026-10-01T00:00:00.000Z",
+    effectiveUntil: "2026-12-01T00:00:00.000Z"
+  }] });
+  assert.equal(policy.canDecideMembership(c, "approve", now), false);
+});
