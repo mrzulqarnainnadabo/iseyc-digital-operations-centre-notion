@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { privateJson } from "@/lib/private-response";
 import { requireStaffSession } from "@/lib/auth";
-import { isSameOriginRequest } from "@/lib/request-security";
+import { isSameOriginRequest, readBoundedJson } from "@/lib/request-security";
 import { getMeeting, setMeetingStatus } from "@/lib/notion";
 import { legacySessionCanReadMeeting, legacySessionCanSetMeetingStatus } from "@/lib/legacy-session-boundary";
 
@@ -43,12 +43,12 @@ export async function PATCH(
     return privateJson({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: unknown;
-  try {
-    body = await req.json();
-  } catch {
-    return privateJson({ ok: false, error: "Invalid JSON" }, { status: 400 });
+  const parsed = await readBoundedJson(req, 8_192);
+  if (!parsed.ok) {
+    const status = parsed.reason === "too_large" ? 413 : parsed.reason === "content_type" ? 415 : 400;
+    return privateJson({ ok: false, error: "Invalid meeting update request." }, { status });
   }
+  const body = parsed.value;
 
   if (!body || typeof body !== "object" || Array.isArray(body)) {
     return privateJson({ ok: false, error: "Invalid request body" }, { status: 400 });
