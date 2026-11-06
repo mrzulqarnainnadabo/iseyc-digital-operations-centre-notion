@@ -59,32 +59,22 @@ export default function QueuePage() {
       <header className="space-y-3">
         <div>
           
-          <h1 className="mt-1 font-serif text-2xl text-forest-950 sm:text-3xl">Global approval queue</h1>
+          <h1 className="mt-1 font-serif text-2xl text-forest-950 sm:text-3xl">Approval queue</h1>
           
         </div>
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={() => setReloadKey((value) => value + 1)} disabled={loading} className="inline-flex min-h-[44px] items-center rounded-control border border-line bg-white px-4 text-sm font-semibold text-ink-700 disabled:opacity-50">{loading ? "Refreshing…" : "Refresh"}</button>
-          <Link href="/ops/intake" className="inline-flex min-h-[44px] items-center rounded-control bg-forest-900 px-4 text-sm font-semibold text-white hover:bg-forest-800">New intake</Link>
+          <Link href="/ops/intake" className="inline-flex min-h-[44px] items-center rounded-control bg-forest-900 px-4 text-sm font-semibold text-white hover:bg-forest-800">Intake</Link>
         </div>
       </header>
 
-      <section className="rounded-card border border-amber-200 bg-amber-50 p-4" aria-label="Human review policy">
-        <div className="flex items-start gap-3">
-          <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-amber-100 text-sm font-bold text-amber-900" aria-hidden="true">!</span>
-          <div>
-            <p className="text-sm font-semibold text-amber-950">Human review is mandatory</p>
-            <p className="mt-1 text-sm leading-5 text-amber-900">AI assistance, if introduced, remains a draft aid only. No AI output is an institutional decision, and no record is approved by appearing in this queue.</p>
-          </div>
-        </div>
-      </section>
-
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-3" aria-label="Queue summary">
         <div className="rounded-card border border-line bg-white p-4">
-          <p className="text-xs text-ink-600">Records loaded</p>
+          <p className="text-xs text-ink-600">Records</p>
           <p className="mt-1 font-serif text-2xl tabular-nums">{loading || error ? "—" : meetings.length}</p>
         </div>
         <div className="rounded-card border border-line bg-white p-4">
-          <p className="text-xs text-ink-600">Awaiting review</p>
+          <p className="text-xs text-ink-600">Awaiting</p>
           <p className="mt-1 font-serif text-2xl tabular-nums">{loading || error ? "—" : reviewCount}</p>
         </div>
         <div className="col-span-2 rounded-card border border-line bg-white p-4 sm:col-span-1">
