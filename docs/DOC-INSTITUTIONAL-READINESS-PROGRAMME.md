@@ -157,3 +157,16 @@ The regression suite now checks:
 - Retention of staff-session checks on protected meeting read/write endpoints.
 
 These checks are source-level regression safeguards, not a substitute for end-to-end security testing against a running deployment.
+
+
+### Browser security headers
+
+The application now configures baseline response headers for all routes:
+- `X-Content-Type-Options: nosniff`
+- `X-Frame-Options: DENY`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `X-Permitted-Cross-Domain-Policies: none`
+- A restrictive `Permissions-Policy` disabling unused camera, microphone and geolocation access.
+- Production-only HSTS with a one-year max age and deliberately no `includeSubDomains`, because the application is hosted on shared infrastructure.
+
+A regression test checks the production header configuration. A Content Security Policy has not been added yet; it requires a separate audit of scripts, styles, fonts, image origins and any future Google OIDC integration to avoid a falsely restrictive or ineffective policy.
