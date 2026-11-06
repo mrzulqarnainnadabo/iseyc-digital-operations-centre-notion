@@ -119,3 +119,12 @@ The transitional shared-key session verifier now rejects non-canonical token enc
 Regression coverage now includes valid-token acceptance, signature tampering, malformed token segments, invalid nonce/signature encodings, expired tokens, future timestamps and the shared authenticated layout protecting every current operations page.
 
 This does not add individual identity or central per-session revocation. Logout clears the browser cookie; because sessions remain stateless, a copied token remains valid until expiry or staff-key rotation. Treat this as a documented transitional limitation, not a production identity system.
+
+
+## Notion database identity and mutation boundary
+
+DOC database identifiers are canonicalized by removing UUID hyphens and lowercasing before use or comparison. The Civic Mandate public database blocklist is checked against this canonical form, so case or hyphen formatting cannot bypass the separation check.
+
+The meeting status adapter independently retrieves the target page immediately before mutation and verifies that its parent database is the configured internal Meetings database. Route-level session, same-origin, sensitivity and transition checks remain required; this adapter-level parent check is defence in depth, not a substitute for authorization.
+
+Regression tests cover uppercase/hyphenated variants of the blocked public database ID and ensure the status adapter verifies the database parent before calling the Notion update API.
