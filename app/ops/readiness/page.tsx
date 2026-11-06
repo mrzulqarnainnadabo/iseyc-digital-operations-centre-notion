@@ -13,7 +13,7 @@ const modules = [
     name: "Membership register",
     route: "/ops/access",
     state: "Not operational",
-    detail: "No authoritative membership records or live member decisions are connected.",
+    detail: "No authoritative membership records or live member decisions are connected. The member register is Not connected.",
     dependency: "Approved restricted data store, verified identity and Presidential governance workflow.",
   },
   {
@@ -33,14 +33,14 @@ const modules = [
   {
     name: "Action register",
     route: "/ops/actions",
-    state: "Placeholder",
+    state: "Not operational",
     detail: "No operational action ownership, due dates, evidence or closure workflow is connected. Placeholder only.",
     dependency: "Approved decision linkage, responsible owners, review and closure evidence.",
   },
   {
     name: "Media & Content Command",
     route: "/ops/media",
-    state: "Placeholder",
+    state: "Not operational",
     detail: "No editorial queue, approval workflow or publication evidence is connected. Placeholder only.",
     dependency: "Draft records, editorial permissions, human approval and publication history.",
   },
