@@ -58,12 +58,12 @@ export default function QueuePage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <header className="space-y-3">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Human authority · controlled records</p>
+          
           <h1 className="mt-1 font-serif text-2xl text-forest-950 sm:text-3xl">Global approval queue</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-600">A single review surface for records submitted to the Notion-backed meeting workflow. A queue item is not an institutional decision.</p>
+          
         </div>
         <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => setReloadKey((value) => value + 1)} disabled={loading} className="inline-flex min-h-[44px] items-center rounded-control border border-line bg-white px-4 text-sm font-semibold text-ink-700 disabled:opacity-50">{loading ? "Refreshing…" : "Refresh queue"}</button>
+          <button type="button" onClick={() => setReloadKey((value) => value + 1)} disabled={loading} className="inline-flex min-h-[44px] items-center rounded-control border border-line bg-white px-4 text-sm font-semibold text-ink-700 disabled:opacity-50">{loading ? "Refreshing…" : "Refresh"}</button>
           <Link href="/ops/intake" className="inline-flex min-h-[44px] items-center rounded-control bg-forest-900 px-4 text-sm font-semibold text-white hover:bg-forest-800">New intake</Link>
         </div>
       </header>
@@ -127,9 +127,9 @@ export default function QueuePage() {
                       <StatusBadge status={meeting.status} />
                     </div>
                     <p className="mt-1 text-xs leading-5 text-ink-600">{meeting.conveningBody || "Convening body not supplied"} · {meeting.meetingDate || "Date not supplied"}</p>
-                    <p className="mt-2 text-xs text-ink-600">Human decision required · Not an approved institutional record</p>
+                    
                   </div>
-                  <Link href={`/ops/review/${encodeURIComponent(meeting.id)}`} className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-control border border-forest-900 px-4 text-sm font-semibold text-forest-900 hover:bg-forest-100">Open for review</Link>
+                  <Link href={`/ops/review/${encodeURIComponent(meeting.id)}`} className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-control border border-forest-900 px-4 text-sm font-semibold text-forest-900 hover:bg-forest-100">Review</Link>
                 </div>
               </li>
             ))}
