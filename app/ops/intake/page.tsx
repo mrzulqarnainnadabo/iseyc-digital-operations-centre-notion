@@ -10,7 +10,6 @@ export default function IntakePage() {
   const [conveningBody, setConveningBody] = useState("");
   const [meetingDate, setMeetingDate] = useState("");
   const [summary, setSummary] = useState("");
-  const [sensitivity, setSensitivity] = useState("Standard");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -22,7 +21,7 @@ export default function IntakePage() {
       const res = await fetch("/api/meetings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, conveningBody, meetingDate, summary, sensitivity }),
+        body: JSON.stringify({ title, conveningBody, meetingDate, summary, sensitivity: "Standard" }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -47,14 +46,14 @@ export default function IntakePage() {
       <p className="text-sm text-slate-600">
         Creates a New record in Notion. Not institutional memory until an officer approves it.
       </p>
-      <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5">
+      <form onSubmit={onSubmit} aria-busy={pending} className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5">
         <div>
           <label className="text-sm font-medium" htmlFor="title">Meeting title</label>
-          <input id="title" required minLength={5} value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 min-h-[48px] w-full rounded-xl border border-slate-300 px-3" />
+          <input id="title" required minLength={5} maxLength={200} autoComplete="off" value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 min-h-[48px] w-full rounded-xl border border-slate-300 px-3" />
         </div>
         <div>
           <label className="text-sm font-medium" htmlFor="body">Convening body</label>
-          <input id="body" value={conveningBody} onChange={(e) => setConveningBody(e.target.value)} className="mt-1 min-h-[48px] w-full rounded-xl border border-slate-300 px-3" />
+          <input id="body" maxLength={200} autoComplete="organization" value={conveningBody} onChange={(e) => setConveningBody(e.target.value)} className="mt-1 min-h-[48px] w-full rounded-xl border border-slate-300 px-3" />
         </div>
         <div>
           <label className="text-sm font-medium" htmlFor="date">Meeting date</label>
@@ -62,17 +61,17 @@ export default function IntakePage() {
         </div>
         <div>
           <label className="text-sm font-medium" htmlFor="summary">Summary / notes</label>
-          <textarea id="summary" rows={4} value={summary} onChange={(e) => setSummary(e.target.value)} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2" />
+          <textarea id="summary" rows={4} maxLength={1900} value={summary} onChange={(e) => setSummary(e.target.value)} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2" />
         </div>
-        <div>
-          <label className="text-sm font-medium" htmlFor="sens">Sensitivity</label>
-          <select id="sens" value={sensitivity} onChange={(e) => setSensitivity(e.target.value)} className="mt-1 min-h-[48px] w-full rounded-xl border border-slate-300 px-3">
-            <option>Standard</option>
-            <option>Restricted</option>
-          </select>
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+          <p className="text-sm font-medium text-slate-800">Sensitivity: Standard</p>
+          <p className="mt-1 text-xs leading-5 text-slate-600">
+            Transitional staff sessions may submit Standard records only. Restricted records
+            cannot be submitted through this intake until individual officer authorisation is available.
+          </p>
         </div>
-        {error ? <p className="text-sm text-red-600">{error}</p> : null}
-        <button type="submit" disabled={pending} className="min-h-[52px] w-full rounded-xl bg-emerald-700 font-semibold text-white disabled:opacity-60">
+        {error ? <p className="text-sm text-red-700" role="alert" aria-live="assertive">{error}</p> : null}
+        <button type="submit" disabled={pending || title.trim().length < 5} className="min-h-[52px] w-full rounded-xl bg-emerald-700 font-semibold text-white disabled:opacity-60">
           {pending ? "Saving…" : "Submit for queue"}
         </button>
       </form>
