@@ -606,3 +606,16 @@ test("every operational page inherits the authenticated operations layout", () =
   assert.ok(pages.length > 0, "operations page inventory should not be empty");
   assert.ok(pages.every((page) => page.startsWith(root)), "all operations pages must be inside the protected route group");
 });
+
+
+test("readiness register distinguishes placeholders from implemented workflows", () => {
+  const readiness = fs.readFileSync(require("node:path").join(__dirname, "../app/ops/readiness/page.tsx"), "utf8");
+  const dashboard = fs.readFileSync(require("node:path").join(__dirname, "../app/ops/page.tsx"), "utf8");
+  assert.ok(readiness.includes("Placeholder"));
+  assert.ok(readiness.includes("Not connected"));
+  assert.ok(readiness.includes("not verified individual identity"));
+  assert.ok(readiness.includes("Do not enter real membership"));
+  assert.ok(dashboard.includes("Environment configuration"));
+  assert.ok(dashboard.includes("do not verify database connectivity"));
+  assert.ok(dashboard.includes('href="/ops/readiness"'));
+});
