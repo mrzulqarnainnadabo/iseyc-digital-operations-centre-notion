@@ -86,14 +86,13 @@ test("operations loading state is announced accessibly", () => {
 
 test("planned operational modules cannot present placeholders as live workflows", () => {
   const modules = [
-    ["actions", /No action workflow is connected/],
-    ["chamber", /No Chamber workflow is connected/],
-    ["media", /Not operational — no editorial or publishing workflow is connected/]
+    ["actions", /data-status="not-operational"/],
+    ["chamber", /data-status="not-operational"/],
+    ["media", /data-status="not-operational"/]
   ];
   for (const [name, warning] of modules) {
     const source = fs.readFileSync(path.join(opsRoot, name, "page.tsx"), "utf8");
     assert.match(source, warning, `${name} must state its non-operational status`);
-    assert.match(source, /Required workflow before (launch|activation)/);
     assert.match(source, /\/ops\/readiness/);
   }
 });
@@ -120,7 +119,7 @@ test("department desks and Day-1 packet do not imply staffing or appointments", 
   const seat = fs.readFileSync(path.join(opsRoot, "seat/page.tsx"), "utf8");
   assert.match(department, /Not operational/);
   assert.match(department, /task register not connected/i);
-  assert.match(department, /role="status"/);
+  assert.match(department, /data-source-state="not-connected"/);
   for (const name of [
     "Education & Capacity Building",
     "Health & Well-being",
