@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { configFlags, listMeetings } from "@/lib/notion";
+import { legacySessionCanReadMeeting } from "@/lib/legacy-session-boundary";
 
 export const dynamic = "force-dynamic";
 
@@ -9,9 +10,15 @@ export default async function CommandBriefPage() {
   let listError: string | null = null;
   if (flags.token && flags.meetings) {
     try {
-      meetings = await listMeetings();
-    } catch (e) {
-      listError = e instanceof Error ? e.message : "Could not load meetings";
+      // Keep dashboard aggregates inside the same Standard-only boundary as
+      // the legacy-session meeting API. Restricted and unclassified records
+      // must not influence counts visible to a shared-key session.
+      meetings = (await listMeetings()).filter((meeting) =>
+        legacySessionCanReadMeeting(meeting.sensitivity)
+      );
+    } catch {
+      // Do not surface raw Notion/API exception details in the DOC interface.
+      listError = "Unable to load the Standard meeting summary.";
     }
   }
   const awaiting = meetings.filter((m) =>
@@ -37,7 +44,7 @@ export default async function CommandBriefPage() {
             <p className="mt-1 font-serif text-3xl">{awaiting.length}</p>
           </div>
           <div className="rounded-xl border border-slate-700 bg-white/5 p-4">
-            <p className="text-xs uppercase tracking-wide text-slate-400">Meetings total</p>
+            <p className="text-xs uppercase tracking-wide text-slate-400">Standard meetings total</p>
             <p className="mt-1 font-serif text-3xl">{meetings.length}</p>
           </div>
           <div className="rounded-xl border border-slate-700 bg-white/5 p-4">
