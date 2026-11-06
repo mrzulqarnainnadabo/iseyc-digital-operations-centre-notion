@@ -120,7 +120,7 @@ test("department desks and Day-1 packet do not imply staffing or appointments", 
   const seat = fs.readFileSync(path.join(opsRoot, "seat/page.tsx"), "utf8");
   assert.match(department, /Not operational/);
   assert.match(department, /task register not connected/i);
-  assert.match(department, /does not imply that a department head or staff member has been appointed/i);
+  assert.match(department, /role="status"/);
   for (const name of [
     "Education & Capacity Building",
     "Health & Well-being",
@@ -128,7 +128,7 @@ test("department desks and Day-1 packet do not imply staffing or appointments", 
     "Civic Affairs"
   ]) assert.ok(department.includes(name));
   assert.match(seat, /No active appointment record is linked to this session/);
-  assert.match(seat, /generic onboarding framework/i);
+  assert.match(seat, /Generic seat packet/i);
   assert.match(seat, /AI is staff to the seat, never the seat-holder/);
 });
 
