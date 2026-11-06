@@ -374,8 +374,8 @@ test("every DOC API route declares private caching or an explicit public classif
   for (const route of routes) {
     const source = fs.readFileSync(route, "utf8");
     assert.ok(
-      source.includes("privateJson(") || source.includes("PUBLIC_API_ROUTE:"),
-      `${route} must use privateJson or declare PUBLIC_API_ROUTE with an explicit public rationale`
+      source.includes("privateJson(") || source.includes("privateResponseHeaders(") || source.includes("PUBLIC_API_ROUTE:"),
+      `${route} must use private no-store response handling or declare PUBLIC_API_ROUTE with an explicit public rationale`
     );
   }
 });
