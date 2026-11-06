@@ -90,7 +90,7 @@ export async function getMeeting(id: string): Promise<MeetingRecord | null> {
   assertInternalDb(database_id);
   try {
     const page: any = await client.pages.retrieve({ page_id: id });
-    if (!("properties" in page) || page.parent?.database_id !== database_id) return null;
+    if (!("properties" in page) || typeof page.parent?.database_id !== "string" || page.parent.database_id.replace(/-/g, "").trim() !== database_id) return null;
     const props = page.properties;
     return {
       id: page.id,
