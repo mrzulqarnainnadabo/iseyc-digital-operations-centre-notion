@@ -24,7 +24,8 @@ export function docAppOrigin(): string | null {
 
 export function googleOidcConfigured(): boolean {
   return Boolean(
-    docAppOrigin() &&\n    process.env.DOC_GOOGLE_CLIENT_ID?.trim() &&
+    docAppOrigin() &&
+    process.env.DOC_GOOGLE_CLIENT_ID?.trim() &&
     process.env.DOC_GOOGLE_CLIENT_SECRET?.trim() &&
     process.env.DOC_SESSION_SECRET &&
     Buffer.byteLength(process.env.DOC_SESSION_SECRET) >= 32
