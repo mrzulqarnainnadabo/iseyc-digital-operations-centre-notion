@@ -32,7 +32,7 @@ const contracts = {
   },
   "auth/oidc/callback/route.ts": {
     methods: ["GET"],
-    required: ["googleOidcConfigured", "safeEqual", "verifyGoogleIdToken", "signPendingIdentity", "privateResponseHeaders"],
+    required: ["googleOidcConfigured", "safeEqual", "verifyGoogleIdToken", "signPendingIdentity", "privateJson", "privateResponseHeaders"],
     forbidden: []
   },
   "auth/oidc/status/route.ts": {
