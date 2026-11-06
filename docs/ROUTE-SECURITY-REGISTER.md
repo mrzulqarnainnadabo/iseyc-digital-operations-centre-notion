@@ -43,3 +43,14 @@ The route inventory test intentionally fails when a new or removed API route has
 ## Current release decision
 
 **NO-GO for production.** Shared-key authentication is transitional. Individual OIDC identity, trusted membership and appointment adapters, complete object-level authorization, durable audit events, distributed rate limiting, session revocation and authenticated browser QA remain outstanding.
+
+
+## Guard ordering regression checks
+
+The route-security test suite also checks that:
+- Login rejects cross-origin requests before parsing the submitted key.
+- Meeting creation checks origin and the staff session before parsing the body or writing to Notion.
+- Meeting updates check origin and the staff session before parsing the body, loading the target record or mutating it.
+- Meeting collection and detail reads authenticate before retrieving Notion records.
+
+These are source-order regression checks. They help detect accidental refactors that move data access ahead of a guard, but they do not replace runtime tests of the deployed framework and middleware.
