@@ -82,7 +82,7 @@ export function DocShell({ children }: { children: React.ReactNode }) {
             <button type="button" onClick={logout} className="min-h-[44px] shrink-0 rounded-control px-3 text-xs font-semibold text-ink-700 hover:bg-white lg:hidden">Sign out</button>
           </div>
           <nav aria-label="Mobile navigation" className="flex gap-1 overflow-x-auto px-3 pb-3 lg:hidden">
-            {DOC_NAV.filter((item) => ["Command home", "Approval queue", "Meeting intake", "Civic Mandate", "Civic Brain"].includes(item.label)).map((item) => navLink(item, true))}
+            {DOC_NAV.filter((item) => ["Command home", "Approval queue", "Meeting intake", "Day-1 seat briefing", "Civic Mandate", "Civic Brain"].includes(item.label)).map((item) => navLink(item, true))}
           </nav>
         </header>
 
