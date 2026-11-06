@@ -135,3 +135,10 @@ Exit gate: workflows are usable end-to-end by the correct role, with evidence an
 ## Current release decision
 
 **NO-GO for production.** The shared-key gate is transitional and is not suitable as the final identity or authorization system. The current work is review-branch engineering only. CI and PR preview checks may run automatically, but no production merge, promotion or deployment is authorized by this programme.
+
+
+### Additional controls added after the initial inventory
+
+- A closed DOC permission vocabulary is now defined in `lib/doc-permissions.ts`. It defines capability identifiers only; it does not grant access. Runtime policy rejects unknown permission strings even if they appear in a supplied appointment payload.
+- The policy test suite now checks that every API route either uses the private no-store response helper or carries an explicit `PUBLIC_API_ROUTE:` classification and rationale. This is a guard against silently adding an unclassified API endpoint.
+- Tests cover the closed permission vocabulary and unknown-permission denial.
