@@ -10,6 +10,7 @@ require.extensions[".ts"] = (mod, filename) => {
   mod._compile(js, filename);
 };
 const policy = require("../lib/access-control.ts");
+const legacyBoundary = require("../lib/legacy-session-boundary.ts");
 const now = new Date("2026-11-06T12:00:00.000Z");
 const context = (extra = {}) => ({
   googleSubject: "member",
@@ -181,4 +182,21 @@ test("a delegate cannot decide after the delegation end date", () => {
     effectiveUntil: "2026-11-01T00:00:00.000Z"
   }] });
   assert.equal(policy.canDecideMembership(c, "approve", now), false);
+});
+
+test("legacy shared session can read only standard meetings", () => {
+  assert.equal(legacyBoundary.legacySessionCanReadMeeting("Standard"), true);
+  assert.equal(legacyBoundary.legacySessionCanReadMeeting("Restricted"), false);
+  assert.equal(legacyBoundary.legacySessionCanReadMeeting(undefined), true);
+});
+test("legacy shared session cannot create restricted meetings", () => {
+  assert.equal(legacyBoundary.legacySessionCanCreateMeeting("Standard"), true);
+  assert.equal(legacyBoundary.legacySessionCanCreateMeeting("Restricted"), false);
+});
+test("legacy shared session cannot approve meeting records", () => {
+  assert.equal(legacyBoundary.legacySessionCanSetMeetingStatus("In review"), true);
+  assert.equal(legacyBoundary.legacySessionCanSetMeetingStatus("Archived"), true);
+  assert.equal(legacyBoundary.legacySessionCanSetMeetingStatus("Draft"), true);
+  assert.equal(legacyBoundary.legacySessionCanSetMeetingStatus("Approved"), false);
+  assert.equal(legacyBoundary.legacySessionCanSetMeetingStatus("unknown"), false);
 });
