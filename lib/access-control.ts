@@ -208,3 +208,41 @@ export function canManageMembershipDelegations(
     context.googleSubject === context.nationalPresidentGoogleSubject
   );
 }
+
+
+/**
+ * A member may view only their own membership summary. Full-register access
+ * is reserved for the President or an explicitly appointed records handler.
+ * Callers must still project a safe DTO and never return the raw Notion page.
+ */
+export function canReadMembershipRecord(
+  context: AuthorizationContext,
+  targetGoogleSubject: string,
+  now = new Date()
+): boolean {
+  if (!targetGoogleSubject) return false;
+
+  if (
+    context.googleSubject === targetGoogleSubject &&
+    checkMemberAccess(context, now).allowed
+  ) {
+    return true;
+  }
+
+  return canAdministerMembershipRecords(context, now);
+}
+
+/**
+ * Audit events should be attributable to the authenticated server-side
+ * identity. This helper intentionally refuses anonymous or mismatched actors.
+ */
+export function canAttributeGovernanceAction(
+  context: AuthorizationContext,
+  authenticatedGoogleSubject: string
+): boolean {
+  return Boolean(
+    context.googleSubject &&
+      authenticatedGoogleSubject &&
+      context.googleSubject === authenticatedGoogleSubject
+  );
+}
