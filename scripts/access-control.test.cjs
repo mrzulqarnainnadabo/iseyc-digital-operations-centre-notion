@@ -286,3 +286,12 @@ test("delegation from anyone other than the recorded President is denied", () =>
   }] });
   assert.equal(policy.canDecideMembership(c, "approve", now), false);
 });
+
+const privateResponse = require("../lib/private-response.ts");
+test("private DOC API responses prohibit storage and vary by session cookie", () => {
+  const headers = privateResponse.privateResponseHeaders({ "X-Test": "preserved" });
+  assert.equal(headers.get("Cache-Control"), "private, no-store, max-age=0, must-revalidate");
+  assert.equal(headers.get("Pragma"), "no-cache");
+  assert.equal(headers.get("Vary"), "Cookie");
+  assert.equal(headers.get("X-Test"), "preserved");
+});
