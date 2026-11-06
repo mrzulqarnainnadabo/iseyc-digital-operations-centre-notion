@@ -6,14 +6,18 @@ export function notion(): Client | null {
   return new Client({ auth });
 }
 
+function canonicalNotionId(id: string): string {
+  return id.replace(/-/g, "").trim().toLowerCase();
+}
+
 export function dbId(envName: string): string {
-  return (process.env[envName] || "").replace(/-/g, "").trim();
+  return canonicalNotionId(process.env[envName] || "");
 }
 
 const MANDATE_BLOCKLIST = new Set(["19b213d55bfc4ce8a653a05147cbbe2a"]);
 
 export function assertInternalDb(id: string): void {
-  if (MANDATE_BLOCKLIST.has(id)) {
+  if (MANDATE_BLOCKLIST.has(canonicalNotionId(id))) {
     throw new Error("Refusing to use Civic Mandate public database for DOC operations.");
   }
 }
@@ -90,7 +94,7 @@ export async function getMeeting(id: string): Promise<MeetingRecord | null> {
   assertInternalDb(database_id);
   try {
     const page: any = await client.pages.retrieve({ page_id: id });
-    if (!("properties" in page) || typeof page.parent?.database_id !== "string" || page.parent.database_id.replace(/-/g, "").trim() !== database_id) return null;
+    if (!("properties" in page) || typeof page.parent?.database_id !== "string" || canonicalNotionId(page.parent.database_id) !== database_id) return null;
     const props = page.properties;
     return {
       id: page.id,
@@ -150,7 +154,19 @@ export async function setMeetingStatus(
   status: "In review" | "Approved" | "Archived" | "Draft"
 ): Promise<void> {
   const client = notion();
-  if (!client) throw new Error("Notion not configured");
+  const database_id = dbId("NOTION_MEETINGS_DATABASE_ID");
+  if (!client || !database_id) throw new Error("Notion meetings database not configured");
+  assertInternalDb(database_id);
+
+  // Re-check the page's parent immediately before mutation. Callers should
+  // enforce authorization too, but this adapter must never mutate a page
+  // outside the configured internal Meetings database.
+  const page: any = await client.pages.retrieve({ page_id: id });
+  if (typeof page.parent?.database_id !== "string" ||
+      canonicalNotionId(page.parent.database_id) !== database_id) {
+    throw new Error("Refusing to update a page outside the configured Meetings database.");
+  }
+
   await client.pages.update({
     page_id: id,
     properties: { Status: { select: { name: status } } },
