@@ -295,3 +295,44 @@ test("private DOC API responses prohibit storage and vary by session cookie", ()
   assert.equal(headers.get("Vary"), "Cookie");
   assert.equal(headers.get("X-Test"), "preserved");
 });
+
+const requestSecurity = require("../lib/request-security.ts");
+test("bounded JSON parser accepts JSON within the configured byte limit", async () => {
+  const request = new Request("https://doc.example/api", {
+    method: "POST",
+    headers: { "Content-Type": "application/json; charset=utf-8" },
+    body: JSON.stringify({ status: "In review" })
+  });
+  const result = await requestSecurity.readBoundedJson(request, 128);
+  assert.deepEqual(result, { ok: true, value: { status: "In review" } });
+});
+
+test("bounded JSON parser rejects incorrect media types", async () => {
+  const request = new Request("https://doc.example/api", {
+    method: "POST",
+    headers: { "Content-Type": "text/plain" },
+    body: "{}"
+  });
+  assert.deepEqual(await requestSecurity.readBoundedJson(request), {
+    ok: false, reason: "content_type"
+  });
+});
+
+test("bounded JSON parser rejects oversized and malformed payloads", async () => {
+  const oversized = new Request("https://doc.example/api", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ note: "x".repeat(100) })
+  });
+  const malformed = new Request("https://doc.example/api", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: "{"
+  });
+  assert.deepEqual(await requestSecurity.readBoundedJson(oversized, 32), {
+    ok: false, reason: "too_large"
+  });
+  assert.deepEqual(await requestSecurity.readBoundedJson(malformed), {
+    ok: false, reason: "invalid_json"
+  });
+});
