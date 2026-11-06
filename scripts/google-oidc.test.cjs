@@ -32,7 +32,7 @@ test("Google OIDC transaction uses independent high-entropy state, nonce and PKC
   else process.env.DOC_APP_URL = prior;
 });
 
-test("Google OIDC is disabled unless client credentials and a 32-byte session secret exist", () => {
+test("Google OIDC is disabled unless client credentials and a separate 32-byte identity-proof secret exist", () => {
   const prior = {
     id: process.env.DOC_GOOGLE_CLIENT_ID,
     secret: process.env.DOC_GOOGLE_CLIENT_SECRET,
