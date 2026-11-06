@@ -4,16 +4,16 @@
 
 :root {
   color-scheme: light;
-  --iseyc-forest-950: #102f26;
+  --iseyc-forest-950: #123b2f;
   --iseyc-forest-900: #123b2f;
   --iseyc-forest-800: #194b3b;
   --iseyc-forest-100: #e8f0ea;
   --iseyc-cream-50: #faf9f5;
   --iseyc-white: #ffffff;
   --iseyc-ink-950: #202923;
-  --iseyc-ink-700: #48544c;
+  --iseyc-ink-700: #626d65;
   --iseyc-ink-600: #626d65;
-  --iseyc-gold-600: #80621f;
+  --iseyc-gold-600: #a7833f;
   --iseyc-border: #e4e6df;
   --iseyc-success: #28664a;
   --iseyc-warning: #93651d;
