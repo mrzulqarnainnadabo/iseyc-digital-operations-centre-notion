@@ -86,15 +86,15 @@ export default async function CommandBriefPage() {
         </div>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {departments.map((department) => (
-            <article key={department.id} className="flex min-h-[176px] flex-col rounded-card border border-line bg-white p-4 shadow-card">
+            <Link key={department.id} href={`/ops/departments/${department.id}`} className="flex min-h-[176px] flex-col rounded-card border border-line bg-white p-4 shadow-card hover:border-forest-800">
               <div className="flex items-start justify-between gap-2">
                 <span className="grid h-9 w-9 place-items-center rounded-xl bg-forest-100 text-sm font-bold text-forest-900" aria-hidden="true">{department.name.slice(0,1)}</span>
                 <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-ink-700">Not operational</span>
               </div>
               <h3 className="mt-4 text-sm font-semibold leading-5 text-ink-950">{department.name}</h3>
               <p className="mt-1 text-xs leading-5 text-ink-600">{department.description}</p>
-              <p className="mt-auto pt-3 text-[11px] text-ink-600">Desk activation awaits approved roles and workflow data.</p>
-            </article>
+              <p className="mt-auto pt-3 text-[11px] font-semibold text-forest-800">Open department desk →</p>
+            </Link>
           ))}
         </div>
       </section>
