@@ -1,7 +1,5 @@
 import { createHmac, randomBytes, scrypt as scryptCallback, timingSafeEqual } from "node:crypto";
-import { promisify } from "node:util";
 
-const scrypt = promisify(scryptCallback);
 const KEY_LENGTH = 32;
 const SALT_LENGTH = 16;
 const COST = 32_768;
@@ -26,6 +24,21 @@ function derivePasswordInput(pin: string, pepper: string): Buffer {
   return createHmac("sha256", pepper).update(pin, "utf8").digest();
 }
 
+function deriveKey(pin: string, salt: Buffer, pepper: string): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    scryptCallback(
+      derivePasswordInput(pin, pepper),
+      salt,
+      KEY_LENGTH,
+      { N: COST, r: BLOCK_SIZE, p: PARALLELIZATION, maxmem: MAX_MEMORY },
+      (error, derived) => {
+        if (error) reject(error);
+        else resolve(derived as Buffer);
+      }
+    );
+  });
+}
+
 /**
  * Hash one six-digit personal DOC PIN. The returned encoded hash is intended
  * for a restricted backend store, never for a public API or browser response.
@@ -35,12 +48,7 @@ export async function hashDocPin(pin: string): Promise<string> {
   if (!validPin(pin)) throw new Error("DOC PIN must contain exactly six digits");
   const pepper = getPepper();
   const salt = randomBytes(SALT_LENGTH);
-  const derived = await scrypt(derivePasswordInput(pin, pepper), salt, KEY_LENGTH, {
-    N: COST,
-    r: BLOCK_SIZE,
-    p: PARALLELIZATION,
-    maxmem: MAX_MEMORY,
-  }) as Buffer;
+  const derived = await deriveKey(pin, salt, pepper);
   return [
     FORMAT,
     COST,
@@ -73,12 +81,7 @@ export async function verifyDocPin(pin: string, encodedHash: string): Promise<bo
     const salt = Buffer.from(parts[4], "base64url");
     const expected = Buffer.from(parts[5], "base64url");
     if (salt.length !== SALT_LENGTH || expected.length !== KEY_LENGTH) return false;
-    const actual = await scrypt(derivePasswordInput(pin, pepper), salt, KEY_LENGTH, {
-      N: COST,
-      r: BLOCK_SIZE,
-      p: PARALLELIZATION,
-      maxmem: MAX_MEMORY,
-    }) as Buffer;
+    const actual = await deriveKey(pin, salt, pepper);
     return actual.length === expected.length && timingSafeEqual(actual, expected);
   } catch {
     return false;
