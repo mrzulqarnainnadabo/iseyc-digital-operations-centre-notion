@@ -43,7 +43,8 @@ export async function verifyGoogleIdToken(
     !safeEqual(payload.nonce, expectedNonce) ||
     payload.email_verified !== true ||
     typeof payload.email !== "string" ||
-    !payload.email.includes("@")
+    payload.email.length > 254 ||
+    !/^[^\\s@]+@[^\\s@]+$/.test(payload.email)
   ) {
     throw new Error("Google identity claims are incomplete or unverified");
   }
