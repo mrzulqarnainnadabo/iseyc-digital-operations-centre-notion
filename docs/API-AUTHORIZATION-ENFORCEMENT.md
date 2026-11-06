@@ -48,3 +48,16 @@ The server must derive the authorization context from a verified Google OIDC ses
 Do not enable Google member sign-in or remove the legacy gate until the identity provider, restricted membership source, appointment source, permission mapping, session revocation, audit persistence, route integration tests, and authenticated browser QA are complete. A passing policy-unit-test workflow alone does not satisfy this gate.
 
 No deployment, production configuration change, or access migration is authorised by this document.
+
+
+## Transitional shared-session containment (implemented on this review branch)
+
+Until individual Google identity and trusted appointment records are implemented, the legacy shared staff-key session is treated as a restricted transitional credential:
+
+- Meeting list and detail reads exclude records marked `Restricted`.
+- Restricted meeting intake is rejected by the API.
+- The legacy session cannot transition a meeting to `Approved`.
+- The interface disables the approval action and explains that individually authorised officer access is required.
+- The legacy session may continue to read standard meeting records and create standard meeting submissions; this is not individual member access or role-based authorization.
+
+These controls reduce exposure while the legacy gate exists. They do not provide per-person accountability, officer identity, approval authority, record-level permissions for other DOC modules, or a durable audit trail. They must not be represented as the final authorization system.
