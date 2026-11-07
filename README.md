@@ -85,6 +85,6 @@ AI-generated summaries and recommendations remain drafts. AI must not approve de
 
 ## Product boundaries
 
-The DOC is an internal institutional operating system. Civic Mandate Nigeria, ISEYC Civic Brain and the Civic Intelligence Observatory remain separate public-facing civic products. Do not copy private personnel, finance, health, safeguarding or contributor records into public civic datasets.
+IDCC provides the public institutional entry point and a separate restricted operating environment. Civic Mandate Nigeria, ISEYC Civic Brain and the Civic Intelligence Observatory remain distinct public civic systems with their own data ownership and release gates; IDCC composes them rather than copying their records into a second civic database. Do not copy private personnel, finance, health, safeguarding or contributor records into public civic datasets.
 
 This repository is not a public campaign site and must preserve ISEYC's non-partisan institutional identity.
