@@ -61,3 +61,12 @@ These are source-order regression checks. They help detect accidental refactors 
 The current meeting adapter now accepts only a canonical 32-hex-character Notion database ID from `NOTION_MEETINGS_DATABASE_ID`. It rejects malformed IDs and binds every meeting read/create/update operation to that named setting. A request-supplied or otherwise unbound database ID is not accepted by the adapter. The known Civic Mandate public database remains explicitly blocked.
 
 This is configuration integrity, not a complete Notion tenancy boundary: a deployment administrator could still point the environment variable at another valid Notion database. Before enabling restricted membership, personnel, finance or safeguarding records, create and verify dedicated restricted databases, their page sharing, workspace permissions and integration access. The application must not claim that syntactic ID validation proves Notion access isolation.
+
+
+## Public IDCC and restricted cookie boundary (review branch)
+
+The IDCC root and the routes `/explore`, `/submit`, `/explain`, `/method` and `/contact` are public, read-only composition pages. They do not read Notion operational databases and do not consume restricted session cookies.
+
+The existing shared staff session is scoped to cookie path `/ops`. Browser meeting operations use `/ops/api/meetings` and `/ops/api/meetings/[id]`, whose handlers delegate to the existing server-side authenticated meeting handlers. The OIDC pending-identity status endpoint is available at `/ops/api/auth/oidc/status` so its proof cookie can remain scoped to `/ops`. OIDC transaction cookies are scoped to `/api/auth/oidc` because only the callback needs them.
+
+The older `/api/meetings` paths remain guarded by the same server-side session checks, but the restricted browser no longer uses them; the `/ops` cookie is not sent to those public-path URLs. Public pages must not read or depend on restricted cookie values. This same-host path isolation is transitional; a dedicated operations hostname remains preferable before officer onboarding.
