@@ -16,8 +16,26 @@ test("public root is a public composer and does not load restricted operations",
   assert.match(read("app/login/layout.tsx"), /index: false/);
 });
 
-test("public shell uses the official seal asset", () => {
-  assert.match(read("components/PublicShell.tsx"), /src="\/iseyc-seal\.svg"/);
+test("public shell uses the official seal, clear navigation and all product entry points", () => {
+  const shell = read("components/PublicShell.tsx");
+  assert.match(shell, /src="\/iseyc-seal\.svg"/);
+  for (const label of ["Home", "Explore", "Submit", "Explain", "Method", "Contact"]) {
+    assert.match(shell, new RegExp(`label: "${label}"`));
+  }
+  for (const url of [
+    "https://2027-street-mandate.vercel.app",
+    "https://iseyc-civic-brain.vercel.app",
+    "https://iseyc-civic-intelligence-observatory-p5rb607x3.vercel.app",
+  ]) assert.ok(shell.includes(url));
+  assert.match(shell, /Source alignment pending/);
+  assert.match(shell, /ISEYC · Non-partisan/);
+});
+
+test("institutional Tailwind tokens match the approved palette", () => {
+  const config = read("tailwind.config.js");
+  for (const token of ["#123b2f", "#194b3b", "#e8f0ea", "#faf9f5", "#202923", "#626d65", "#a7833f", "#e4e6df"]) {
+    assert.ok(config.includes(token), `Missing institutional token ${token}`);
+  }
 });
 
 test("restricted session cookie is scoped to /ops only", () => {
