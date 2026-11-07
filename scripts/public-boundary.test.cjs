@@ -9,14 +9,18 @@ const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 test("public root is a public composer and does not load restricted operations", () => {
   const page = read("app/page.tsx");
   assert.match(page, /PublicShell/);
-  assert.match(page, /Explore public information/);
+  assert.match(page, /Three systems\. One evidence chain\./);
+  assert.match(page, /Civic Mandate Nigeria/);
+  assert.match(page, /ISEYC Civic Brain/);
+  assert.match(page, /Civic Intelligence Observatory/);
   assert.doesNotMatch(page, /requireStaffSession|listMeetings|@\/lib\/notion/);
+  assert.doesNotMatch(page, /iseyc-civic-intelligence-observatory-p5rb607x3\.vercel\.app/);
   assert.match(read("app/layout.tsx"), /index: true/);
   assert.match(read("app/ops/layout.tsx"), /index: false/);
   assert.match(read("app/login/layout.tsx"), /index: false/);
 });
 
-test("public shell uses the official seal, clear navigation and all product entry points", () => {
+test("public shell uses the official seal, clear navigation and verified product entry points", () => {
   const shell = read("components/PublicShell.tsx");
   assert.match(shell, /src="\/iseyc-seal\.svg"/);
   for (const label of ["Home", "Explore", "Submit", "Explain", "Method", "Contact"]) {
@@ -25,10 +29,12 @@ test("public shell uses the official seal, clear navigation and all product entr
   for (const url of [
     "https://2027-street-mandate.vercel.app",
     "https://iseyc-civic-brain.vercel.app",
-    "https://iseyc-civic-intelligence-observatory-p5rb607x3.vercel.app",
   ]) assert.ok(shell.includes(url));
-  assert.match(shell, /Source alignment pending/);
+  // Intentionally withhold unverified Observatory production URL
+  assert.doesNotMatch(shell, /iseyc-civic-intelligence-observatory-p5rb607x3\.vercel\.app/);
+  assert.match(shell, /Observatory · release alignment pending/);
   assert.match(shell, /ISEYC · Non-partisan/);
+  assert.match(shell, /Skip to content/);
 });
 
 test("institutional Tailwind tokens match the approved palette", () => {
