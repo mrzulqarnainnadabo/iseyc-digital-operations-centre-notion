@@ -1,11 +1,22 @@
 import Link from "next/link";
 
 const links = [
+  { href: "/", label: "Home" },
   { href: "/explore", label: "Explore" },
   { href: "/submit", label: "Submit" },
   { href: "/explain", label: "Explain" },
   { href: "/method", label: "Method" },
   { href: "/contact", label: "Contact" },
+];
+
+const products = [
+  { href: "https://2027-street-mandate.vercel.app", label: "Civic Mandate" },
+  { href: "https://iseyc-civic-brain.vercel.app", label: "Civic Brain" },
+  {
+    href: "https://iseyc-civic-intelligence-observatory-p5rb607x3.vercel.app",
+    label: "Observatory",
+    note: "Source alignment pending",
+  },
 ];
 
 export function PublicShell({ children }: { children: React.ReactNode }) {
@@ -22,19 +33,32 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
             </span>
           </Link>
           <nav aria-label="Public navigation" className="flex w-full gap-1 overflow-x-auto pb-1 sm:w-auto sm:flex-wrap sm:pb-0">
-            {links.map((item) => {
-              return <Link key={item.href} href={item.href} className="inline-flex min-h-[40px] shrink-0 items-center rounded-control px-3 text-sm font-medium text-ink-700 hover:bg-forest-100 hover:text-forest-950">{item.label}</Link>;
-            })}
+            {links.map((item) => (
+              <Link key={item.href} href={item.href} aria-current={item.href === "/" ? undefined : undefined} className="inline-flex min-h-[44px] shrink-0 items-center rounded-control px-3 text-sm font-medium text-ink-700 hover:bg-forest-100 hover:text-forest-950">
+                {item.label}
+              </Link>
+            ))}
           </nav>
         </div>
       </header>
       <main id="main-content" className="mx-auto min-h-[65vh] max-w-7xl px-4 sm:px-6 lg:px-8">{children}</main>
       <footer className="border-t border-line bg-white">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-6 text-xs text-ink-600 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-          <p>Initiative for Sustainable Evolution for Youth and Community · Non-partisan</p>
-          <div className="flex flex-wrap gap-x-4 gap-y-2">
-            <a className="min-h-[32px] inline-flex items-center hover:text-forest-900 hover:underline" href="mailto:iseycglobal@gmail.com">iseycglobal@gmail.com</a>
-            <Link className="min-h-[32px] inline-flex items-center hover:text-forest-900 hover:underline" href="/login">Official sign-in</Link>
+        <div className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs text-ink-600">ISEYC · Non-partisan</p>
+            <nav aria-label="ISEYC public products" className="flex flex-wrap gap-x-5 gap-y-2">
+              {products.map((product) => (
+                <a key={product.label} href={product.href} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center gap-1 text-xs font-semibold text-forest-800 hover:underline">
+                  {product.label}
+                  {product.note ? <span className="font-normal text-ink-600">· {product.note}</span> : null}
+                  <span aria-hidden="true">↗</span>
+                </a>
+              ))}
+            </nav>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line pt-3 text-xs text-ink-600">
+            <a className="inline-flex min-h-[44px] items-center hover:text-forest-900 hover:underline" href="mailto:iseycglobal@gmail.com">iseycglobal@gmail.com</a>
+            <Link className="inline-flex min-h-[44px] items-center hover:text-forest-900 hover:underline" href="/login">Official sign-in</Link>
           </div>
         </div>
       </footer>
