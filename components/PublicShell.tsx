@@ -12,11 +12,6 @@ const links = [
 const products = [
   { href: "https://2027-street-mandate.vercel.app", label: "Civic Mandate" },
   { href: "https://iseyc-civic-brain.vercel.app", label: "Civic Brain" },
-  {
-    href: "https://iseyc-civic-intelligence-observatory-p5rb607x3.vercel.app",
-    label: "Observatory",
-    note: "Source alignment pending",
-  },
 ];
 
 export function PublicShell({ children }: { children: React.ReactNode }) {
@@ -46,14 +41,13 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
         <div className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs text-ink-600">ISEYC · Non-partisan</p>
-            <nav aria-label="ISEYC public products" className="flex flex-wrap gap-x-5 gap-y-2">
+            <nav aria-label="Verified public products" className="flex flex-wrap gap-x-5 gap-y-2">
               {products.map((product) => (
                 <a key={product.label} href={product.href} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center gap-1 text-xs font-semibold text-forest-800 hover:underline">
-                  {product.label}
-                  {product.note ? <span className="font-normal text-ink-600">· {product.note}</span> : null}
-                  <span aria-hidden="true">↗</span>
+                  {product.label}<span aria-hidden="true">↗</span>
                 </a>
               ))}
+              <span className="inline-flex min-h-[44px] items-center text-xs text-ink-600" aria-label="Observatory release pending">Observatory · release alignment pending</span>
             </nav>
           </div>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line pt-3 text-xs text-ink-600">
