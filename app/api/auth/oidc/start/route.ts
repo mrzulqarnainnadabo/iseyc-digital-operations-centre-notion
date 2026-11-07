@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax" as const,
-    path: "/",
+    path: "/api/auth/oidc",
     maxAge: 600,
   };
   response.cookies.set(OIDC_STATE_COOKIE, state, cookieOptions);
