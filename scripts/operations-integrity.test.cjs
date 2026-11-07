@@ -149,11 +149,15 @@ test("AI draft and human decision components preserve the authority boundary", (
   }
 });
 
-test("public gate remains a private access gate with published-only links", () => {
-  const gate = fs.readFileSync(path.join(root, "app/page.tsx"), "utf8");
-  assert.match(gate, /Private institutional workspace/);
-  assert.match(gate, /Authorised access is required/);
-  assert.match(gate, /Civic Mandate/);
-  assert.match(gate, /Civic Brain/);
-  assert.doesNotMatch(gate, /members nationwide|national impact|campaign/i);
+test("public home composes public systems while operations retain server-side access control", () => {
+  const home = fs.readFileSync(path.join(root, "app/page.tsx"), "utf8");
+  const opsLayout = fs.readFileSync(path.join(root, "app/ops/layout.tsx"), "utf8");
+  assert.match(home, /PublicShell/);
+  assert.match(home, /Understand what is happening in Nigeria/);
+  assert.match(home, /Civic Mandate/);
+  assert.match(home, /Civic Brain/);
+  assert.doesNotMatch(home, /requireStaffSession|listMeetings|@\/lib\/notion/);
+  assert.match(opsLayout, /requireStaffSession/);
+  assert.match(opsLayout, /redirect\("\/login"\)/);
+  assert.doesNotMatch(home, /members nationwide|national impact|campaign/i);
 });
