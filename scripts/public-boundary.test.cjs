@@ -26,6 +26,7 @@ test("restricted session cookie is scoped to /ops only", () => {
   assert.match(read("app/api/auth/logout/route.ts"), /path: SESSION_COOKIE_PATH/);
   assert.match(read("app/api/auth/oidc/callback/route.ts"), /path: SESSION_COOKIE_PATH/);
   assert.match(read("app/api/auth/oidc/start/route.ts"), /path: "\/api\/auth\/oidc"/);
+  assert.match(read("app/api/auth/oidc/start/route.ts"), /path: SESSION_COOKIE_PATH/);
 });
 
 test("browser operational requests stay under the restricted cookie path", () => {
