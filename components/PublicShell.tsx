@@ -34,7 +34,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
           </Link>
           <nav aria-label="Public navigation" className="flex w-full gap-1 overflow-x-auto pb-1 sm:w-auto sm:flex-wrap sm:pb-0">
             {links.map((item) => (
-              <Link key={item.href} href={item.href} aria-current={item.href === "/" ? undefined : undefined} className="inline-flex min-h-[44px] shrink-0 items-center rounded-control px-3 text-sm font-medium text-ink-700 hover:bg-forest-100 hover:text-forest-950">
+              <Link key={item.href} href={item.href} className="inline-flex min-h-[44px] shrink-0 items-center rounded-control px-3 text-sm font-medium text-ink-700 hover:bg-forest-100 hover:text-forest-950">
                 {item.label}
               </Link>
             ))}
