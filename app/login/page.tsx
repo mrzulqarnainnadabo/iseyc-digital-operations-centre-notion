@@ -18,7 +18,7 @@ export default function LoginPage() {
     } else if (result === "failed") {
       setIdentityNotice("Google could not verify this sign-in. Try again or contact the system administrator.");
     }
-    fetch("/api/auth/oidc/status", { cache: "no-store" })
+    fetch("/ops/api/auth/oidc/status", { cache: "no-store" })
       .then((response) => response.json())
       .then((data: { providerConfigured?: boolean; identityVerified?: boolean; message?: string }) => {
         setOidcConfigured(data.providerConfigured === true);
