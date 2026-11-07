@@ -18,6 +18,9 @@ module.exports = {
         },
         gold: { 600: "#a7833f" },
         line: "#e4e6df",
+        success: { DEFAULT: "#28664a", 50: "#edf4ef", 200: "#c7d9cd" },
+        warning: { DEFAULT: "#93651d", 50: "#fbf6ec", 200: "#e6d2aa" },
+        danger: { DEFAULT: "#a43d37", 50: "#fbf1f0", 200: "#e9bfbb" },
       },
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
