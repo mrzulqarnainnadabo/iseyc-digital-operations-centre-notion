@@ -65,4 +65,8 @@ test("ops API aliases delegate to existing server-authorized handlers", () => {
   assert.match(detail, /getMeeting\(req, context\)|updateMeeting\(req, context\)/);
   assert.match(read("app/ops/api/auth/oidc/status/route.ts"), /getOidcStatus\(req\)/);
   assert.match(read("app/ops/layout.tsx"), /requireStaffSession/);
+  const commandHome = read("app/ops/page.tsx");
+  assert.match(commandHome, /requireStaffSession/);
+  assert.match(commandHome, /if \(!\(await requireStaffSession\(\)\)\) redirect\("\/login"\)/);
+  assert.ok(commandHome.indexOf("requireStaffSession") < commandHome.indexOf("listMeetings()"));
 });
