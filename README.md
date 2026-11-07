@@ -50,6 +50,13 @@ The workspace already has these internal DOC databases:
 
 These databases and their schemas have been found in the Notion workspace. This does not prove that the dedicated API integration used by the Vercel application has been shared with them. Share only the databases required by the application and verify access with the integration itself.
 
+### Existing governance source — not yet integrated
+
+- **Appointment & Role Register**: existing Notion database `b9750d94-400f-4393-ad11-0e6a501c0ccd`; data source `collection://c689c101-c875-4048-adc9-b1d54731d3be`. The inspected register contains 11 `Template` rows and 0 named appointees. It is not an operational access source until the approved identity-linking fields, permissions, scope, provenance and revocation controls are added and verified.
+- **Membership Register**: no dedicated membership database was found in the inspected DOC workspace. The Field Register Desk is an unrelated RSVP/activities register and must not be repurposed. Do not create a duplicate or connect an unrelated register without the founder's approved schema and access model.
+
+The existing appointment database must be extended in place only after governance approval. No membership or appointment records are created or activated by this repository.
+
 ## Environment configuration
 
 Use the keys and descriptions in `.env.example` as the source of truth. Configure them in the correct Vercel project and deployment environments. Never commit real values, print secret values in logs or paste tokens into Notion pages. Confirm values privately; the presence of a Vercel environment-variable entry alone does not prove that the value is valid.
