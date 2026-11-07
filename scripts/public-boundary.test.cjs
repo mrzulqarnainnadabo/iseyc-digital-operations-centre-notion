@@ -22,9 +22,9 @@ test("public shell uses the official seal asset", () => {
 
 test("restricted session cookie is scoped to /ops only", () => {
   assert.match(read("lib/auth.ts"), /SESSION_COOKIE_PATH = "\/ops"/);
-  assert.match(read("app/api/auth/login/route.ts"), /path: "\/ops"/);
-  assert.match(read("app/api/auth/logout/route.ts"), /path: "\/ops"/);
-  assert.match(read("app/api/auth/oidc/callback/route.ts"), /path: "\/ops"/);
+  assert.match(read("app/api/auth/login/route.ts"), /path: SESSION_COOKIE_PATH/);
+  assert.match(read("app/api/auth/logout/route.ts"), /path: SESSION_COOKIE_PATH/);
+  assert.match(read("app/api/auth/oidc/callback/route.ts"), /path: SESSION_COOKIE_PATH/);
   assert.match(read("app/api/auth/oidc/start/route.ts"), /path: "\/api\/auth\/oidc"/);
 });
 
@@ -40,7 +40,7 @@ test("browser operational requests stay under the restricted cookie path", () =>
 test("ops API aliases delegate to existing server-authorized handlers", () => {
   const collection = read("app/ops/api/meetings/route.ts");
   assert.ok(collection.includes('from "../../../api/meetings/route"'));
-  assert.match(collection, /getMeetings\(req\)|createMeeting\(req\)/);
+  assert.match(collection, /getMeetings\(\)|createMeeting\(req\)/);
   const detail = read("app/ops/api/meetings/[id]/route.ts");
   assert.ok(detail.includes('from "../../../../api/meetings/[id]/route"'));
   assert.match(detail, /getMeeting\(req, context\)|updateMeeting\(req, context\)/);
