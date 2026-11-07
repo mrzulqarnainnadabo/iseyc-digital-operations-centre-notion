@@ -15,6 +15,14 @@ This is a point-in-time engineering record, not a live deployment monitor.
 
 **READY is a deployment/build state, not proof of operational readiness.** Production HTTP behaviour, Notion credential validity, integration permissions, officer sign-in and end-to-end workflows still require verification. A Vercel SSO gate may appear before the application's own sign-in screen.
 
+## Public and restricted environments
+
+The IDCC root is the public institutional home. Public routes include `/`, `/explore`, `/submit`, `/explain`, `/method` and `/contact`. They compose the existing Civic Mandate, Civic Brain and Observatory products; they do not create a second civic-record database.
+
+Restricted institutional operations remain under `/ops` and are protected by the existing server-side session gate. The transitional session cookie is scoped to `Path=/ops`; meeting API browser requests use `/ops/api/meetings`. OIDC transaction cookies are scoped to the callback path. Public pages do not use the restricted session. This same-host path isolation is transitional; a separate operations hostname is preferred before officer onboarding.
+
+Public pages do not imply that the underlying civic products are nationally operational. Each product retains its own source, deployment and evidence limitations.
+
 ## Current application scope
 
 The repository now contains:
