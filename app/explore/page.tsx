@@ -4,7 +4,7 @@ const destinations = [
   {
     name: "Civic Mandate Nigeria",
     description: "Published community demands and public civic records. Submissions remain subject to human review.",
-    href: "https://2027-street-mandate.vercel.app",
+    href: "https://2027-street-mandate.vercel.app/explore",
     status: "Published public system",
   },
   {
