@@ -153,7 +153,8 @@ test("public home composes public systems while operations retain server-side ac
   const home = fs.readFileSync(path.join(root, "app/page.tsx"), "utf8");
   const opsLayout = fs.readFileSync(path.join(root, "app/ops/layout.tsx"), "utf8");
   assert.match(home, /PublicShell/);
-  assert.match(home, /Understand what is happening in Nigeria/);
+  assert.match(home, /Public information\. Clear evidence\. Stronger accountability\./);
+  assert.match(home, /Three systems\. One evidence chain\./);
   assert.match(home, /Civic Mandate/);
   assert.match(home, /Civic Brain/);
   assert.doesNotMatch(home, /requireStaffSession|listMeetings|@\/lib\/notion/);
