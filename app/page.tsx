@@ -82,6 +82,20 @@ export default function PublicHomePage() {
         </div>
       </section>
 
+      <nav className="grid gap-3 border-t border-line py-8 sm:grid-cols-4" aria-label="Public pathways">
+        {[
+          { href: "/explore", title: "Explore", copy: "Civic systems and release states" },
+          { href: "/submit", title: "Submit", copy: "Reviewed community intake" },
+          { href: "/explain", title: "Explain", copy: "Evidence-grounded clarification" },
+          { href: "/method", title: "Method", copy: "Sources and limitations" },
+        ].map((item) => (
+          <Link key={item.href} href={item.href} className="rounded-card border border-line bg-white p-4 hover:border-forest-800">
+            <h2 className="text-base font-semibold text-forest-950">{item.title}</h2>
+            <p className="mt-1 text-sm leading-5 text-ink-700">{item.copy}</p>
+          </Link>
+        ))}
+      </nav>
+
       <section className="grid gap-5 border-t border-line py-9 sm:grid-cols-2 sm:items-center">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-600">Public participation</p>
