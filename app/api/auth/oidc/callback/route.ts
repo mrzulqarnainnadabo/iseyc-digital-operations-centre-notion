@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { privateJson, privateResponseHeaders } from "@/lib/private-response";
+import { SESSION_COOKIE_PATH } from "@/lib/auth";
 import {
   docAppOrigin,
   googleOidcConfigured,
@@ -16,9 +17,10 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 function clearTransactionCookies(response: NextResponse) {
-  for (const name of [OIDC_STATE_COOKIE, OIDC_NONCE_COOKIE, OIDC_VERIFIER_COOKIE, PENDING_IDENTITY_COOKIE]) {
-    response.cookies.set(name, "", { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 0 });
+  for (const name of [OIDC_STATE_COOKIE, OIDC_NONCE_COOKIE, OIDC_VERIFIER_COOKIE]) {
+    response.cookies.set(name, "", { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/api/auth/oidc", maxAge: 0 });
   }
+  response.cookies.set(PENDING_IDENTITY_COOKIE, "", { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: SESSION_COOKIE_PATH, maxAge: 0 });
 }
 
 function loginRedirect(origin: string, result: string) {
@@ -84,7 +86,7 @@ export async function GET(req: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      path: "/",
+      path: "/ops",
       maxAge: 900,
     });
     return response;

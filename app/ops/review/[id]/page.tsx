@@ -34,7 +34,7 @@ export default function ReviewPage() {
     }
     setLoading(true);
     try {
-      const response = await fetch(`/api/meetings/${encodeURIComponent(id)}`, { cache: "no-store", signal });
+      const response = await fetch(`/ops/api/meetings/${encodeURIComponent(id)}`, { cache: "no-store", signal });
       const data: unknown = await response.json();
       if (!response.ok) throw new Error("This record is unavailable or you do not have access.");
       if (!data || typeof data !== "object" || !(data as { meeting?: unknown }).meeting) {
@@ -62,7 +62,7 @@ export default function ReviewPage() {
     setPending(true);
     setError(null);
     try {
-      const response = await fetch(`/api/meetings/${encodeURIComponent(id)}`, {
+      const response = await fetch(`/ops/api/meetings/${encodeURIComponent(id)}`, {
         method: "PATCH",
         cache: "no-store",
         headers: { "Content-Type": "application/json" },

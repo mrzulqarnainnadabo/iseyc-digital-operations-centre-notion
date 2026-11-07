@@ -19,7 +19,7 @@ export default function IntakePage() {
     setPending(true);
     setError(null);
     try {
-      const response = await fetch("/api/meetings", {
+      const response = await fetch("/ops/api/meetings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, conveningBody, meetingDate, summary, sensitivity: "Standard" }),

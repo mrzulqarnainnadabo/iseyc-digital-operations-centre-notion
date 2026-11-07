@@ -2,6 +2,7 @@ import { createHmac, randomBytes, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 
 const COOKIE = "iseyc_doc_session";
+export const SESSION_COOKIE_PATH = "/ops";
 const SESSION_TTL_SECONDS = 60 * 60 * 12;
 
 export function staffKeyConfigured(): boolean {

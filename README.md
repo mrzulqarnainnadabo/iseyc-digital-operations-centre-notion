@@ -15,6 +15,14 @@ This is a point-in-time engineering record, not a live deployment monitor.
 
 **READY is a deployment/build state, not proof of operational readiness.** Production HTTP behaviour, Notion credential validity, integration permissions, officer sign-in and end-to-end workflows still require verification. A Vercel SSO gate may appear before the application's own sign-in screen.
 
+## Public and restricted environments
+
+The IDCC root is the public institutional home. Public routes include `/`, `/explore`, `/submit`, `/explain`, `/method` and `/contact`. They compose the existing Civic Mandate, Civic Brain and Observatory products; they do not create a second civic-record database.
+
+Restricted institutional operations remain under `/ops` and are protected by the existing server-side session gate. The transitional session cookie is scoped to `Path=/ops`; meeting API browser requests use `/ops/api/meetings`. OIDC transaction cookies are scoped to the callback path. Public pages do not use the restricted session. This same-host path isolation is transitional; a separate operations hostname is preferred before officer onboarding.
+
+Public pages do not imply that the underlying civic products are nationally operational. Each product retains its own source, deployment and evidence limitations.
+
 ## Current application scope
 
 The repository now contains:
@@ -41,6 +49,13 @@ The workspace already has these internal DOC databases:
 | `NOTION_ACTIONS_DATABASE_ID` | ISEYC DOC Actions | [Open database](https://app.notion.com/p/9a32cbe45bc04f9cb32ac8cb2d11e425) |
 
 These databases and their schemas have been found in the Notion workspace. This does not prove that the dedicated API integration used by the Vercel application has been shared with them. Share only the databases required by the application and verify access with the integration itself.
+
+### Existing governance source — not yet integrated
+
+- **Appointment & Role Register**: existing Notion database `b9750d94-400f-4393-ad11-0e6a501c0ccd`; data source `collection://c689c101-c875-4048-adc9-b1d54731d3be`. The inspected register contains 11 `Template` rows and 0 named appointees. It is not an operational access source until the approved identity-linking fields, permissions, scope, provenance and revocation controls are added and verified.
+- **Membership Register**: no dedicated membership database was found in the inspected DOC workspace. The Field Register Desk is an unrelated RSVP/activities register and must not be repurposed. Do not create a duplicate or connect an unrelated register without the founder's approved schema and access model.
+
+The existing appointment database must be extended in place only after governance approval. No membership or appointment records are created or activated by this repository.
 
 ## Environment configuration
 
@@ -77,6 +92,6 @@ AI-generated summaries and recommendations remain drafts. AI must not approve de
 
 ## Product boundaries
 
-The DOC is an internal institutional operating system. Civic Mandate Nigeria, ISEYC Civic Brain and the Civic Intelligence Observatory remain separate public-facing civic products. Do not copy private personnel, finance, health, safeguarding or contributor records into public civic datasets.
+IDCC provides the public institutional entry point and a separate restricted operating environment. Civic Mandate Nigeria, ISEYC Civic Brain and the Civic Intelligence Observatory remain distinct public civic systems with their own data ownership and release gates; IDCC composes them rather than copying their records into a second civic database. Do not copy private personnel, finance, health, safeguarding or contributor records into public civic datasets.
 
 This repository is not a public campaign site and must preserve ISEYC's non-partisan institutional identity.

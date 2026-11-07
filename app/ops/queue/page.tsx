@@ -24,7 +24,7 @@ export default function QueuePage() {
     const controller = new AbortController();
     setLoading(true);
     setError(null);
-    fetch("/api/meetings", { cache: "no-store", signal: controller.signal })
+    fetch("/ops/api/meetings", { cache: "no-store", signal: controller.signal })
       .then(async (response) => {
         const data: unknown = await response.json();
         if (!response.ok) {

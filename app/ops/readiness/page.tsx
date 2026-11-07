@@ -57,15 +57,15 @@ export default function ReadinessPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <header className="space-y-2">
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">Operational governance</p>
-        <h2 className="font-serif text-3xl text-slate-950">Module readiness</h2>
-        <p className="max-w-2xl text-sm leading-6 text-slate-600">
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-600">Operational governance</p>
+        <h2 className="font-serif text-3xl text-forest-950">Module readiness</h2>
+        <p className="max-w-2xl text-sm leading-6 text-ink-700">
           A factual view of what the Digital Operations Centre can do today, what remains a policy foundation,
           and what is still a placeholder. A configured database or visible page does not mean a workflow is operational.
         </p>
       </header>
 
-      <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+      <section className="rounded-card border border-amber-200 bg-amber-50 p-4">
         <p className="text-sm font-semibold text-amber-950">Release status: not approved for real restricted institutional records</p>
         <p className="mt-1 text-sm leading-6 text-amber-900">
           The current sign-in is a transitional shared-key gate, not verified individual identity.
@@ -75,25 +75,25 @@ export default function ReadinessPage() {
 
       <div className="grid gap-3">
         {modules.map((module) => (
-          <article key={module.name} className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+          <article key={module.name} className="rounded-card border border-line bg-white p-4 sm:p-5">
             <div className="flex flex-wrap items-start justify-between gap-2">
-              <h3 className="font-semibold text-slate-950">{module.name}</h3>
+              <h3 className="font-semibold text-forest-950">{module.name}</h3>
               <StatusBadge status={module.state} />
             </div>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{module.detail}</p>
-            <p className="mt-3 text-xs leading-5 text-slate-500">
-              <span className="font-semibold text-slate-700">Required before operational use:</span> {module.dependency}
+            <p className="mt-2 text-sm leading-6 text-ink-700">{module.detail}</p>
+            <p className="mt-3 text-xs leading-5 text-ink-600">
+              <span className="font-semibold text-ink-700">Required before operational use:</span> {module.dependency}
             </p>
-            <Link href={module.route} className="mt-3 inline-flex min-h-[40px] items-center text-sm font-semibold text-emerald-800 hover:underline">
+            <Link href={module.route} className="mt-3 inline-flex min-h-[40px] items-center text-sm font-semibold text-forest-800 hover:underline">
               View module →
             </Link>
           </article>
         ))}
       </div>
 
-      <footer className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-        <p className="text-sm font-semibold text-slate-900">Institutional rule</p>
-        <p className="mt-1 text-sm leading-6 text-slate-600">
+      <footer className="rounded-card border border-line bg-cream-50 p-4">
+        <p className="text-sm font-semibold text-ink-950">Institutional rule</p>
+        <p className="mt-1 text-sm leading-6 text-ink-700">
           Membership, appointment, permission and decision authority are separate records.
           Only the National President or a person holding a valid, recorded delegation may exercise
           membership decision authority. Administrative access alone never grants that authority.

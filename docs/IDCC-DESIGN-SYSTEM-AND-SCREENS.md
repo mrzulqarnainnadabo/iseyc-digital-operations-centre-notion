@@ -4,7 +4,7 @@ Status: implementation specification for the private officer interface. This doc
 
 ## Product rules
 
-1. IDCC is private institutional operations, not a public marketing surface.
+1. IDCC has two environments: public institutional information routes and restricted officer operations. This specification describes the restricted officer interface; public pages are a separate, read-only composition layer.
 2. Human officers own institutional seats and decisions. AI may assist with drafts but cannot approve, appoint, publish, or represent an officer.
 3. External civic links open published public surfaces only. Internal submissions, membership data, officer records, and deliberations remain private.
 4. A configured integration is not proof of operational workflow. A visible route is not proof of authority.

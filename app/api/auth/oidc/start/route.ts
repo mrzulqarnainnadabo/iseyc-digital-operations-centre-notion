@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { privateJson, privateResponseHeaders } from "@/lib/private-response";
+import { SESSION_COOKIE_PATH } from "@/lib/auth";
 import {
   createOidcTransaction,
   docAppOrigin,
@@ -38,12 +39,12 @@ export async function GET(req: NextRequest) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax" as const,
-    path: "/",
+    path: "/api/auth/oidc",
     maxAge: 600,
   };
   response.cookies.set(OIDC_STATE_COOKIE, state, cookieOptions);
   response.cookies.set(OIDC_NONCE_COOKIE, nonce, cookieOptions);
   response.cookies.set(OIDC_VERIFIER_COOKIE, verifier, cookieOptions);
-  response.cookies.set(PENDING_IDENTITY_COOKIE, "", { ...cookieOptions, maxAge: 0 });
+  response.cookies.set(PENDING_IDENTITY_COOKIE, "", { ...cookieOptions, path: SESSION_COOKIE_PATH, maxAge: 0 });
   return response;
 }
