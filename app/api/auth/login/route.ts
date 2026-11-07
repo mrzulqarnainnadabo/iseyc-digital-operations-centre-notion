@@ -3,6 +3,7 @@ import { privateJson } from "@/lib/private-response";
 import {
   isValidStaffKey,
   SESSION_COOKIE,
+  SESSION_COOKIE_PATH,
   signSession,
   staffKeyConfigured,
 } from "@/lib/auth";
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    path: "/ops",
+    path: SESSION_COOKIE_PATH,
     maxAge: 60 * 60 * 12,
   });
   return res;
