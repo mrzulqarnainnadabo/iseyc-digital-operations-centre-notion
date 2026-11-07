@@ -1,7 +1,4 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 const links = [
   { href: "/explore", label: "Explore" },
@@ -12,7 +9,6 @@ const links = [
 ];
 
 export function PublicShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
   return (
     <div className="min-h-screen bg-cream-50 text-ink-950">
       <a href="#main-content" className="sr-only z-50 rounded-control bg-white px-4 py-3 font-semibold text-forest-950 focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Skip to content</a>
@@ -27,8 +23,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
           </Link>
           <nav aria-label="Public navigation" className="flex w-full gap-1 overflow-x-auto pb-1 sm:w-auto sm:flex-wrap sm:pb-0">
             {links.map((item) => {
-              const active = pathname === item.href;
-              return <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={"inline-flex min-h-[40px] shrink-0 items-center rounded-control px-3 text-sm font-medium " + (active ? "bg-forest-100 text-forest-950" : "text-ink-700 hover:bg-forest-100")}>{item.label}</Link>;
+              return <Link key={item.href} href={item.href} className="inline-flex min-h-[40px] shrink-0 items-center rounded-control px-3 text-sm font-medium text-ink-700 hover:bg-forest-100 hover:text-forest-950">{item.label}</Link>;
             })}
           </nav>
         </div>
