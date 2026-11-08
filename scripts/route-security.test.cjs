@@ -153,3 +153,11 @@ test("queue UI exposes bounded previous/next navigation and labels page-local co
   assert.match(queue, /Records on this page/);
   assert.match(queue, /Filters apply to this page|status on this page/);
 });
+
+
+test("command home uses the bounded meetings page and labels the count as page-local", () => {
+  const dashboard = fs.readFileSync(path.join(__dirname, "../app/ops/page.tsx"), "utf8");
+  assert.match(dashboard, /listMeetingsPage\(\)/);
+  assert.doesNotMatch(dashboard, /listMeetings\(/);
+  assert.match(dashboard, /Latest page · up to 25 Standard records/);
+});
