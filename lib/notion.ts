@@ -59,46 +59,70 @@ export type MeetingRecord = {
   sensitivity: string;
 };
 
-export async function listMeetings(): Promise<MeetingRecord[]> {
+export type MeetingPage = {
+  meetings: MeetingRecord[];
+  nextCursor: string | null;
+  hasMore: boolean;
+};
+
+const MEETING_PAGE_SIZE = 25;
+const MAX_NOTION_CURSOR_LENGTH = 256;
+
+export function isValidMeetingCursor(cursor: unknown): cursor is string {
+  return typeof cursor === "string" &&
+    cursor.length > 0 &&
+    cursor.length <= MAX_NOTION_CURSOR_LENGTH &&
+    !/[\u0000-\u001f\u007f]/.test(cursor);
+}
+
+function toMeetingRecord(page: { id: string; properties: Record<string, unknown> }): MeetingRecord {
+  const props = page.properties as Record<string, any>;
+  return {
+    id: page.id,
+    title: textProp(props.Name) || textProp(props.Title) || "Untitled meeting",
+    status: textProp(props.Status) || "New",
+    conveningBody: textProp(props["Convening body"]) || textProp(props.ConveningBody) || "—",
+    meetingDate: textProp(props["Meeting date"]) || textProp(props.Date) || "",
+    summary: textProp(props.Summary) || textProp(props.Notes) || "",
+    sensitivity: textProp(props.Sensitivity) || "Unclassified",
+  };
+}
+
+/**
+ * Fetch one bounded page only. The Notion-side sensitivity filter is essential:
+ * legacy sessions must never receive restricted records through pagination.
+ */
+export async function listMeetingsPage(cursor?: string): Promise<MeetingPage> {
   const client = notion();
   const database_id = dbId("NOTION_MEETINGS_DATABASE_ID");
-  if (!client || !database_id) return [];
+  if (!client || !database_id) throw new Error("Notion Meetings source is not configured.");
   assertInternalDb(database_id, "NOTION_MEETINGS_DATABASE_ID");
-  const pages: Array<{ id: string; properties: Record<string, unknown> }> = [];
-  let cursor: string | undefined;
 
-  // Notion caps page_size at 100. Follow every cursor so older records do not
-  // silently disappear from the operational meeting register.
-  do {
-    const res = await client.databases.query({
-      database_id,
-      page_size: 100,
-      ...(cursor ? { start_cursor: cursor } : {}),
-    });
-    for (const result of res.results) {
-      if ("properties" in result) {
-        pages.push(result as { id: string; properties: Record<string, unknown> });
-      }
-    }
-    cursor = res.has_more ? res.next_cursor ?? undefined : undefined;
-    if (res.has_more && !cursor) {
-      throw new Error("Notion returned has_more without a next_cursor");
-    }
-  } while (cursor);
-
-  return pages.map((page) => {
-    const props = page.properties as Record<string, any>;
-    return {
-      id: page.id,
-      title: textProp(props.Name) || textProp(props.Title) || "Untitled meeting",
-      status: textProp(props.Status) || "New",
-      conveningBody:
-        textProp(props["Convening body"]) || textProp(props.ConveningBody) || "—",
-      meetingDate: textProp(props["Meeting date"]) || textProp(props.Date) || "",
-      summary: textProp(props.Summary) || textProp(props.Notes) || "",
-      sensitivity: textProp(props.Sensitivity) || "Unclassified",
-    };
+  const res = await client.databases.query({
+    database_id,
+    page_size: MEETING_PAGE_SIZE,
+    filter: {
+      property: "Sensitivity",
+      select: { equals: "Standard" },
+    },
+    sorts: [{ timestamp: "created_time", direction: "descending" }],
+    ...(cursor ? { start_cursor: cursor } : {}),
   });
+
+  const pages = res.results.filter(
+    (result): result is typeof result & { id: string; properties: Record<string, unknown> } =>
+      "properties" in result
+  );
+  const nextCursor = res.has_more ? res.next_cursor ?? null : null;
+  if (res.has_more && !nextCursor) {
+    throw new Error("Notion returned has_more without a next_cursor");
+  }
+
+  return {
+    meetings: pages.map((page) => toMeetingRecord(page)),
+    nextCursor,
+    hasMore: Boolean(res.has_more),
+  };
 }
 
 export async function getMeeting(id: string): Promise<MeetingRecord | null> {
@@ -110,16 +134,7 @@ export async function getMeeting(id: string): Promise<MeetingRecord | null> {
     const page: any = await client.pages.retrieve({ page_id: id });
     if (!("properties" in page) || typeof page.parent?.database_id !== "string" || canonicalNotionId(page.parent.database_id) !== database_id) return null;
     const props = page.properties;
-    return {
-      id: page.id,
-      title: textProp(props.Name) || textProp(props.Title) || "Untitled meeting",
-      status: textProp(props.Status) || "New",
-      conveningBody:
-        textProp(props["Convening body"]) || textProp(props.ConveningBody) || "—",
-      meetingDate: textProp(props["Meeting date"]) || textProp(props.Date) || "",
-      summary: textProp(props.Summary) || textProp(props.Notes) || "",
-      sensitivity: textProp(props.Sensitivity) || "Unclassified",
-    };
+    return toMeetingRecord({ id: page.id, properties: props });
   } catch {
     return null;
   }
