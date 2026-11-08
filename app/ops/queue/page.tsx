@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { StatusBadge } from "@/components/StatusBadge";
 import { EmptyState, ErrorState, LoadingState } from "@/components/QueueStates";
@@ -43,6 +43,7 @@ export default function QueuePage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const loadingMoreRef = useRef(false);
   const [reloadKey, setReloadKey] = useState(0);
   const [filter, setFilter] = useState("All");
 
@@ -68,7 +69,8 @@ export default function QueuePage() {
   }, [reloadKey]);
 
   async function loadMore() {
-    if (!nextCursor || loadingMore) return;
+    if (!nextCursor || loadingMoreRef.current) return;
+    loadingMoreRef.current = true;
     setLoadingMore(true);
     setError(null);
     try {
@@ -81,6 +83,7 @@ export default function QueuePage() {
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Unable to load more records. Try again.");
     } finally {
+      loadingMoreRef.current = false;
       setLoadingMore(false);
     }
   }
