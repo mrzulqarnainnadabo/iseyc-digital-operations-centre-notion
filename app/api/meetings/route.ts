@@ -8,7 +8,7 @@ import { legacySessionCanCreateMeeting, legacySessionCanReadMeeting } from "@/li
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   if (!(await requireStaffSession())) {
     return privateJson({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
@@ -21,11 +21,22 @@ export async function GET() {
     );
   }
 
+  const requestUrl = new URL(req.url);
+  const cursor = requestUrl.searchParams.get("cursor") || undefined;
+  if (cursor && cursor.length > 2_000) {
+    return privateJson({ ok: false, error: "Invalid page cursor." }, { status: 400 });
+  }
+
   try {
-    const meetings = (await listMeetings()).filter((meeting) =>
+    const page = await listMeetings({ cursor, pageSize: 25 });
+    const meetings = page.meetings.filter((meeting) =>
       legacySessionCanReadMeeting(meeting.sensitivity)
     );
-    return privateJson({ ok: true, meetings });
+    return privateJson({
+      ok: true,
+      meetings,
+      nextCursor: page.nextCursor,
+    });
   } catch {
     return privateJson(
       { ok: false, error: "Unable to retrieve meetings." },
