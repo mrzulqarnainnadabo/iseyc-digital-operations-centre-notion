@@ -812,3 +812,13 @@ test("operations API alias forwards the request to the authenticated paginated h
   assert.match(source, /export async function GET\(req: NextRequest\)/);
   assert.match(source, /return getMeetings\(req\)/);
 });
+
+
+test("meeting queue prevents overlapping page requests and distinguishes hidden-only pages", () => {
+  const source = fs.readFileSync(require("node:path").join(__dirname, "../app/ops/queue/page.tsx"), "utf8");
+  assert.match(source, /const loadingMoreRef = useRef\(false\)/);
+  assert.match(source, /if \(!nextCursor \|\| loadingMoreRef\.current\) return/);
+  assert.match(source, /loadingMoreRef\.current = true/);
+  assert.match(source, /loadingMoreRef\.current = false/);
+  assert.match(source, /nextCursor \? "No visible records on this page" : "No items"/);
+});
