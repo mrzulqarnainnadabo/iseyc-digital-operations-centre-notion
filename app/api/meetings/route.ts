@@ -2,13 +2,13 @@ import { NextRequest } from "next/server";
 import { privateJson } from "@/lib/private-response";
 import { requireStaffSession } from "@/lib/auth";
 import { isSameOriginRequest, readBoundedJson } from "@/lib/request-security";
-import { configFlags, createMeeting, listMeetings } from "@/lib/notion";
-import { legacySessionCanCreateMeeting, legacySessionCanReadMeeting } from "@/lib/legacy-session-boundary";
+import { configFlags, createMeeting, isValidMeetingCursor, listMeetingsPage } from "@/lib/notion";
+import { legacySessionCanCreateMeeting } from "@/lib/legacy-session-boundary";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   if (!(await requireStaffSession())) {
     return privateJson({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
@@ -21,11 +21,19 @@ export async function GET() {
     );
   }
 
+  const cursorParam = req.nextUrl.searchParams.get("cursor");
+  if (cursorParam !== null && !isValidMeetingCursor(cursorParam)) {
+    return privateJson({ ok: false, error: "Invalid queue cursor." }, { status: 400 });
+  }
+
   try {
-    const meetings = (await listMeetings()).filter((meeting) =>
-      legacySessionCanReadMeeting(meeting.sensitivity)
-    );
-    return privateJson({ ok: true, meetings });
+    const page = await listMeetingsPage(cursorParam ?? undefined);
+    return privateJson({
+      ok: true,
+      meetings: page.meetings,
+      nextCursor: page.nextCursor,
+      hasMore: page.hasMore,
+    });
   } catch {
     return privateJson(
       { ok: false, error: "Unable to retrieve meetings." },
@@ -76,8 +84,6 @@ export async function POST(req: NextRequest) {
     return privateJson({ ok: false, error: "Meeting date must be a valid calendar date." }, { status: 400 });
   }
 
-  // Do not coerce missing or unknown values to Standard: that would let a
-  // malformed client request bypass the restricted-intake boundary.
   if (input.sensitivity !== "Standard") {
     return privateJson(
       { ok: false, error: "Legacy staff access may create Standard meetings only. Explicit Standard sensitivity is required." },
