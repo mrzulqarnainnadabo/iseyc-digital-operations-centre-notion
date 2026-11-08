@@ -123,3 +123,10 @@ test("protected meeting reads authenticate and fail closed when Notion is not co
   const getDetail = detail.slice(detail.indexOf("export async function GET"));
   assertInOrder(getDetail, ["requireStaffSession()", "getMeeting(id)"], "meeting detail GET");
 });
+
+test("meeting pagination rejects malformed continuation cursors before calling Notion", () => {
+  const source = fs.readFileSync(path.join(apiRoot, "meetings/route.ts"), "utf8");
+  assert.match(source, /if \(cursor && !\/\^\[0-9a-f\]\{8\}/);
+  assert.match(source, /Invalid page cursor/);
+  assert.match(source, /status: 400/);
+});
