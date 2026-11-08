@@ -116,10 +116,40 @@ test("state-changing DOC routes enforce origin and session checks before parsing
 test("protected meeting reads authenticate and fail closed when Notion is not configured", () => {
   const collection = fs.readFileSync(path.join(apiRoot, "meetings/route.ts"), "utf8");
   const getBody = collection.slice(collection.indexOf("export async function GET"));
-  assertInOrder(getBody, ["requireStaffSession()", "configFlags()", "listMeetings()"], "meeting GET");
+  assertInOrder(getBody, ["requireStaffSession()", "configFlags()", "isValidMeetingCursor(cursorParam)", "listMeetingsPage(cursorParam ?? undefined)"], "meeting GET");
   assert.match(getBody, /The Notion Meetings source is not configured/);
 
   const detail = fs.readFileSync(path.join(apiRoot, "meetings/[id]/route.ts"), "utf8");
   const getDetail = detail.slice(detail.indexOf("export async function GET"));
   assertInOrder(getDetail, ["requireStaffSession()", "getMeeting(id)"], "meeting detail GET");
+});
+
+
+test("meeting queue pagination remains bounded and filters Standard records at the Notion query", () => {
+  const notion = fs.readFileSync(path.join(__dirname, "../lib/notion.ts"), "utf8");
+  assert.match(notion, /const MEETING_PAGE_SIZE = 25/);
+  assert.match(notion, /page_size: MEETING_PAGE_SIZE/);
+  assert.match(notion, /property: "Sensitivity",\s*select: \{ equals: "Standard" \}/);
+  assert.match(notion, /sorts: \[\{ timestamp: "created_time", direction: "descending" \}\]/);
+  assert.match(notion, /start_cursor: cursor/);
+  assert.doesNotMatch(notion, /do\s*\{[\s\S]*?\}\s*while\s*\(cursor\)/);
+});
+
+test("meeting queue cursor input is bounded and rejects control characters", () => {
+  const notion = fs.readFileSync(path.join(__dirname, "../lib/notion.ts"), "utf8");
+  assert.match(notion, /MAX_NOTION_CURSOR_LENGTH = 256/);
+  assert.match(notion, /isValidMeetingCursor\(cursor: unknown\)/);
+  const route = fs.readFileSync(path.join(apiRoot, "meetings/route.ts"), "utf8");
+  assert.match(route, /cursorParam !== null && !isValidMeetingCursor\(cursorParam\)/);
+  const alias = fs.readFileSync(path.join(__dirname, "../app/ops/api/meetings/route.ts"), "utf8");
+  assert.match(alias, /getMeetings\(req\)/);
+});
+
+test("queue UI exposes bounded previous/next navigation and labels page-local counts", () => {
+  const queue = fs.readFileSync(path.join(__dirname, "../app/ops/queue/page.tsx"), "utf8");
+  assert.match(queue, /Page \{pageIndex \+ 1\}/);
+  assert.match(queue, /onClick=\{goPrevious\}/);
+  assert.match(queue, /onClick=\{goNext\}/);
+  assert.match(queue, /Records on this page/);
+  assert.match(queue, /Filters apply to this page|status on this page/);
 });
