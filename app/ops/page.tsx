@@ -19,11 +19,12 @@ export default async function CommandBriefPage() {
   if (!(await requireStaffSession())) redirect("/login");
 
   const flags = configFlags();
-  let meetings: Awaited<ReturnType<typeof listMeetings>> = [];
+  let meetings: Awaited<ReturnType<typeof listMeetings>>["meetings"] = [];
   let listError: string | null = null;
   if (flags.token && flags.meetings) {
     try {
-      meetings = filterLegacyVisibleMeetings(await listMeetings());
+      const firstPage = await listMeetings({ pageSize: 25 });
+      meetings = filterLegacyVisibleMeetings(firstPage.meetings);
     } catch {
       listError = "Unable to load the meeting queue. No count is shown until the source responds.";
     }
@@ -45,9 +46,9 @@ export default async function CommandBriefPage() {
         </div>
         <div className="grid divide-y divide-white/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
           <div className="px-5 py-4 sm:px-7">
-            <p className="text-xs text-white/60">Items awaiting review</p>
+            <p className="text-xs text-white/60">Awaiting · first page</p>
             <p className="mt-1 font-serif text-3xl tabular-nums">{queueConnected ? awaiting.length : "—"}</p>
-            <p className="mt-1 text-xs text-white/60">{queueConnected ? "Current Standard meeting records" : "Not connected"}</p>
+            <p className="mt-1 text-xs text-white/60">{queueConnected ? "Up to 25 loaded records · open queue for more" : "Not connected"}</p>
           </div>
           <div className="px-5 py-4 sm:px-7">
             <p className="text-xs text-white/60">Meeting register</p>
