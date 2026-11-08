@@ -793,3 +793,22 @@ test("delegation cannot be self-issued or granted by a non-President", () => {
     assert.equal(policy.canDecideMembership(c, "approve", now), false);
   }
 });
+
+
+test("meeting list adapter reads one bounded Notion page and exposes only its continuation cursor", () => {
+  const source = fs.readFileSync(require("node:path").join(__dirname, "../lib/notion.ts"), "utf8");
+  const start = source.indexOf("export async function listMeetings(");
+  const end = source.indexOf("\\nexport async function getMeeting", start);
+  assert.ok(start >= 0 && end > start, "paginated meeting adapter should exist");
+  const implementation = source.slice(start, end);
+  assert.match(implementation, /pageSize = Math\.min\(50, Math\.max\(1, Math\.floor\(options\.pageSize \?\? 25\)\)\)/);
+  assert.match(implementation, /start_cursor: cursor/);
+  assert.match(implementation, /nextCursor: res\.has_more \? res\.next_cursor/);
+  assert.doesNotMatch(implementation, /do\s*\{|while\s*\(cursor\)/);
+});
+
+test("operations API alias forwards the request to the authenticated paginated handler", () => {
+  const source = fs.readFileSync(require("node:path").join(__dirname, "../app/ops/api/meetings/route.ts"), "utf8");
+  assert.match(source, /export async function GET\(req: NextRequest\)/);
+  assert.match(source, /return getMeetings\(req\)/);
+});
