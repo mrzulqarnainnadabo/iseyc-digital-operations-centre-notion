@@ -139,7 +139,7 @@ export default function QueuePage() {
         ) : error && meetings.length === 0 ? (
           <ErrorState message={error} onRetry={() => setReloadKey((value) => value + 1)} />
         ) : !visibleMeetings.length ? (
-          <EmptyState title={meetings.length ? "No matching loaded items" : "No items"} />
+          <EmptyState title={meetings.length ? "No matching loaded items" : nextCursor ? "No visible records on this page" : "No items"} />
         ) : (
           <ul className="space-y-2">
             {visibleMeetings.map((meeting) => (
