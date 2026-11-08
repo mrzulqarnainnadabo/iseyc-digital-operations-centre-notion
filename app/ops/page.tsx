@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireStaffSession } from "@/lib/auth";
-import { configFlags, listMeetings } from "@/lib/notion";
+import { configFlags, listMeetingsPage } from "@/lib/notion";
 import { filterLegacyVisibleMeetings } from "@/lib/legacy-session-boundary";
 
 export const dynamic = "force-dynamic";
@@ -19,11 +19,11 @@ export default async function CommandBriefPage() {
   if (!(await requireStaffSession())) redirect("/login");
 
   const flags = configFlags();
-  let meetings: Awaited<ReturnType<typeof listMeetings>> = [];
+  let meetings: Awaited<ReturnType<typeof listMeetingsPage>>["meetings"] = [];
   let listError: string | null = null;
   if (flags.token && flags.meetings) {
     try {
-      meetings = filterLegacyVisibleMeetings(await listMeetings());
+      meetings = filterLegacyVisibleMeetings((await listMeetingsPage()).meetings);
     } catch {
       listError = "Unable to load the meeting queue. No count is shown until the source responds.";
     }
@@ -47,7 +47,7 @@ export default async function CommandBriefPage() {
           <div className="px-5 py-4 sm:px-7">
             <p className="text-xs text-white/60">Items awaiting review</p>
             <p className="mt-1 font-serif text-3xl tabular-nums">{queueConnected ? awaiting.length : "—"}</p>
-            <p className="mt-1 text-xs text-white/60">{queueConnected ? "Current Standard meeting records" : "Not connected"}</p>
+            <p className="mt-1 text-xs text-white/60">{queueConnected ? "Latest page · up to 25 Standard records" : "Not connected"}</p>
           </div>
           <div className="px-5 py-4 sm:px-7">
             <p className="text-xs text-white/60">Meeting register</p>
