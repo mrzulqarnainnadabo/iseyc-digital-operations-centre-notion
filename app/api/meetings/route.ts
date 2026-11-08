@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 
   const requestUrl = new URL(req.url);
   const cursor = requestUrl.searchParams.get("cursor") || undefined;
-  if (cursor && cursor.length > 2_000) {
+  if (cursor && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cursor)) {
     return privateJson({ ok: false, error: "Invalid page cursor." }, { status: 400 });
   }
 
