@@ -3,7 +3,7 @@ import { privateJson } from "@/lib/private-response";
 import { requireStaffSession } from "@/lib/auth";
 import { isSameOriginRequest, readBoundedJson } from "@/lib/request-security";
 import { configFlags, createMeeting, isValidMeetingCursor, listMeetingsPage } from "@/lib/notion";
-import { legacySessionCanCreateMeeting } from "@/lib/legacy-session-boundary";
+import { legacySessionCanCreateMeeting, legacySessionCanReadMeeting } from "@/lib/legacy-session-boundary";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,9 +28,10 @@ export async function GET(req: NextRequest) {
 
   try {
     const page = await listMeetingsPage(cursorParam ?? undefined);
+    const meetings = page.meetings.filter((meeting) => legacySessionCanReadMeeting(meeting.sensitivity));
     return privateJson({
       ok: true,
-      meetings: page.meetings,
+      meetings,
       nextCursor: page.nextCursor,
       hasMore: page.hasMore,
     });
