@@ -74,5 +74,5 @@ test("ops API aliases delegate to existing server-authorized handlers", () => {
   const commandHome = read("app/ops/page.tsx");
   assert.match(commandHome, /requireStaffSession/);
   assert.match(commandHome, /if \(!\(await requireStaffSession\(\)\)\) redirect\("\/login"\)/);
-  assert.ok(commandHome.indexOf("requireStaffSession") < commandHome.indexOf("listMeetings()"));
+  assert.ok(commandHome.indexOf("requireStaffSession") < commandHome.indexOf("listMeetings({ pageSize: 25 })"));
 });
