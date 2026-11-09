@@ -141,6 +141,9 @@ test("department desks connect department work, reporting and filtered meeting a
   assert.match(ui, /Programme pipeline/);
   assert.match(ui, /Department reports/);
   assert.match(ui, /Department meetings/);
+  assert.match(department, /const attention=\[\.\.\.overdue/);
+  assert.match(ui, /Needs attention/);
+  assert.match(ui, /workspace\?\.attention\.slice\(0,5\)/);
   assert.match(ui, /Modules listed for this department/);
   assert.doesNotMatch(ui, /Approved modules for this department/);
   assert.match(ui, /completion dates are not captured/);
