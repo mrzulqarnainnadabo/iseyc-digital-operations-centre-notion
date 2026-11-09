@@ -13,12 +13,26 @@ test("department workspaces use the approved four-department identity and real r
   for (const name of ["Education & Capacity Building", "Health & Well-being", "Software & Technology", "Civic Department"]) assert.ok(adapter.includes(name));
   assert.match(adapter, /NOTION_PROGRAMMES_DATABASE_ID/);
   assert.match(adapter, /NOTION_DEPARTMENT_REPORTS_DATABASE_ID/);
+  assert.match(adapter, /NOTION_LEARNING_DATABASE_ID/);
+  assert.match(adapter, /All Departments/);
   assert.match(adapter, /filter:\{property:"Department",select:\{equals:department\}\}/);
   assert.match(adapter, /Status:\{status:\{name:"Proposed"\}\}/);
   assert.match(adapter, /Status:\{status:\{name:"Draft"\}\}/);
   assert.match(page, /DepartmentWorkspace/);
-  for (const tab of ["overview", "work", "reports", "meetings"]) assert.ok(ui.includes(`"${tab}"`));
+  for (const tab of ["overview", "work", "reports", "learning", "meetings"]) assert.ok(ui.includes(`"${tab}"`));
   for (const style of ["education", "health", "technology", "civic"]) assert.ok(css.includes(`.department-desk--${style}`));
+});
+
+test("learning workspace shows approved modules without implying individual completion", () => {
+  const adapter = read("lib/department-workspace.ts");
+  const ui = read("components/DepartmentWorkspace.tsx");
+  const notion = read("lib/notion.ts");
+  assert.match(adapter, /Learning Module \/ Assessment/);
+  assert.match(adapter, /Mandatory/);
+  assert.match(adapter, /Learning Objectives/);
+  assert.match(notion, /NOTION_LEARNING_DATABASE_ID/);
+  assert.match(ui, /Learning & competency library/);
+  assert.match(ui, /not a record of individual completion/);
 });
 
 test("department programme intake requires owner, intended outcome, acceptance criteria and dated delivery", () => {
