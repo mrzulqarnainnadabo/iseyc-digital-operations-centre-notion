@@ -139,8 +139,8 @@ test("staff login throttles repeated failures and clears the local bucket after 
     'req.headers.get("x-real-ip")',
     "isLoginRateLimited(clientIp)",
     "readBoundedJson(req",
-    "recordLoginFailure(clientIp)",
     "isValidStaffKey(key)",
+    "recordLoginFailure(clientIp)",
     "clearLoginFailures(clientIp)",
     "signSession(key)"
   ], "staff login throttling");
