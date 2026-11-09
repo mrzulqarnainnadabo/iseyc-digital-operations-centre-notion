@@ -12,6 +12,7 @@ export const DOC_NAV: NavItem[] = [
   { label: "Calendar", href: "/ops/calendar", group: "Command" },
   { label: "Departments", href: "/ops/readiness", group: "Departments" },
   { label: "Communications", href: "/ops/media", group: "Shared function" },
+  { label: "External engagement", href: "/ops/partners", group: "Shared function" },
   { label: "Chamber", href: "/ops/chamber", group: "Module slots" },
   { label: "Actions", href: "/ops/actions", group: "Module slots" },
   { label: "Seat packet", href: "/ops/seat", group: "Governance" },
