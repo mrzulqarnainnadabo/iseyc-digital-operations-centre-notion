@@ -100,6 +100,9 @@ export default async function DepartmentPage({ params }: Props) {
               </a>
             </div>
 
+            <p className="mt-3 text-xs leading-5 text-ink-600">{mandate.classificationNote}</p>
+            <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-gold-700">Matching: provisional keyword · not institutional taxonomy</p>
+
             {mandate.status === "ready" ? (
               <>
                 <p className="mt-3 text-xs leading-5 text-ink-600">{mandate.prevalenceNote}</p>
@@ -128,7 +131,7 @@ export default async function DepartmentPage({ params }: Props) {
               </>
             ) : mandate.status === "empty" ? (
               <p className="mt-4 text-sm leading-6 text-ink-700">
-                No published Mandate records currently matched this department’s public keywords. That is an absence of matching published text — not zero need.
+                No published Mandate records currently matched this department as a provisional primary keyword match. That is an absence of matching published text — not zero need.
               </p>
             ) : (
               <p className="mt-4 text-sm leading-6 text-ink-700">
@@ -159,7 +162,7 @@ export default async function DepartmentPage({ params }: Props) {
                   {evidence.indicator.title}
                 </h2>
                 <p className="mt-2 text-xs leading-5 text-ink-600">
-                  National estimate · Nigeria (NGA) · {evidence.observations?.length} observations · values retain the source unit: {" "}
+                  National estimate · Nigeria (NGA) · {evidence.observations?.length} observations · values retain the source unit:{" "}
                   {evidence.indicator.unit}.
                 </p>
                 <ol className="evidence-data-list mt-4" aria-label={`${evidence.indicator.title} by reference year`}>
