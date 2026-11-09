@@ -109,14 +109,21 @@ export default async function DepartmentPage({ params }: Props) {
                       <p className="text-sm leading-6 text-forest-950">{record.text}</p>
                       <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-ink-600">
                         {record.duty ? <span>{record.duty}</span> : null}
-                        {record.state ? <span>{record.state}{record.lga ? ` · ${record.lga}` : ""}</span> : null}
+                        {record.state ? (
+                          <span>
+                            {record.state}
+                            {record.lga ? ` · ${record.lga}` : ""}
+                          </span>
+                        ) : null}
                         <span className="font-semibold text-ink-700">{record.verificationStatus}</span>
                       </p>
                     </li>
                   ))}
                 </ul>
                 {mandate.truncatedUpstream ? (
-                  <p className="mt-3 text-xs text-ink-600">Upstream published list may be truncated. Open Mandate for the full public register.</p>
+                  <p className="mt-3 text-xs text-ink-600">
+                    Upstream published list may be truncated. Open Mandate for the full public register.
+                  </p>
                 ) : null}
               </>
             ) : mandate.status === "empty" ? (
@@ -145,14 +152,15 @@ export default async function DepartmentPage({ params }: Props) {
                 </span>
                 {evidence.status === "stale" && (
                   <p className="mt-3 border-l-4 border-warning bg-cream-50 p-3 text-sm leading-6 text-forest-950">
-                    The last successful Observatory receipt is more than 24 hours old. Review the linked original before relying on these values.
+                    The last successful Observatory receipt is more than 24 hours old. These observations may not reflect the latest available source; review the linked original before relying on them.
                   </p>
                 )}
                 <h2 id="evidence-title" className="mt-3 font-serif text-xl text-forest-950">
                   {evidence.indicator.title}
                 </h2>
                 <p className="mt-2 text-xs leading-5 text-ink-600">
-                  National estimate · Nigeria (NGA) · {evidence.observations?.length} observations · unit: {evidence.indicator.unit}.
+                  National estimate · Nigeria (NGA) · {evidence.observations?.length} observations · values retain the source unit: {" "}
+                  {evidence.indicator.unit}.
                 </p>
                 <ol className="evidence-data-list mt-4" aria-label={`${evidence.indicator.title} by reference year`}>
                   {evidence.observations?.map((observation) => (
@@ -164,10 +172,32 @@ export default async function DepartmentPage({ params }: Props) {
                     </li>
                   ))}
                 </ol>
+                <p className="mt-3 text-xs leading-5 text-ink-600">
+                  Reference years shown in ascending order. Missing years are not zero. The endpoint does not provide a publication date for these observations.
+                </p>
                 <dl className="mt-4 space-y-3 border-t border-line pt-4 text-xs leading-5">
                   <div>
                     <dt className="font-semibold text-forest-950">Publisher</dt>
                     <dd className="text-ink-700">{evidence.indicator.sourcePublisher}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-semibold text-forest-950">Method</dt>
+                    <dd className="text-ink-700">{evidence.indicator.methodologyNotes}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-semibold text-forest-950">Last retrieved from Observatory</dt>
+                    <dd className="text-ink-700">
+                      <time dateTime={evidence.retrievedAt}>
+                        {evidence.retrievedAt
+                          ? new Date(evidence.retrievedAt).toLocaleString("en", {
+                              dateStyle: "medium",
+                              timeStyle: "short",
+                              timeZone: "UTC",
+                            })
+                          : "Not available"}{" "}
+                        UTC
+                      </time>
+                    </dd>
                   </div>
                   <div>
                     <dt className="font-semibold text-forest-950">Known limitations</dt>
@@ -192,13 +222,15 @@ export default async function DepartmentPage({ params }: Props) {
             ) : evidence.status === "empty" ? (
               <>
                 <h2 id="evidence-title" className="mt-2 font-serif text-xl text-forest-950">No observations returned</h2>
-                <p className="mt-3 text-sm leading-6 text-ink-700">A valid empty result is not zero need.</p>
+                <p className="mt-3 text-sm leading-6 text-ink-700">
+                  The verified source returned a valid empty result for this indicator. This does not mean zero need or zero activity.
+                </p>
               </>
             ) : evidence.status === "not-integrated" ? (
               <>
                 <h2 id="evidence-title" className="mt-2 font-serif text-xl text-forest-950">No matching pilot indicator</h2>
                 <p className="mt-3 text-sm leading-6 text-ink-700">
-                  The Observatory pilot has no department-matched indicator here. No proxy statistic is substituted.
+                  The current Observatory pilot catalog does not provide a department-matched indicator for this area. No proxy statistic is substituted. This is an evidence gap, not an empty result or a measure of need.
                 </p>
               </>
             ) : (
@@ -208,8 +240,8 @@ export default async function DepartmentPage({ params }: Props) {
                 </h2>
                 <p className="mt-3 text-sm leading-6 text-ink-700">
                   {evidence.status === "invalid"
-                    ? "The Observatory response did not match the verified contract. IDCC withheld the data."
-                    : "The public Observatory feed could not be refreshed."}
+                    ? "The Observatory response did not match the verified v1 contract. IDCC withheld the data."
+                    : "The public Observatory feed could not be refreshed. IDCC does not show expired cached data or substitute zero. Please retry after the source is restored."}
                 </p>
                 <p className="mt-4 border-t border-line pt-4 text-xs leading-5 text-ink-600">{observatoryConnection.detail}</p>
               </>
@@ -236,7 +268,7 @@ export default async function DepartmentPage({ params }: Props) {
           <p className="eyebrow">Shared civic intelligence framework</p>
           <h2 id="classification-title" className="mt-2 font-serif text-2xl text-forest-950">Four evidence labels. Four different meanings.</h2>
           <p className="mt-3 text-sm leading-6 text-ink-700">
-            Labels IDCC uses when records are connected — not a claim that each type is currently available.
+            These are the classifications IDCC will use when records are connected. They are not claims that evidence of each type is currently available.
           </p>
         </div>
         <div className="classification-list mt-6">
@@ -251,7 +283,7 @@ export default async function DepartmentPage({ params }: Props) {
           ))}
         </div>
         <p className="mt-5 border-t border-line pt-4 text-xs leading-5 text-ink-600">
-          Community reports do not establish prevalence. See the{" "}
+          Community reports do not establish prevalence. Announcements do not prove implementation. Published statistics do not automatically describe current conditions. See the{" "}
           <Link className="font-semibold text-forest-800 underline" href="/method">
             evidence method
           </Link>
