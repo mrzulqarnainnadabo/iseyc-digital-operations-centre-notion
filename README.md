@@ -7,8 +7,9 @@ The canonical ISEYC Digital Operations Centre (IDCC/DOC) implementation is **Nex
 This is a point-in-time engineering record, not a live deployment monitor.
 
 - Last previously verified production deployment source: `6158b85ac190dc655cb670910d87833103fc8316` (Vercel reported READY on 6 November 2026).
-- Mainline has advanced beyond that deployment source. The latest Vercel check on the current mainline reports a **build-rate-limit failure**; this does not establish whether an earlier deployment remains available or whether the latest code is live.
-- The latest mainline Vercel status is a **build-rate-limit failure**, not a verified successful deployment. No deployment of the later mainline security work is claimed.
+- Mainline has since advanced. The IDCC quality-gates workflow passed on the 9 November 2026 pull request, including route-security tests, TypeScript validation and production build.
+- Mainline commit `78a81e855ae22349ce570aa267d409ab211e92a1` received a successful Vercel Git status. A later mainline security-regression commit `1e4e0b32a1d7b47be5ac1b741045e2a2aa6a9483` was merged after its pull-request checks passed; its Vercel status was still pending at the time of this note.
+- No production deployment of the latest mainline commit is claimed until its deployment reaches READY and the deployed routes are verified.
 - Vercel project: `iseyc-digital-operations-centre-notion`.
 - Project domain: `https://iseyc-digital-operations-centre-not.vercel.app`.
 - Vercel previously reported SSO protection for deployment domains except custom domains. The intended staff access path must be confirmed before onboarding.
