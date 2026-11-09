@@ -123,6 +123,21 @@ export default function ExternalEngagementPage() {
       </form>
     </section>
 
+    <section className="grid gap-4 lg:grid-cols-2">
+      <div className="rounded-card border border-line bg-white p-4 shadow-card">
+        <div className="flex items-center justify-between gap-2"><h2 className="font-serif text-xl text-forest-950">Organisation directory</h2><span className="text-xs text-ink-600">{data.organisations.length} loaded</span></div>
+        <ul className="mt-3 divide-y divide-line">
+          {data.organisations.length ? data.organisations.slice(0, 12).map(x=><li key={x.id} className="py-3"><div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm font-semibold text-forest-950">{x.title}</p><span className="rounded-full border border-line bg-cream-50 px-2 py-1 text-xs">{x.status || "Unverified"}</span></div><p className="mt-1 text-xs text-ink-600">{x.detail || "Organisation type not recorded"}</p>{x.url ? <a href={x.url} target="_blank" rel="noreferrer" className="mt-1 inline-flex min-h-8 items-center text-xs font-semibold text-forest-800 underline">Open organisation record ↗</a> : null}</li>) : <li className="py-3 text-sm text-ink-600">No organisation records are currently loaded.</li>}
+        </ul>
+      </div>
+      <div className="rounded-card border border-line bg-white p-4 shadow-card">
+        <div className="flex items-center justify-between gap-2"><h2 className="font-serif text-xl text-forest-950">External contacts</h2><span className="text-xs text-ink-600">{data.contacts.length} loaded</span></div>
+        <ul className="mt-3 divide-y divide-line">
+          {data.contacts.length ? data.contacts.slice(0, 12).map(x=><li key={x.id} className="py-3"><div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm font-semibold text-forest-950">{x.title}</p><span className="rounded-full border border-line bg-cream-50 px-2 py-1 text-xs">{x.status || "Unverified"}</span></div><p className="mt-1 text-xs text-ink-600">{x.detail || "Work email not recorded"} · {x.verified ? "Identity verified" : "Identity not verified"}</p></li>) : <li className="py-3 text-sm text-ink-600">No contact records are currently loaded.</li>}
+        </ul>
+      </div>
+    </section>
+
     <form onSubmit={createInvitation} className="space-y-4 rounded-card border border-forest-200 bg-white p-4 shadow-card sm:p-6">
       <div><p className="text-xs font-semibold uppercase tracking-widest text-gold-700">03 · Meeting participation</p><h2 className="mt-1 font-serif text-2xl text-forest-950">Prepare an external invitation</h2><p className="mt-1 text-sm leading-6 text-ink-600">Only approved Standard meetings and verified organisations can be selected. Named contacts must also be verified and active.</p></div>
       <div className="grid gap-3 sm:grid-cols-2">
