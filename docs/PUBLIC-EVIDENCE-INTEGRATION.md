@@ -6,9 +6,9 @@ Status: limited read-only integration verified against the public Civic Intellig
 
 The public read-only gateway is implemented in [the Observatory repository](https://github.com/mrzulqarnainnadabo/iseyc-civic-intelligence-observatory) and exposed at:
 
-- `GET https://iseyc-civic-intelligence-observator.vercel.app/api/evidence/observations?catalog=1`
-- `GET https://iseyc-civic-intelligence-observator.vercel.app/api/evidence/observations?indicatorId=wb-nga-se-prm-enrr`
-- `GET https://iseyc-civic-intelligence-observator.vercel.app/api/evidence/observations?indicatorId=wb-nga-sh-dyn-mort`
+- `GET https://iseyc-civic-intelligence-observatory.vercel.app/api/evidence/observations?catalog=1`
+- `GET https://iseyc-civic-intelligence-observatory.vercel.app/api/evidence/observations?indicatorId=wb-nga-se-prm-enrr`
+- `GET https://iseyc-civic-intelligence-observatory.vercel.app/api/evidence/observations?indicatorId=wb-nga-sh-dyn-mort`
 
 These endpoints were requested successfully during implementation. The catalog identified an allowlist-only v1 API. Responses use `contractVersion: "1.0.0"`; the observation payload includes an indicator descriptor, observations and a retrieval receipt. The handler permits only allowlisted indicator IDs and returns public read-only data. IDCC does not build query URLs from browser input.
 

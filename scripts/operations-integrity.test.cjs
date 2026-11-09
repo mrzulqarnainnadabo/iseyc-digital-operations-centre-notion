@@ -162,12 +162,12 @@ test("AI draft and human decision components preserve the authority boundary", (
   }
 });
 
-test("public home composes public systems while operations retain server-side access control", () => {
+test("department-first public home keeps supporting systems secondary and operations protected", () => {
   const home = fs.readFileSync(path.join(root, "app/page.tsx"), "utf8");
   const opsLayout = fs.readFileSync(path.join(root, "app/ops/layout.tsx"), "utf8");
   assert.match(home, /PublicShell/);
-  assert.match(home, /Public information\. Clear evidence\. Stronger accountability\./);
-  assert.match(home, /Three systems\. One evidence chain\./);
+  assert.match(home, /Four departments\. One institution\. Clear public information\./);
+  assert.match(home, /Digital infrastructure behind the departments/);
   assert.match(home, /Civic Mandate/);
   assert.match(home, /Civic Brain/);
   assert.doesNotMatch(home, /requireStaffSession|listMeetings|@\/lib\/notion/);

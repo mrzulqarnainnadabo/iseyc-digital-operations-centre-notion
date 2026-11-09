@@ -16,7 +16,7 @@ export const observatoryConnection = {
   detail: "The live Observatory v1 endpoint is verified for two relevant World Bank pilot series: national primary-school gross enrollment and national under-five mortality estimates. The current catalog has no department-matched software/technology or civic-service indicators. This is a limited pilot, not a broad departmental feed or state/LGA coverage.",
 };
 
-const OBSERVATORY_BASE_URL = "https://iseyc-civic-intelligence-observator.vercel.app";
+const OBSERVATORY_BASE_URL = "https://iseyc-civic-intelligence-observatory.vercel.app";
 const WORLD_BANK_DATA_URLS = {
   "wb-nga-se-prm-enrr": "https://data.worldbank.org/indicator/SE.PRM.ENRR?locations=NG",
   "wb-nga-sh-dyn-mort": "https://data.worldbank.org/indicator/SH.DYN.MORT?locations=NG",

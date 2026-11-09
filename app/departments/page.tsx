@@ -40,7 +40,7 @@ export default function DepartmentsPage() {
         </div>
         <p className="mt-4 max-w-3xl text-sm leading-6 text-ink-700">{observatoryConnection.detail}</p>
         <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
-          <a href="https://iseyc-civic-intelligence-observator.vercel.app/api/evidence/observations?catalog=1" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center font-semibold text-forest-800 underline">Open the verified public indicator catalog <span aria-hidden="true" className="ml-2">↗</span></a>
+          <a href="https://iseyc-civic-intelligence-observatory.vercel.app/api/evidence/observations?catalog=1" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center font-semibold text-forest-800 underline">Open the verified public indicator catalog <span aria-hidden="true" className="ml-2">↗</span></a>
           <Link href="/method" className="inline-flex min-h-[44px] items-center font-semibold text-forest-800 hover:underline">Read how to interpret evidence <span aria-hidden="true" className="ml-2">→</span></Link>
         </div>
       </section>
