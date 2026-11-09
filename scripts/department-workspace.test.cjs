@@ -101,3 +101,22 @@ test("department workspace fails closed and never substitutes demo records", () 
   assert.match(ui, /No programme or work records yet/);
   assert.match(ui, /Register unavailable; no records are shown/);
 });
+
+test("department snapshots are fetched from the allowlisted Observatory contract and fail closed", () => {
+  const evidence = read("lib/public-evidence.ts");
+  const workspace = read("lib/department-workspace.ts");
+  const ui = read("components/DepartmentWorkspace.tsx");
+  assert.match(evidence, /SNAPSHOT_API = "https:\/\/iseyc-civic-intelligence-observatory\.vercel\.app\/api\/evidence\/snapshots"/);
+  assert.match(evidence, /iseyc-observatory-national-snapshots-v1/);
+  assert.match(evidence, /SNAPSHOT_SOURCE_HOSTS/);
+  assert.match(evidence, /validSnapshotRecord/);
+  assert.match(evidence, /AbortSignal\.timeout\(8000\)/);
+  assert.match(evidence, /cache: "no-store"/);
+  assert.match(evidence, /status: "invalid", records: \[\]/);
+  assert.match(evidence, /status: "unavailable", records: \[\]/);
+  assert.match(workspace, /getDepartmentSnapshots\(evidenceSlug\)/);
+  assert.match(workspace, /snapshots,/);
+  assert.match(ui, /Curated national source snapshots/);
+  assert.match(ui, /No substitute figures are shown/);
+  assert.match(ui, /publisher, reference period, geography and limitations/);
+});
