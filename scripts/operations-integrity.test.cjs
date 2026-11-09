@@ -228,6 +228,11 @@ test("external engagement is authenticated, linked and draft-only until human di
   assert.match(route, /readBoundedJson/);
   assert.match(route, /status: "Draft"/);
   assert.match(route, /Not sent/);
+  assert.match(route, /subject.length < 5/);
+  assert.match(route, /draft.length < 20/);
+  assert.match(adapter, /Invitation subject/);
+  assert.match(adapter, /Invitation draft/);
+  assert.match(page, /Invitation message draft/);
   assert.match(page, /Create invitation draft/);
   assert.match(page, /has NOT been sent/);
   assert.match(page, /verified and active/);
