@@ -71,7 +71,8 @@ export async function getDepartmentWorkspace(slug:DepartmentSlug) {
   const active=work.filter(x=>["Approved","In Progress","Under Review"].includes(x.status));
   const overdue=work.filter(x=>x.dueDate && x.dueDate<today && !["Completed","Cancelled","Paused"].includes(x.status));
   const dueSoon=work.filter(x=>x.dueDate && x.dueDate>=today && x.dueDate<=sevenDays && !["Completed","Cancelled","Paused"].includes(x.status));
-  return {department,work,reports,meetings,learning,evidence,summary:{totalWork:work.length,activeWork:active.length,overdueWork:overdue.length,dueSoonWork:dueSoon.length,draftReports:reports.filter(x=>x.status==="Draft").length,submittedReports:reports.filter(x=>["Submitted","Under Review"].includes(x.status)).length},source:"notion",scope:"first 50 records per register"};
+  const attention=[...overdue.map(x=>({...x,attention:"overdue" as const})),...dueSoon.map(x=>({...x,attention:"due-soon" as const}))].sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+  return {department,work,reports,meetings,learning,evidence,attention,summary:{totalWork:work.length,activeWork:active.length,overdueWork:overdue.length,dueSoonWork:dueSoon.length,draftReports:reports.filter(x=>x.status==="Draft").length,submittedReports:reports.filter(x=>["Submitted","Under Review"].includes(x.status)).length},source:"notion",scope:"first 50 records per register"};
 }
 const dateOk = isValidCalendarDate;
 export async function createDepartmentWork(slug:DepartmentSlug,input:{title:string;type:string;priority:string;owner:string;outcome:string;startDate:string;dueDate:string;acceptance:string;risk:string}) {
