@@ -300,3 +300,23 @@ test("external engagement list responses do not disclose private email or phone 
   assert.match(adapter, /if \(input\.email\) properties\["Work email"\]/);
   assert.match(adapter, /if \(input\.phone\) properties\["Work phone"\]/);
 });
+
+test("external engagement keeps contact channels private and invitations as unsent drafts", () => {
+  const adapter = read("lib/external-engagement.ts");
+  const route = read("app/ops/api/external-engagement/route.ts");
+  const page = read("app/ops/partners/page.tsx");
+  const start = adapter.indexOf("export async function listExternalOptions()");
+  const end = adapter.indexOf("export async function listExternalInvitations()", start);
+  assert.ok(start >= 0 && end > start);
+  const publicListing = adapter.slice(start, end);
+  assert.doesNotMatch(publicListing, /Work email|Work phone|\.email|\.phone_number/i);
+  assert.match(route, /requireStaffSession/);
+  assert.match(route, /privateJson/);
+  assert.match(route, /isSameOriginRequest/);
+  assert.match(route, /readBoundedJson/);
+  assert.match(route, /Not sent — human approval and external dispatch are still required/);
+  assert.match(page, /x\.status === "Active" && x\.verified/);
+  assert.match(page, /It has NOT been sent/);
+  assert.match(adapter, /Unverified/);
+  assert.match(adapter, /Not recorded/);
+});
