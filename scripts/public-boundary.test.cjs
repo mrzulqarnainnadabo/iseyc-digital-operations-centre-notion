@@ -9,11 +9,11 @@ const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 test("public root is a public intelligence pulse and does not load restricted operations", () => {
   const page = read("app/page.tsx");
   assert.match(page, /PublicShell/);
-  assert.ok(page.includes("What is happening across Nigeria?"));
+  assert.ok(page.includes("Building capable people. Stronger communities."));
   assert.match(page, /getDepartmentMandateRecords/);
   assert.match(page, /getDepartmentEvidence/);
-  assert.match(page, /provisional keyword match/);
-  assert.match(page, /Not yet computed/);
+  assert.match(page, /Provisional keyword match · not institutional taxonomy/);
+  assert.match(page, /No national coverage score is claimed/);
   assert.equal(page.includes("requireStaffSession"), false);
   assert.equal(page.includes("listMeetings"), false);
   assert.equal(page.includes("@/lib/notion"), false);
