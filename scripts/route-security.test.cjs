@@ -167,3 +167,32 @@ test("department applications connection diagnostic is read-only and returns no 
   assert.match(source, /privateJson/);
   assert.doesNotMatch(source, /pages\.query|pages\.create|Applicant Name|Applicant Statement/);
 });
+
+
+test("Google OIDC verifies identity but cannot grant operations access", () => {
+  const callback = fs.readFileSync(path.join(apiRoot, "auth/oidc/callback/route.ts"), "utf8");
+  const status = fs.readFileSync(path.join(apiRoot, "auth/oidc/status/route.ts"), "utf8");
+  assert.ok(callback.includes("verifyGoogleIdToken"));
+  assert.ok(callback.includes("signPendingIdentity"));
+  assert.equal(callback.includes("signSession("), false);
+  assert.equal(callback.includes("SESSION_COOKIE,"), false);
+  assert.equal(callback.includes("requireStaffSession("), false);
+  assert.ok(status.includes("identityVerified"));
+  assert.ok(status.includes("accessGranted: false"));
+  assert.match(status, /membership and appointment authorisation are not connected/);
+});
+
+test("legacy shared-key sessions are explicitly limited to standard meeting records", () => {
+  const boundary = fs.readFileSync(path.join(__dirname, "../lib/legacy-session-boundary.ts"), "utf8");
+  assert.match(boundary, /sensitivity === "Standard"/);
+  assert.match(boundary, /status === "In review"/);
+  assert.match(boundary, /not a replacement for individual/);
+  assert.match(boundary, /role-based authorization/);
+});
+
+test("login throttling documents the distributed enforcement requirement", () => {
+  const limiter = fs.readFileSync(path.join(__dirname, "../lib/login-rate-limit.ts"), "utf8");
+  assert.match(limiter, /Serverless instances do not share memory/);
+  assert.match(limiter, /distributed Vercel Firewall\/WAF limit/);
+  assert.match(limiter, /POST \/api\/auth\/login/);
+});
