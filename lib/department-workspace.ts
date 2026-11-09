@@ -32,6 +32,7 @@ function value(prop:any):string {
   if (prop.type === "status") return prop.status?.name || "";
   if (prop.type === "date") return prop.date?.start || "";
   if (prop.type === "url") return prop.url || "";
+  if (prop.type === "last_edited_time" || prop.type === "created_time") return prop[prop.type] || "";
   return "";
 }
 async function listForDepartment(env:string, department:string) {
@@ -71,7 +72,7 @@ export async function getDepartmentWorkspace(slug:DepartmentSlug) {
   const dueSoon=work.filter(x=>x.dueDate && x.dueDate>=today && x.dueDate<=sevenDays && !["Completed","Cancelled"].includes(x.status));
   return {department,work,reports,meetings,learning,evidence,summary:{totalWork:work.length,activeWork:active.length,overdueWork:overdue.length,dueSoonWork:dueSoon.length,draftReports:reports.filter(x=>x.status==="Draft").length,submittedReports:reports.filter(x=>["Submitted","Under Review"].includes(x.status)).length},source:"notion",scope:"first 50 records per register"};
 }
-function dateOk(s:string) { return /^\\d{4}-\\d{2}-\\d{2}$/.test(s) && !Number.isNaN(Date.parse(s+"T00:00:00.000Z")) && new Date(s+"T00:00:00.000Z").toISOString().slice(0,10)===s; }
+function dateOk(s:string) { return /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(s+"T00:00:00.000Z")) && new Date(s+"T00:00:00.000Z").toISOString().slice(0,10)===s; }
 export async function createDepartmentWork(slug:DepartmentSlug,input:{title:string;type:string;priority:string;owner:string;outcome:string;startDate:string;dueDate:string;acceptance:string;risk:string}) {
   const {client,id}=getClientAndDb(PROGRAMMES_ENV);
   const types=["Programme","Project","Training","Research","Operations","Community Engagement"];
