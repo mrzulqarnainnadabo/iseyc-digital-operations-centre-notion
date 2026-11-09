@@ -11,7 +11,7 @@ export default function MethodPage() {
   return (
     <PublicShell>
       <section className="max-w-3xl py-10 sm:py-14">
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-600">Method and limitations</p>
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-700">Method and limitations</p>
         <h1 className="mt-3 font-serif text-3xl text-forest-950 sm:text-4xl">How to read the public record</h1>
         <p className="mt-4 text-sm leading-6 text-ink-700">ISEYC connects community information with public evidence. The system must preserve where information came from, what it can establish and what remains unknown.</p>
       </section>

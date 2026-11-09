@@ -50,7 +50,7 @@ export function DocShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-3">
             <img src="/iseyc-seal.svg" alt="ISEYC seal" width="38" height="38" className="rounded-full border border-gold-600 bg-white object-contain" />
             <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold-600">ISEYC</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold-700">ISEYC</p>
               <p className="text-sm font-semibold leading-5 text-forest-950">Initiative for Sustainable Evolution for Youth and Community</p>
             </div>
           </div>
@@ -76,7 +76,7 @@ export function DocShell({ children }: { children: React.ReactNode }) {
             <div className="flex min-w-0 items-center gap-3">
               <img src="/iseyc-seal.svg" alt="" width="30" height="30" className="rounded-full border border-gold-600 bg-white object-contain lg:hidden" />
               <div className="min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">ISEYC</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">ISEYC</p>
                 <p className="truncate text-sm font-semibold text-forest-950 sm:text-base">Digital Operations Centre</p>
                 <p className="hidden text-[9px] leading-tight text-ink-600 sm:block">Initiative for Sustainable Evolution for Youth and Community</p>
               </div>

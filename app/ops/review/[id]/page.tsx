@@ -109,7 +109,7 @@ export default function ReviewPage() {
       </div>
 
       <header>
-        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Controlled human review</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Controlled human review</p>
         <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
           <h1 className="font-serif text-2xl text-forest-950 sm:text-3xl">{meeting.title}</h1>
           <StatusBadge status={meeting.status} />
@@ -131,7 +131,7 @@ export default function ReviewPage() {
       {error ? <p className="rounded-control border border-red-200 bg-red-50 p-3 text-sm text-red-800" role="alert">{error}</p> : null}
 
       <section className="rounded-card border border-line bg-white p-4">
-        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Permitted transitional action</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Permitted transitional action</p>
         <h2 className="mt-1 text-sm font-semibold text-forest-950">Move record into review</h2>
         <p className="mt-1 text-sm leading-5 text-ink-600">This changes the workflow state to In review. It does not approve the record.</p>
         <button type="button" disabled={pending || meeting.status === "In review"} onClick={() => void setStatus("In review")} className="mt-3 inline-flex min-h-[44px] items-center rounded-control border border-forest-900 px-4 text-sm font-semibold text-forest-900 disabled:cursor-not-allowed disabled:opacity-50">

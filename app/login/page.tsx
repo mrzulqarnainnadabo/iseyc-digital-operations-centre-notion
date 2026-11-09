@@ -60,7 +60,7 @@ export default function LoginPage() {
         <header className="mb-5 flex items-center gap-3">
           <img src="/iseyc-seal.svg" alt="ISEYC seal" width="42" height="42" className="rounded-full border border-gold-600 bg-white object-contain" />
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold-600">ISEYC</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold-700">ISEYC</p>
             <p className="max-w-[245px] text-xs font-semibold leading-4 text-forest-950">Initiative for Sustainable Evolution for Youth and Community</p>
           </div>
         </header>

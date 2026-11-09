@@ -16,7 +16,7 @@ module.exports = {
           700: "#626d65",
           600: "#626d65",
         },
-        gold: { 600: "#a7833f" },
+        gold: { 700: "#755f27", 600: "#a7833f" },
         line: "#e4e6df",
         success: { DEFAULT: "#28664a", 50: "#edf4ef", 200: "#c7d9cd" },
         warning: { DEFAULT: "#93651d", 50: "#fbf6ec", 200: "#e6d2aa" },

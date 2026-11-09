@@ -2,6 +2,7 @@ import Link from "next/link";
 
 const links = [
   { href: "/", label: "Home" },
+  { href: "/departments", label: "Departments" },
   { href: "/explore", label: "Explore" },
   { href: "/submit", label: "Submit" },
   { href: "/explain", label: "Explain" },
@@ -20,20 +21,32 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
       <a href="#main-content" className="sr-only z-50 rounded-control bg-white px-4 py-3 font-semibold text-forest-950 focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Skip to content</a>
       <header className="border-b border-line bg-white">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex min-w-0 items-center gap-3" aria-label="ISEYC public home">
-            <img src="/iseyc-seal.svg" alt="ISEYC official seal" width="42" height="42" className="shrink-0 rounded-full border border-gold-600 bg-white object-contain" />
+          <Link href="/" className="flex min-w-0 items-center gap-3">
+            <img src="/iseyc-seal.svg" alt="" width="42" height="42" className="shrink-0 rounded-full border border-gold-600 bg-white object-contain" />
             <span className="min-w-0">
-              <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-gold-600">ISEYC</span>
+              <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-gold-700">ISEYC</span>
               <span className="block max-w-[250px] text-sm font-semibold leading-5 text-forest-950 sm:max-w-none">Public Information & Civic Intelligence</span>
             </span>
           </Link>
-          <nav aria-label="Public navigation" className="flex w-full gap-1 overflow-x-auto pb-1 sm:w-auto sm:flex-wrap sm:pb-0">
+          <nav aria-label="Public navigation" className="public-nav hidden w-auto max-w-full gap-1 sm:flex sm:flex-wrap">
             {links.map((item) => (
               <Link key={item.href} href={item.href} className="inline-flex min-h-[44px] shrink-0 items-center rounded-control px-3 text-sm font-medium text-ink-700 hover:bg-forest-100 hover:text-forest-950">
                 {item.label}
               </Link>
             ))}
           </nav>
+          <details className="public-mobile-menu relative sm:hidden">
+            <summary aria-label="Menu: open public navigation" className="inline-flex min-h-[44px] min-w-[84px] cursor-pointer list-none items-center justify-center gap-2 border border-line px-3 text-sm font-semibold text-forest-950 hover:bg-forest-100">
+              Menu <span aria-hidden="true" className="text-gold-700">+</span>
+            </summary>
+            <nav aria-label="Mobile public navigation" className="public-mobile-menu__links absolute right-0 top-[calc(100%+0.5rem)] z-20 flex w-[min(18rem,calc(100vw-2rem))] flex-col border border-line bg-white p-2 shadow-lg">
+              {links.map((item) => (
+                <Link key={item.href} href={item.href} className="inline-flex min-h-[44px] items-center px-3 text-sm font-medium text-ink-700 hover:bg-forest-100 hover:text-forest-950">
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </details>
         </div>
       </header>
       <main id="main-content" className="mx-auto min-h-[65vh] max-w-7xl px-4 sm:px-6 lg:px-8">{children}</main>

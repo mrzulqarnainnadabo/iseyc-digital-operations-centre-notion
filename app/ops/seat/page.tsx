@@ -15,7 +15,7 @@ export default function SeatBriefingPage() {
       </section>
 
       <section className="rounded-card border border-line bg-white p-5 shadow-card">
-        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Institutional orientation</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Institutional orientation</p>
         <h2 className="mt-1 text-lg font-semibold text-forest-950">What every seat must protect</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-ink-700">
           <li>ISEYC's non-partisan identity and public-interest purpose.</li>

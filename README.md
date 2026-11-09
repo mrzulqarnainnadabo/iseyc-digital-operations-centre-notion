@@ -17,7 +17,7 @@ This is a point-in-time engineering record, not a live deployment monitor.
 
 ## Public and restricted environments
 
-The IDCC root is the public institutional home. Public routes include `/`, `/explore`, `/submit`, `/explain`, `/method` and `/contact`. They compose the existing Civic Mandate, Civic Brain and Observatory products; they do not create a second civic-record database.
+The IDCC root is the public institutional home. Public routes include `/`, `/departments`, `/departments/[department]`, `/explore`, `/submit`, `/explain`, `/method` and `/contact`. Department pages read only the allowlisted public v1 Observatory World Bank pilot series for education and health. They do not create a second civic-record database or access restricted DOC records. Software/technology and civic-service indicator gaps remain visible. See [the public evidence integration note](docs/PUBLIC-EVIDENCE-INTEGRATION.md).
 
 Restricted institutional operations remain under `/ops` and are protected by the existing server-side session gate. The transitional session cookie is scoped to `Path=/ops`; meeting API browser requests use `/ops/api/meetings`. OIDC transaction cookies are scoped to the callback path. Public pages do not use the restricted session. This same-host path isolation is transitional; a separate operations hostname is preferred before officer onboarding.
 
