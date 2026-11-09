@@ -14,7 +14,11 @@ test("public home and navigation expose all four named departments", () => {
     assert.ok(registry.includes(label), `Missing department: ${label}`);
   }
   assert.match(shell, /href: "\/departments", label: "Departments"/);
-  assert.match(home, /Three systems\. One evidence chain\./);
+  assert.match(home, /Four departments\. One institution\. Clear public information\./);
+  assert.match(home, /Digital infrastructure behind the departments/);
+  const departmentsPosition = home.indexOf('aria-labelledby="departments-heading"');
+  const systemsPosition = home.indexOf('aria-labelledby="systems-heading"');
+  assert.ok(departmentsPosition >= 0 && systemsPosition > departmentsPosition, "departments must precede supporting systems");
 });
 
 test("department detail routes are public and never query private operations records", () => {
@@ -50,7 +54,7 @@ test("evidence framework distinguishes four classifications and never upgrades a
 test("Observatory adapter uses a bounded refresh cache and requests only verified allowlisted public series", () => {
   const evidence = read("lib/public-evidence.ts");
   const page = read("app/departments/[department]/page.tsx");
-  assert.match(evidence, /https:\/\/iseyc-civic-intelligence-observator\.vercel\.app/);
+  assert.match(evidence, /https:\/\/iseyc-civic-intelligence-observatory\.vercel\.app/);
   assert.match(evidence, /\/api\/evidence\/observations/);
   assert.match(evidence, /wb-nga-se-prm-enrr/);
   assert.match(evidence, /wb-nga-sh-dyn-mort/);
