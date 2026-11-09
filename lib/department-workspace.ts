@@ -10,9 +10,11 @@ export const DEPARTMENT_LABELS = {
 export type DepartmentSlug = keyof typeof DEPARTMENT_LABELS;
 const DEPARTMENT_TERMS:Record<DepartmentSlug,string[]>={education:["education","capacity","learning"],health:["health","well-being","wellbeing"],"digital-systems":["digital","technology","systems"],"civic-affairs":["civic","affairs","governance"]};
 type WorkItem = { id:string; title:string; status:string; type:string; priority:string; owner:string; outcome:string; dueDate:string; startDate:string; risk:string; url:string; updated:string };
+type LearningModule={id:string;title:string;type:string;level:string;audience:string;mandatory:boolean;objectives:string;evidenceRequired:string;reviewDate:string;url:string};
 type Report = { id:string; title:string; status:string; cycle:string; periodStart:string; periodEnd:string; preparedBy:string; completed:string; planned:string; outcomes:string; risks:string; limitations:string; decisions:string; evidenceUrl:string; url:string; updated:string };
 const PROGRAMMES_ENV = "NOTION_PROGRAMMES_DATABASE_ID";
 const REPORTS_ENV = "NOTION_DEPARTMENT_REPORTS_DATABASE_ID";
+const LEARNING_ENV = "NOTION_LEARNING_DATABASE_ID";
 
 function getClientAndDb(env:string) {
   const client = notion();
@@ -36,6 +38,15 @@ async function listForDepartment(env:string, department:string) {
   const result=await client.databases.query({database_id:id,page_size:50,filter:{property:"Department",select:{equals:department}},sorts:[{timestamp:"last_edited_time",direction:"descending"}]});
   return result.results.filter((p:any)=>p.object==="page");
 }
+async function listLearningForDepartment(department:string) {
+  const {client,id}=getClientAndDb(LEARNING_ENV);
+  const result=await client.databases.query({database_id:id,page_size:50,filter:{or:[{property:"Department",select:{equals:department}},{property:"Department",select:{equals:"All Departments"}}]},sorts:[{timestamp:"last_edited_time",direction:"descending"}]});
+  return result.results.filter((p:any)=>p.object==="page");
+}
+function mapLearning(p:any):LearningModule {
+  const x=p.properties||{};
+  return {id:p.id,title:value(x["Learning Module / Assessment"])||"Untitled module",type:value(x["Learning Type"]),level:value(x["Competency Level"]),audience:value(x.Audience),mandatory:x.Mandatory?.checkbox===true,objectives:value(x["Learning Objectives"]),evidenceRequired:value(x["Evidence Required"]),reviewDate:value(x["Review Date"]),url:p.url||""};
+}
 function mapWork(p:any):WorkItem {
   const x=p.properties||{};
   return {id:p.id,title:value(x["Programme / Work Item"])||"Untitled work",status:value(x.Status)||"Proposed",type:value(x["Work Type"]),priority:value(x.Priority),owner:value(x["Accountable Role"]),outcome:value(x["Intended Outcome"]),dueDate:value(x["Due Date"]),startDate:value(x["Start Date"]),risk:value(x["Risk Level"]),url:p.url||"",updated:value(x.Updated)};
@@ -46,13 +57,14 @@ function mapReport(p:any):Report {
 }
 export async function getDepartmentWorkspace(slug:DepartmentSlug) {
   const department=DEPARTMENT_LABELS[slug];
-  const [workPages,reportPages,meetingPage]=await Promise.all([listForDepartment(PROGRAMMES_ENV,department),listForDepartment(REPORTS_ENV,department),listMeetings({pageSize:50})]);
+  const [workPages,reportPages,meetingPage,learningPages]=await Promise.all([listForDepartment(PROGRAMMES_ENV,department),listForDepartment(REPORTS_ENV,department),listMeetings({pageSize:50}),listLearningForDepartment(department)]);
   const work=workPages.map(mapWork), reports=reportPages.map(mapReport);
+  const learning=learningPages.map(mapLearning);
   const meetings=filterLegacyVisibleMeetings(meetingPage.meetings).filter((meeting:MeetingRecord)=>DEPARTMENT_TERMS[slug].some(term=>`${meeting.conveningBody} ${meeting.title}`.toLowerCase().includes(term))).sort((a,b)=>a.meetingDate.localeCompare(b.meetingDate));
   const today=new Date().toISOString().slice(0,10);
   const active=work.filter(x=>["Approved","In Progress","Under Review"].includes(x.status));
   const overdue=work.filter(x=>x.dueDate && x.dueDate<today && !["Completed","Cancelled"].includes(x.status));
-  return {department,work,reports,meetings,summary:{totalWork:work.length,activeWork:active.length,overdueWork:overdue.length,draftReports:reports.filter(x=>x.status==="Draft").length,submittedReports:reports.filter(x=>["Submitted","Under Review"].includes(x.status)).length},source:"notion",scope:"first 50 records per register"};
+  return {department,work,reports,meetings,learning,summary:{totalWork:work.length,activeWork:active.length,overdueWork:overdue.length,draftReports:reports.filter(x=>x.status==="Draft").length,submittedReports:reports.filter(x=>["Submitted","Under Review"].includes(x.status)).length},source:"notion",scope:"first 50 records per register"};
 }
 function dateOk(s:string) { return /^\\d{4}-\\d{2}-\\d{2}$/.test(s) && !Number.isNaN(Date.parse(s+"T00:00:00.000Z")) && new Date(s+"T00:00:00.000Z").toISOString().slice(0,10)===s; }
 export async function createDepartmentWork(slug:DepartmentSlug,input:{title:string;type:string;priority:string;owner:string;outcome:string;startDate:string;dueDate:string;acceptance:string;risk:string}) {
