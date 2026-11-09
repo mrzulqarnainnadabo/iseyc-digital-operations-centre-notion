@@ -162,17 +162,21 @@ test("AI draft and human decision components preserve the authority boundary", (
   }
 });
 
-test("department-first public home keeps supporting systems secondary and operations protected", () => {
+test("public intelligence home keeps evidence systems secondary and operations protected", () => {
   const home = fs.readFileSync(path.join(root, "app/page.tsx"), "utf8");
+  const shell = fs.readFileSync(path.join(root, "components/PublicShell.tsx"), "utf8");
   const opsLayout = fs.readFileSync(path.join(root, "app/ops/layout.tsx"), "utf8");
   assert.match(home, /PublicShell/);
-  assert.match(home, /Four departments\. One institution\. Clear public information\./);
-  assert.match(home, /Digital infrastructure behind the departments/);
-  assert.match(home, /Civic Mandate/);
-  assert.match(home, /Civic Brain/);
-  assert.doesNotMatch(home, /requireStaffSession|listMeetings|@\/lib\/notion/);
+  assert.ok(home.includes("What is happening across Nigeria?"));
+  assert.match(home, /getDepartmentMandateRecords/);
+  assert.match(home, /getDepartmentEvidence/);
+  assert.match(home, /Not yet computed/);
+  assert.match(home, /Not mapped yet in this public view/);
+  assert.doesNotMatch(home, /requireStaffSession|listMeetings/);
+  assert.match(shell, /Civic Mandate/);
+  assert.match(shell, /Civic Brain/);
   assert.match(opsLayout, /requireStaffSession/);
-  assert.match(opsLayout, /redirect\("\/login"\)/);
+  assert.ok(opsLayout.includes('redirect("/login")'));
   assert.doesNotMatch(home, /members nationwide|national impact|campaign/i);
 });
 
