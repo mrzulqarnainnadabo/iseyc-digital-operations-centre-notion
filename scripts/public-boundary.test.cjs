@@ -24,7 +24,7 @@ test("public root is a public intelligence pulse and does not load restricted op
 
 test("public shell uses the official seal and functional public navigation", () => {
   const shell = read("components/PublicShell.tsx");
-  assert.ok(shell.includes('src="/iseyc-seal.svg"'));
+  assert.ok(shell.includes('src="/iseyc-wordmark.svg"'));
   for (const label of ["Home", "Departments", "Explore", "Report", "Method"]) {
     assert.match(shell, new RegExp(`label: "${label}"`));
   }
