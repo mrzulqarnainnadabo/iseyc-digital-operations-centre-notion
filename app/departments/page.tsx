@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PublicShell } from "@/components/PublicShell";
-import { departments } from "@/lib/departments";
+import { departments, getDepartmentRouteSlug } from "@/lib/departments";
 import { observatoryConnection } from "@/lib/public-evidence";
 
 export const metadata = {
@@ -62,7 +62,7 @@ export default function DepartmentsPage() {
 
       <section className="department-list pb-10" aria-label="ISEYC departments">
         {departments.map((department) => (
-          <Link key={department.slug} href={`/departments/${department.slug}`} className="department-index-row group">
+          <Link key={department.slug} href={`/departments/${getDepartmentRouteSlug(department.slug)}`} className="department-index-row group">
             <span className="font-mono text-xs text-gold-700">{department.number}</span>
             <div>
               <h2 className="font-serif text-2xl text-forest-950 group-hover:underline">{department.name}</h2>
