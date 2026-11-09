@@ -65,7 +65,8 @@ test("browser operational requests stay under the restricted cookie path", () =>
 test("ops API aliases delegate to existing server-authorized handlers", () => {
   const collection = read("app/ops/api/meetings/route.ts");
   assert.ok(collection.includes('from "../../../api/meetings/route"'));
-  assert.match(collection, /getMeetings\(\)|createMeeting\(req\)/);
+  assert.match(collection, /export async function GET\(req: NextRequest\)\s*\{\s*return getMeetings\(req\);/);
+  assert.match(collection, /export async function POST\(req: NextRequest\)\s*\{\s*return createMeeting\(req\);/);
   const detail = read("app/ops/api/meetings/[id]/route.ts");
   assert.ok(detail.includes('from "../../../../api/meetings/[id]/route"'));
   assert.match(detail, /getMeeting\(req, context\)|updateMeeting\(req, context\)/);
@@ -74,5 +75,5 @@ test("ops API aliases delegate to existing server-authorized handlers", () => {
   const commandHome = read("app/ops/page.tsx");
   assert.match(commandHome, /requireStaffSession/);
   assert.match(commandHome, /if \(!\(await requireStaffSession\(\)\)\) redirect\("\/login"\)/);
-  assert.ok(commandHome.indexOf("requireStaffSession") < commandHome.indexOf("listMeetings()"));
+  assert.ok(commandHome.indexOf("requireStaffSession") < commandHome.indexOf("listMeetings({ pageSize: 25 })"));
 });

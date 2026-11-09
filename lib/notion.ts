@@ -59,34 +59,39 @@ export type MeetingRecord = {
   sensitivity: string;
 };
 
-export async function listMeetings(): Promise<MeetingRecord[]> {
+export type MeetingPage = {
+  meetings: MeetingRecord[];
+  nextCursor: string | null;
+};
+
+/**
+ * Read one bounded page from the internal Meetings database.
+ * Never walk every Notion cursor inside a single request: callers explicitly
+ * request subsequent pages, keeping memory and upstream API work bounded.
+ */
+export async function listMeetings(options: {
+  cursor?: string;
+  pageSize?: number;
+} = {}): Promise<MeetingPage> {
   const client = notion();
   const database_id = dbId("NOTION_MEETINGS_DATABASE_ID");
-  if (!client || !database_id) return [];
+  if (!client || !database_id) return { meetings: [], nextCursor: null };
   assertInternalDb(database_id, "NOTION_MEETINGS_DATABASE_ID");
-  const pages: Array<{ id: string; properties: Record<string, unknown> }> = [];
-  let cursor: string | undefined;
 
-  // Notion caps page_size at 100. Follow every cursor so older records do not
-  // silently disappear from the operational meeting register.
-  do {
-    const res = await client.databases.query({
-      database_id,
-      page_size: 100,
-      ...(cursor ? { start_cursor: cursor } : {}),
-    });
-    for (const result of res.results) {
-      if ("properties" in result) {
-        pages.push(result as { id: string; properties: Record<string, unknown> });
-      }
-    }
-    cursor = res.has_more ? res.next_cursor ?? undefined : undefined;
-    if (res.has_more && !cursor) {
-      throw new Error("Notion returned has_more without a next_cursor");
-    }
-  } while (cursor);
+  const pageSize = Math.min(50, Math.max(1, Math.floor(options.pageSize ?? 25)));
+  const cursor = options.cursor?.trim();
+  const res = await client.databases.query({
+    database_id,
+    page_size: pageSize,
+    ...(cursor ? { start_cursor: cursor } : {}),
+  });
 
-  return pages.map((page) => {
+  const pages = res.results.filter(
+    (result): result is typeof result & { properties: Record<string, unknown> } =>
+      "properties" in result
+  );
+
+  const meetings = pages.map((page) => {
     const props = page.properties as Record<string, any>;
     return {
       id: page.id,
@@ -99,6 +104,15 @@ export async function listMeetings(): Promise<MeetingRecord[]> {
       sensitivity: textProp(props.Sensitivity) || "Unclassified",
     };
   });
+
+  if (res.has_more && !res.next_cursor) {
+    throw new Error("Notion returned has_more without a next_cursor");
+  }
+
+  return {
+    meetings,
+    nextCursor: res.has_more ? res.next_cursor ?? null : null,
+  };
 }
 
 export async function getMeeting(id: string): Promise<MeetingRecord | null> {

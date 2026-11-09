@@ -116,10 +116,17 @@ test("state-changing DOC routes enforce origin and session checks before parsing
 test("protected meeting reads authenticate and fail closed when Notion is not configured", () => {
   const collection = fs.readFileSync(path.join(apiRoot, "meetings/route.ts"), "utf8");
   const getBody = collection.slice(collection.indexOf("export async function GET"));
-  assertInOrder(getBody, ["requireStaffSession()", "configFlags()", "listMeetings()"], "meeting GET");
+  assertInOrder(getBody, ["requireStaffSession()", "configFlags()", "listMeetings({ cursor"], "meeting GET");
   assert.match(getBody, /The Notion Meetings source is not configured/);
 
   const detail = fs.readFileSync(path.join(apiRoot, "meetings/[id]/route.ts"), "utf8");
   const getDetail = detail.slice(detail.indexOf("export async function GET"));
   assertInOrder(getDetail, ["requireStaffSession()", "getMeeting(id)"], "meeting detail GET");
+});
+
+test("meeting pagination rejects malformed continuation cursors before calling Notion", () => {
+  const source = fs.readFileSync(path.join(apiRoot, "meetings/route.ts"), "utf8");
+  assert.ok(source.includes("cursor && !/^[0-9a-f]{8}-"));
+  assert.ok(source.includes("Invalid page cursor"));
+  assert.ok(source.includes("status: 400"));
 });
