@@ -9,7 +9,7 @@ const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 test("public root is a public composer and does not load restricted operations", () => {
   const page = read("app/page.tsx");
   assert.match(page, /PublicShell/);
-  assert.match(page, /Three systems\. One evidence chain\./);
+  assert.match(page, /Four departments\. One institution\. Clear public information\./);
   assert.match(page, /Civic Mandate Nigeria/);
   assert.match(page, /ISEYC Civic Brain/);
   assert.match(page, /Civic Intelligence Observatory/);
