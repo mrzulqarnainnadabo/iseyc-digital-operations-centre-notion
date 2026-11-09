@@ -94,13 +94,14 @@ export default async function PublicHomePage() {
         <div className="public-intelligence-section__intro">
           <p className="eyebrow">Supporting public intelligence</p>
           <h2 id="intelligence-title" className="mt-2 font-serif text-2xl text-forest-950">Listen carefully. Understand the evidence.</h2>
-          <p className="mt-3 text-sm leading-6 text-ink-700">Our public intelligence tools support the departments with published community observations and traceable evidence. They do not replace programme delivery or institutional judgement.</p>
+          <p className="mt-3 text-sm leading-6 text-ink-700">What communities report. What evidence supports. What is still unknown. Our public intelligence tools support the departments with published community observations and traceable evidence. They do not replace programme delivery or institutional judgement.</p>
+          <p className="mt-2 text-xs leading-5 text-ink-600">No national coverage score is claimed. Institutional responsibility mapping remains incomplete in this public view.</p>
           <Link href="/method" className="mt-4 inline-flex min-h-[44px] items-center text-sm font-semibold text-forest-800 underline">Read our evidence principles →</Link>
         </div>
         <div className="public-intelligence-section__content">
           <div className="public-intelligence-section__columns">
             <div>
-              <p className="eyebrow">Community voice</p>
+              <p className="eyebrow">Community voice · published records only</p>
               <h3 className="mt-2 font-serif text-xl text-forest-950">Recent published reports</h3>
               {records.length ? (
                 <ul className="mt-3 divide-y divide-line border-y border-line">
@@ -122,6 +123,7 @@ export default async function PublicHomePage() {
                 </div>
               )}
               <p className="mt-3 text-xs leading-5 text-ink-600">{prevalenceNote}</p>
+              <p className="mt-1 text-[11px] font-semibold text-gold-700">Provisional keyword match · not institutional taxonomy.</p>
               <a href="https://2027-street-mandate.vercel.app/explore" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex min-h-[44px] items-center text-sm font-semibold text-forest-800 underline">Explore Civic Mandate ↗</a>
             </div>
             <div>
