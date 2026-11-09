@@ -44,7 +44,7 @@ test("department reporting preserves limitations and keeps reports in Draft unti
   assert.match(adapter, /Data Limitations/);
   assert.match(adapter, /Status:\{status:\{name:"Draft"\}\}/);
   assert.match(adapter, /input\.periodEnd<input\.periodStart/);
-  assert.match(route, /Draft — not submitted or accepted/);
+  assert.match(route, /Draft — not submitted or approved/);
   assert.match(ui, /Data limitations/);
   assert.match(ui, /Save report draft/);
   assert.match(ui, /Submission and acceptance require the authorised review process/);
