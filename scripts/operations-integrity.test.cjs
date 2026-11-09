@@ -129,6 +129,10 @@ test("department desks show sourced meeting activity without implying staffing o
   assert.match(calendar, /listMeetings/);
   assert.match(board, /No meeting is recorded for this date/);
   assert.match(board, /does not create attendance, invitations, minutes or action assignments/);
+  assert.match(calendar, /pageSize: 50/);
+  assert.match(board, /first loaded page \(up to 50 records\)/);
+  assert.match(board, /This month · loaded page/);
+  assert.match(board, /meetings with a valid scheduled date in this loaded page/);
   for (const name of [
     "Education & Capacity Building",
     "Health & Well-being",
