@@ -13,7 +13,7 @@ export const observatoryConnection = {
   status: "limited" as const,
   label: "Limited public Observatory data connected",
   endpoint: "GET /api/evidence/observations?indicatorId={allowlisted-indicator}",
-  detail: "The live Observatory v1 endpoint is verified for two relevant World Bank pilot series: national primary-school gross enrollment and national under-five mortality estimates. The current catalog has no department-matched software/technology or civic-service indicators. This is a limited pilot, not a broad departmental feed or state/LGA coverage.",
+  detail: "The live World Bank indicator endpoint is a two-series national pilot. A separate curated snapshot endpoint now supplies dated publisher records to all four department workspaces. These are distinct evidence types, not a broad live feed or state/LGA coverage.",
 };
 
 const OBSERVATORY_BASE_URL = "https://iseyc-civic-intelligence-observatory.vercel.app";
