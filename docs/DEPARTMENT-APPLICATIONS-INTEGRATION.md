@@ -1,12 +1,10 @@
 # Department applications integration check
 
-The **ISEYC Department Applications — Intake Register** is a private Notion intake source. It is not a membership register, appointment register or officer-authorisation source.
+The diagnostic is designed for an approved private Notion intake source named **ISEYC Department Applications — Intake Register**. The source's existence and integration access must be verified by an authorised administrator. It is not a membership register, appointment register or officer-authorisation source.
 
 ## Configuration
 
-Set `NOTION_DEPARTMENT_APPLICATIONS_DATABASE_ID` in the IDCC Vercel project to the register's database ID:
-
-`8a88fe7e78e440b1a1078d96f538f4fd`
+Set `NOTION_DEPARTMENT_APPLICATIONS_DATABASE_ID` in the IDCC Vercel project to the approved register's database ID. Obtain the value directly from the authorised Notion workspace administrator; do not commit the raw identifier to this public repository.
 
 The existing `NOTION_TOKEN` must belong to the IDCC server integration and that exact integration must have access to the database. A connection made by a separate ChatGPT/Notion integration does not establish access for the Vercel application.
 
