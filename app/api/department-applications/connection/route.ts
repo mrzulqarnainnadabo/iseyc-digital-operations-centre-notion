@@ -17,8 +17,9 @@ export async function GET(_req: NextRequest) {
 
   try {
     const result = await verifyDepartmentApplicationsConnection();
-    return privateJson({ ok: true, ...result }, {
-      status: result.configured && result.accessible ? 200 : 503,
+    const ready = result.configured && result.accessible && result.schemaReady;
+    return privateJson({ ok: ready, ...result }, {
+      status: ready ? 200 : 503,
     });
   } catch {
     return privateJson({
