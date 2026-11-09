@@ -18,7 +18,7 @@ ISEYC is the parent institutional identity. The four departments and three civic
 
 ## 2. Official mark
 
-Use the supplied official ISEYC seal at `/iseyc-seal.svg`. It is the authoritative emblem and must not be redrawn, recoloured, distorted, cropped, or replaced by generated artwork.
+The supplied official ISEYC seal remains the source of truth. Use it at `/iseyc-seal.svg`. It is the authoritative emblem and must not be redrawn, recoloured, distorted, cropped, or replaced by generated artwork.
 
 The horizontal lockup at `/iseyc-wordmark.svg` pairs the official seal with the institution's name and approved tagline. Use the seal alone for favicons, compact app icons and narrow mobile placements. Use the horizontal lockup for institutional headers, reports, presentation covers and formal documents.
 
