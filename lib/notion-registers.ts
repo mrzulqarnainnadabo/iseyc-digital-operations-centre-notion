@@ -1,4 +1,3 @@
-import { Client } from "@notionhq/client";
 import { dbId, notion } from "@/lib/notion";
 
 export type RegisterKind = "actions" | "media" | "chamber";

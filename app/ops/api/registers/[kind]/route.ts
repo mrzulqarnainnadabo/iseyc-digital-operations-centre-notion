@@ -37,7 +37,7 @@ export async function POST(request: NextRequest, context: Context) {
   const date = typeof input.date === "string" ? input.date : "";
   const channel = typeof input.channel === "string" ? input.channel : "";
   if (title.length < 3 || title.length > 180 || detail.length > 1800) return privateJson({ ok: false, error: "Provide a title (3–180 characters) and detail up to 1,800 characters." }, { status: 400 });
-  if (date && (!/^\\d{4}-\\d{2}-\\d{2}$/.test(date) || Number.isNaN(Date.parse(date + "T00:00:00.000Z")) || new Date(date + "T00:00:00.000Z").toISOString().slice(0, 10) !== date)) return privateJson({ ok: false, error: "Date must be a valid calendar date in YYYY-MM-DD format." }, { status: 400 });
+  if (date && (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(date + "T00:00:00.000Z")) || new Date(date + "T00:00:00.000Z").toISOString().slice(0, 10) !== date)) return privateJson({ ok: false, error: "Date must be a valid calendar date in YYYY-MM-DD format." }, { status: 400 });
   if (kind === "media" && !["X", "WhatsApp", "Website", "Other"].includes(channel)) return privateJson({ ok: false, error: "Choose a valid communications channel." }, { status: 400 });
   try {
     const created = await createRegisterDraft(kind, { title, detail, date, channel });
