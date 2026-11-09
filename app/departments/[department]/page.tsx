@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PublicShell } from "@/components/PublicShell";
+import { DepartmentArtwork } from "@/components/DepartmentArtwork";
 import { departments, getDepartment } from "@/lib/departments";
 import { getDepartmentMandateRecords } from "@/lib/mandate-records";
 import { evidenceClassifications, getDepartmentEvidence, observatoryConnection } from "@/lib/public-evidence";
@@ -36,11 +37,11 @@ export default async function DepartmentPage({ params }: Props) {
 
   return (
     <PublicShell>
-      <section className="department-hero py-10 sm:py-14">
+      <section className={`department-hero department-hero--${department.slug} py-10 sm:py-14`}>
         <Link href="/departments" className="back-link">
           ← All departments
         </Link>
-        <p className="eyebrow mt-8">Department {department.number} · ISEYC</p>
+        <div className="department-hero__layout"><div><p className="eyebrow mt-8">Department {department.number} · ISEYC</p>
         <h1 className="editorial-title mt-4 max-w-4xl">{department.name}</h1>
         <p className="mt-5 max-w-2xl text-base leading-7 text-ink-700">{department.introduction}</p>
         <div className="mt-6 flex flex-wrap gap-3">
@@ -58,7 +59,7 @@ export default async function DepartmentPage({ params }: Props) {
           >
             Explain with Civic Brain ↗
           </a>
-        </div>
+        </div><div className="department-hero__visual"><DepartmentArtwork slug={department.slug} /><p>PEOPLE · CAPACITY · COMMUNITY</p></div></div>
       </section>
 
       <section className="department-content-grid pb-12" aria-label={`${department.shortName} information`}>
