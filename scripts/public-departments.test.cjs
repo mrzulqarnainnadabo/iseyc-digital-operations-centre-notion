@@ -140,7 +140,7 @@ test("ISEYC institutional branding uses the supplied official seal and one appro
   const layout = read("app/layout.tsx");
   const css = read("app/globals.css");
   const standard = read("docs/ISEYC-BRAND-SYSTEM.md");
-  assert.match(wordmark, /href="\/iseyc-seal\.svg"/);
+  assert.match(wordmark, /href="data:image\/png;base64,/);
   assert.match(wordmark, /Empowering Youth, Shaping Communities/);
   assert.match(seal, /official seal/);
   assert.match(shell, /src="\/iseyc-wordmark\.svg"/);
