@@ -180,7 +180,9 @@ export default async function DepartmentPage({ params }: Props) {
                 <p className="mt-3 text-xs leading-5 text-ink-600">
                   Reference years shown in ascending order. Missing years are not zero. The endpoint does not provide a publication date for these observations.
                 </p>
-                <dl className="mt-4 space-y-3 border-t border-line pt-4 text-xs leading-5">
+                <details className="mt-4 border-t border-line pt-3">
+                  <summary className="min-h-9 cursor-pointer text-xs font-semibold text-forest-800">Source, method & limitations</summary>
+                  <dl className="mt-3 space-y-3 text-xs leading-5">
                   <div>
                     <dt className="font-semibold text-forest-950">Publisher</dt>
                     <dd className="text-ink-700">{evidence.indicator.sourcePublisher}</dd>
@@ -214,7 +216,8 @@ export default async function DepartmentPage({ params }: Props) {
                       </ul>
                     </dd>
                   </div>
-                </dl>
+                  </dl>
+                </details>
                 <a
                   className="mt-4 inline-flex min-h-[44px] items-center font-semibold text-forest-800 underline"
                   href={evidence.indicator.sourceUrl}
