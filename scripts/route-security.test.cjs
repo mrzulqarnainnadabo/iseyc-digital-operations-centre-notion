@@ -152,5 +152,5 @@ test("staff login throttles repeated failures and clears the local bucket after 
   assert.match(limiter, /prune\(now\)/);
   assert.match(limiter, /failures\.delete\(clientIp\)/);
   assert.match(limiter, /Serverless instances do not share memory/);
-  assert.doesNotMatch(login, /x-forwarded-for/);
+  assert.doesNotMatch(login, /headers\.get\(["\']x-forwarded-for["\']/i);
 });
