@@ -62,10 +62,10 @@ export async function POST(request: NextRequest) {
       const allowed = ["action", "title", "meetingId", "organisationId", "contactId", "participation", "purpose", "subject", "draft", "agendaItems", "ownerRole", "channel"];
       if (Object.keys(body).some(k => !allowed.includes(k))) return privateJson({ ok: false, error: "Unexpected invitation fields." }, { status: 400 });
       const title = text(body.title, 180), meetingId = text(body.meetingId, 80), organisationId = text(body.organisationId, 80);
-      const participation = text(body.participation, 80), channel = text(body.channel, 40), purpose = text(body.purpose, 1000), subject = text(body.subject, 180), draft = text(body.draft, 1800);
+      const participation = text(body.participation, 80), channel = text(body.channel, 40), purpose = text(body.purpose, 1000), subject = text(body.subject, 180), draft = text(body.draft, 1800), ownerRole = text(body.ownerRole, 120);
       const roles = ["Observer", "Presenter", "Technical contributor", "Panelist", "Resource person", "Institutional representative", "Prospective partner", "Host", "Other"];
-      if (title.length < 3 || !meetingId || !organisationId || !roles.includes(participation) || !["Email", "Official letter", "Phone", "Other"].includes(channel) || purpose.length < 5 || subject.length < 5 || draft.length < 20) return privateJson({ ok: false, error: "Complete the meeting, verified organisation, participation role, channel, subject, purpose and invitation draft (minimum 20 characters)." }, { status: 400 });
-      const created = await createMeetingInvitation({ title, meetingId, organisationId, contactId: text(body.contactId, 80) || undefined, participation, purpose, subject, draft, agendaItems: text(body.agendaItems, 800), ownerRole: text(body.ownerRole, 120), channel });
+      if (title.length < 3 || !meetingId || !organisationId || !roles.includes(participation) || !["Email", "Official letter", "Phone", "Other"].includes(channel) || purpose.length < 5 || subject.length < 5 || draft.length < 20 || ownerRole.length < 2) return privateJson({ ok: false, error: "Complete the meeting, verified organisation, participation role, channel, subject, purpose and invitation draft (minimum 20 characters)." }, { status: 400 });
+      const created = await createMeetingInvitation({ title, meetingId, organisationId, contactId: text(body.contactId, 80) || undefined, participation, purpose, subject, draft, agendaItems: text(body.agendaItems, 800), ownerRole, channel });
       return privateJson({ ok: true, action, created, status: "Draft", dispatch: "Not sent — human approval and external dispatch are still required" }, { status: 201 });
     }
     return privateJson({ ok: false, error: "Unknown action." }, { status: 400 });
