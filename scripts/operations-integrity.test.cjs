@@ -273,8 +273,8 @@ test("external engagement is authenticated, linked and draft-only until human di
   assert.match(adapter, /Invitation draft/);
   assert.match(page, /Invitation message draft/);
   assert.match(page, /Create invitation draft/);
-  assert.match(page, /has NOT been sent/);
-  assert.match(page, /verified and active/);
+  assert.match(page, /Draft only/);
+  assert.match(page, /verified identity and recorded contact basis/);
   const meetingReview = fs.readFileSync(path.join(opsRoot, "review/[id]/page.tsx"), "utf8");
   assert.match(meetingReview, /Prepare external invitations/);
   assert.match(meetingReview, /meeting.status === "Approved"/);
