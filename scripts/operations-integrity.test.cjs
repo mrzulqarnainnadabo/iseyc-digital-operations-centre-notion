@@ -171,3 +171,17 @@ test("public home composes public systems while operations retain server-side ac
   assert.match(opsLayout, /redirect\("\/login"\)/);
   assert.doesNotMatch(home, /members nationwide|national impact|campaign/i);
 });
+
+test("department applications integration check validates schema without reading applicant rows", () => {
+  const notion = fs.readFileSync(path.join(root, "lib/notion.ts"), "utf8");
+  const start = notion.indexOf("export async function verifyDepartmentApplicationsConnection");
+  const end = notion.indexOf("export function configFlags", start);
+  assert.ok(start >= 0 && end > start, "connection verifier must be present");
+  const verifier = notion.slice(start, end);
+  assert.match(verifier, /client\.databases\.retrieve/);
+  assert.match(verifier, /"Application Status": "status"/);
+  assert.match(verifier, /"Applicant Name": "rich_text"/);
+  assert.match(verifier, /"Consent Confirmed": "checkbox"/);
+  assert.doesNotMatch(verifier, /databases\.query|pages\.query|pages\.create|pages\.update/);
+  assert.match(notion, /NOTION_DEPARTMENT_APPLICATIONS_DATABASE_ID/);
+});
