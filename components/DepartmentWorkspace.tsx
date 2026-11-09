@@ -52,7 +52,7 @@ export default function DepartmentWorkspace({slug}:{slug:Slug}){
   const today=new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Lagos",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
   const items=workspace?.work||[];
   const completed=items.filter(x=>x.status==="Completed");
-  const active=items.filter(x=>["Proposed","Approved","In Progress","Under Review","Paused"].includes(x.status));
+  const active=items.filter(x=>["Proposed","Approved","In Progress","Under Review"].includes(x.status));
   const risks=items.filter(x=>["High","Critical"].includes(x.risk));
   const line=(x:Work)=>`• ${x.title} — ${x.owner||"owner not recorded"} · due ${x.dueDate||"not recorded"} · ${x.status}`;
   setReportForm({...initialReport,title:`Monthly report — ${workspace?.department||meta.tagline} — ${today.slice(0,7)}`,cycle:"Monthly",periodStart:`${today.slice(0,7)}-01`,periodEnd:today,completed:completed.length?completed.map(line).join(String.fromCharCode(10)):"No work items are marked Completed in the connected register for this period.",planned:active.length?active.map(line).join(String.fromCharCode(10)):"No proposed or active work items are recorded in the connected register.",risks:risks.length?risks.map(x=>`${x.title} — ${x.risk}`).join(String.fromCharCode(10)):"No High or Critical risk ratings are recorded. Missing risk assessments are not assumed to be low.",limitations:"Generated from the department's connected Programme & Work Register. This summarises recorded statuses only; it does not independently verify delivery, outcomes, reach or expenditure. Attach source evidence and record missing data before submission."});
