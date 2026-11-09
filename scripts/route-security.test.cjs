@@ -130,3 +130,11 @@ test("meeting pagination rejects malformed continuation cursors before calling N
   assert.ok(source.includes("Invalid page cursor"));
   assert.ok(source.includes("status: 400"));
 });
+
+test("department applications connection diagnostic is read-only and returns no applicant records", () => {
+  const source = fs.readFileSync(path.join(apiRoot, "department-applications/connection/route.ts"), "utf8");
+  assertInOrder(source, ["requireStaffSession()", "verifyDepartmentApplicationsConnection()"], "department applications connection check");
+  assert.match(source, /schemaReady/);
+  assert.match(source, /privateJson/);
+  assert.doesNotMatch(source, /pages\.query|pages\.create|Applicant Name|Applicant Statement/);
+});
