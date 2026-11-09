@@ -188,4 +188,8 @@ test("department applications integration check validates schema without reading
   assert.doesNotMatch(integrationDoc, /\\b[0-9a-f]{32}\\b/i, "private Notion database IDs must not be published in documentation");
   const readme = fs.readFileSync(path.join(root, "README.md"), "utf8");
   assert.match(readme, /existence and the Vercel integration.s access must be verified/);
+  const route = fs.readFileSync(path.join(root, "app/api/department-applications/connection/route.ts"), "utf8");
+  assert.match(route, /result\.configured && result\.accessible && result\.schemaReady/);
+  assert.match(route, /ok: ready/);
+  assert.match(route, /status: ready \? 200 : 503/);
 });
