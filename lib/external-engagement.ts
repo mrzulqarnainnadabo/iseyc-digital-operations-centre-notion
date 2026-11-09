@@ -46,8 +46,8 @@ export async function listExternalOptions() {
   const [orgPages, contactPages, meetings] = await Promise.all([
     query("organisations"), query("contacts"), listMeetings({ pageSize: 50 }),
   ]);
-  const organisations = orgPages.map((p: any) => ({ ...row(p, "Organisation", "Organisation type", "Verification status"), relationshipStatus: read(p.properties?.["Relationship status"]), detail: [read(p.properties?.["Organisation type"]), read(p.properties?.["Official email"])].filter(Boolean).join(" · ") }));
-  const contacts = contactPages.map((p: any) => ({ ...row(p, "Contact", "Work email", "Contact status"), organisationId: read(p.properties?.Organisation).split(",")[0] || "", verified: p.properties?.Verified?.checkbox === true }));
+  const organisations = orgPages.map((p: any) => ({ ...row(p, "Organisation", "Organisation type", "Verification status"), relationshipStatus: read(p.properties?.["Relationship status"]), detail: read(p.properties?.["Organisation type"]) }));
+  const contacts = contactPages.map((p: any) => ({ ...row(p, "Contact", "Official role", "Contact status"), organisationId: read(p.properties?.Organisation).split(",")[0] || "", verified: p.properties?.Verified?.checkbox === true }));
   const meetingOptions = meetings.meetings.filter((m: MeetingRecord) => m.status === "Approved" && m.sensitivity === "Standard").map((m: MeetingRecord) => ({ id: m.id, title: m.title, detail: m.meetingDate, status: m.status, url: "" }));
   return { organisations, contacts, meetings: meetingOptions };
 }
