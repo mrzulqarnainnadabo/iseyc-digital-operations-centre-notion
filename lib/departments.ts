@@ -73,5 +73,10 @@ export const departments: Department[] = [
 ];
 
 export function getDepartment(slug: string): Department | undefined {
-  return departments.find((department) => department.slug === slug);
+  const resolvedSlug = slug === "software-technology" ? "technology" : slug;
+  return departments.find((department) => department.slug === resolvedSlug);
+}
+
+export function getDepartmentRouteSlug(slug: Department["slug"]): string {
+  return slug === "technology" ? "software-technology" : slug;
 }
