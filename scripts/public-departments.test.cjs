@@ -140,6 +140,7 @@ test("ISEYC institutional branding uses the supplied official seal and one appro
   const layout = read("app/layout.tsx");
   const css = read("app/globals.css");
   const standard = read("docs/ISEYC-BRAND-SYSTEM.md");
+  const architecture = read("public/iseyc-system-architecture.svg");
   assert.match(wordmark, /href="data:image\/png;base64,/);
   assert.match(wordmark, /Empowering Youth, Shaping Communities/);
   assert.match(seal, /official seal/);
@@ -150,4 +151,5 @@ test("ISEYC institutional branding uses the supplied official seal and one appro
   assert.match(css, /--iseyc-forest-900: #0b2d22/);
   assert.match(css, /--iseyc-gold-700: #80621f/);
   assert.match(standard, /The supplied official ISEYC seal remains the source of truth/);
+  for (const label of ["Civic Mandate", "Civic Intelligence", "Civic Brain", "Education", "Health", "Software", "Civic Department", "Digital Operations Centre", "No fabricated data"]) assert.ok(architecture.includes(label));
 });
