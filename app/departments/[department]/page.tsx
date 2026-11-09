@@ -272,29 +272,27 @@ export default async function DepartmentPage({ params }: Props) {
 
       <section className="classification-section mb-12" aria-labelledby="classification-title">
         <div className="max-w-2xl">
-          <p className="eyebrow">Shared civic intelligence framework</p>
-          <h2 id="classification-title" className="mt-2 font-serif text-2xl text-forest-950">Four evidence labels. Four different meanings.</h2>
-          <p className="mt-3 text-sm leading-6 text-ink-700">
-            These are the classifications IDCC will use when records are connected. They are not claims that evidence of each type is currently available.
-          </p>
+          <p className="eyebrow">Evidence standard</p>
+          <h2 id="classification-title" className="mt-2 font-serif text-2xl text-forest-950">Evidence is labelled by what it can prove.</h2>
+          <p className="mt-2 text-sm leading-6 text-ink-700">A community report, an official announcement and a verified outcome are not interchangeable.</p>
         </div>
-        <div className="classification-list mt-6">
-          {evidenceClassifications.map((classification, index) => (
-            <article key={classification.id} className="classification-row">
-              <span className="font-mono text-xs text-gold-700">0{index + 1}</span>
-              <div>
-                <h3 className="font-semibold text-forest-950">{classification.label}</h3>
-                <p className="mt-1 text-sm leading-6 text-ink-700">{classification.note}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-        <p className="mt-5 border-t border-line pt-4 text-xs leading-5 text-ink-600">
+        <details className="mt-4 border-t border-line pt-3">
+          <summary className="min-h-9 cursor-pointer text-sm font-semibold text-forest-800">View the four evidence classifications</summary>
+          <div className="classification-list mt-4">
+            {evidenceClassifications.map((classification, index) => (
+              <article key={classification.id} className="classification-row">
+                <span className="font-mono text-xs text-gold-700">0{index + 1}</span>
+                <div>
+                  <h3 className="font-semibold text-forest-950">{classification.label}</h3>
+                  <p className="mt-1 text-sm leading-6 text-ink-700">{classification.note}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </details>
+        <p className="mt-4 border-t border-line pt-3 text-xs leading-5 text-ink-600">
           Community reports do not establish prevalence. Announcements do not prove implementation. Published statistics do not automatically describe current conditions. See the{" "}
-          <Link className="font-semibold text-forest-800 underline" href="/method">
-            evidence method
-          </Link>
-          .
+          <Link className="font-semibold text-forest-800 underline" href="/method">evidence method</Link>.
         </p>
       </section>
     </PublicShell>
