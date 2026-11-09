@@ -1,7 +1,7 @@
 import { dbId, notion, assertInternalDb, type MeetingRecord } from "@/lib/notion";
 import { listMeetings } from "@/lib/notion";
 
-export type ExternalOption = { id: string; title: string; detail: string; status: string; url: string };
+export type ExternalOption = { id: string; title: string; detail: string; status: string; url: string; organisationId?: string; verified?: boolean };
 const ENV = {
   organisations: "NOTION_PARTNER_ORGANISATIONS_DATABASE_ID",
   contacts: "NOTION_EXTERNAL_CONTACTS_DATABASE_ID",
@@ -44,8 +44,8 @@ export async function listExternalOptions() {
     query("organisations"), query("contacts"), listMeetings({ pageSize: 50 }),
   ]);
   const organisations = orgPages.map((p: any) => row(p, "Organisation", "Organisation type", "Verification status"));
-  const contacts = contactPages.map((p: any) => row(p, "Contact", "Work email", "Contact status"));
-  const meetingOptions = meetings.meetings.map((m: MeetingRecord) => ({ id: m.id, title: m.title, detail: m.meetingDate, status: m.status, url: "" }));
+  const contacts = contactPages.map((p: any) => ({ ...row(p, "Contact", "Work email", "Contact status"), organisationId: read(p.properties?.Organisation).split(",")[0] || "", verified: p.properties?.Verified?.checkbox === true }));
+  const meetingOptions = meetings.meetings.filter((m: MeetingRecord) => m.status === "Approved" && m.sensitivity === "Standard").map((m: MeetingRecord) => ({ id: m.id, title: m.title, detail: m.meetingDate, status: m.status, url: "" }));
   return { organisations, contacts, meetings: meetingOptions };
 }
 export async function listExternalInvitations() {
