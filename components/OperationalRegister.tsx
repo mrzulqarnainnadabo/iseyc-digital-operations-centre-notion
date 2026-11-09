@@ -22,7 +22,7 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
   useEffect(() => { void refresh(); }, [kind]);
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setBusy(true); setError("");
-    try { const r = await fetch(`/ops/api/registers/${kind}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, detail, date, channel }) }); const j = await r.json(); if (!r.ok) throw new Error(j.error || "Could not save record."); setTitle(""); setDetail(""); setDate(""); await refresh(); }
+    try { const r = await fetch(`/ops/api/registers/${kind}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(kind === "media" ? { title, detail, channel } : { title, detail, date }) }); const j = await r.json(); if (!r.ok) throw new Error(j.error || "Could not save record."); setTitle(""); setDetail(""); setDate(""); await refresh(); }
     catch (e) { setError(e instanceof Error ? e.message : "Could not save record."); }
     finally { setBusy(false); }
   }
