@@ -214,6 +214,8 @@ test("register forms send only fields accepted by their route and communications
   const adapter = fs.readFileSync(path.join(root, "lib/notion-registers.ts"), "utf8");
   const route = fs.readFileSync(path.join(opsRoot, "api/registers/[kind]/route.ts"), "utf8");
   assert.match(component, /kind === "media" \? \{ title, detail, channel \} : \{ title, detail, date \}/);
+  assert.match(component, /Array\.isArray\(j\.records\)/);
+  assert.match(component, /setRows\(\[\]\)/);
   assert.match(adapter, /detail: "Notes"/);
   assert.match(adapter, /readText\(props\.Notes\).*readText\(props\.Channel\)/);
   assert.match(route, /kind === "media" \? \["title", "detail", "channel"\] : \["title", "detail", "date"\]/);
