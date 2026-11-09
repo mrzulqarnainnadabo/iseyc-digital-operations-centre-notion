@@ -115,7 +115,7 @@ button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
 }
 .group:hover .dept-card__open { transform: translateX(2px); }
 .dept-card--education { border-left-color: #28664a; }
-.dept-card--health { border-left-color: #a7833f; }
+.dept-card--health { border-left-color: #287a70; }
 .dept-card--technology { border-left-color: #194b3b; }
 .dept-card--civic { border-left-color: #755f27; }
 
@@ -138,7 +138,7 @@ button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
 .department-tile:hover,.department-tile:focus-visible{transform:translateY(-4px);border-color:var(--iseyc-forest-800);box-shadow:0 16px 36px rgb(18 59 47 / 10%)}
 .department-tile__art{position:relative;display:grid;min-height:12rem;place-items:center;overflow:hidden;background:var(--tile-bg)}
 .department-tile--education{--tile-bg:linear-gradient(140deg,#e8f0ea,#dce9df);--tile-ink:#28664a}
-.department-tile--health{--tile-bg:linear-gradient(140deg,#f4eee0,#ece2c9);--tile-ink:#8a6b2d}
+.department-tile--health{--tile-bg:linear-gradient(140deg,#e5f1ee,#d6e9e4);--tile-ink:#287a70}
 .department-tile--technology{--tile-bg:linear-gradient(140deg,#e6eeeb,#d5e2df);--tile-ink:#194b3b}
 .department-tile--civic{--tile-bg:linear-gradient(140deg,#f0eee6,#e5e0d1);--tile-ink:#755f27}
 .department-tile__number{position:absolute;top:1rem;left:1rem;color:var(--tile-ink);font-family:ui-monospace,monospace;font-size:.75rem;font-weight:700}
@@ -168,7 +168,7 @@ button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
 .department-hero__visual .department-artwork{width:min(100%,22rem)}
 .department-hero__visual>p{position:absolute;bottom:1rem;color:var(--dept-ink);font-size:.58rem;font-weight:800;letter-spacing:.16em}
 .department-hero--education{--dept-bg:linear-gradient(145deg,#e8f0ea,#dce9df);--dept-ink:#28664a}
-.department-hero--health{--dept-bg:linear-gradient(145deg,#f4eee0,#ece2c9);--dept-ink:#8a6b2d}
+.department-hero--health{--dept-bg:linear-gradient(145deg,#e5f1ee,#d6e9e4);--dept-ink:#287a70}
 .department-hero--technology{--dept-bg:linear-gradient(145deg,#e6eeeb,#d5e2df);--dept-ink:#194b3b}
 .department-hero--civic{--dept-bg:linear-gradient(145deg,#f0eee6,#e5e0d1);--dept-ink:#755f27}
 .department-hero__visual .artwork-orbit{stroke:var(--dept-ink);stroke-opacity:.24}
