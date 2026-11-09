@@ -141,6 +141,8 @@ test("department desks connect department work, reporting and filtered meeting a
   assert.match(ui, /Programme pipeline/);
   assert.match(ui, /Department reports/);
   assert.match(ui, /Department meetings/);
+  assert.match(ui, /Modules listed for this department/);
+  assert.doesNotMatch(ui, /Approved modules for this department/);
   assert.match(ui, /completion dates are not captured/);
   assert.match(ui, /not a period-verified plan/);
   assert.match(ui, /Register snapshot only/);
