@@ -91,7 +91,7 @@ export async function createDepartmentWork(slug:DepartmentSlug,input:{title:stri
 export async function createDepartmentReport(slug:DepartmentSlug,input:{title:string;cycle:string;periodStart:string;periodEnd:string;preparedBy:string;completed:string;planned:string;outcomes:string;risks:string;limitations:string;decisions:string;evidenceUrl:string}) {
   const {client,id}=getClientAndDb(REPORTS_ENV);
   const cycles=["Weekly","Monthly","Quarterly","Annual"];
-  if(input.title.trim().length<4||!cycles.includes(input.cycle)||!dateOk(input.periodStart)||!dateOk(input.periodEnd)||input.periodEnd<input.periodStart||input.preparedBy.trim().length<2||input.completed.trim().length<5||input.planned.trim().length<5||input.limitations.trim().length<5|| (input.evidenceUrl && !/^https:\\/\\//i.test(input.evidenceUrl))) throw new Error("INVALID_REPORT");
+  if(input.title.trim().length<4||!cycles.includes(input.cycle)||!dateOk(input.periodStart)||!dateOk(input.periodEnd)||input.periodEnd<input.periodStart||input.preparedBy.trim().length<2||input.completed.trim().length<5||input.planned.trim().length<5||input.limitations.trim().length<5||(input.evidenceUrl && !/^https:\/\/[^\s]+$/i.test(input.evidenceUrl))) throw new Error("INVALID_REPORT");
   const properties:any={
     "Report / Period":{title:[{text:{content:input.title.trim().slice(0,180)}}]},
     Department:{select:{name:DEPARTMENT_LABELS[slug]}},
