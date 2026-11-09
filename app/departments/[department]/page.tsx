@@ -59,7 +59,7 @@ export default async function DepartmentPage({ params }: Props) {
           >
             Explain with Civic Brain ↗
           </a>
-        </div><div className="department-hero__visual"><DepartmentArtwork slug={department.slug} /><p>PEOPLE · CAPACITY · COMMUNITY</p></div></div>
+        </div></div><div className="department-hero__visual"><DepartmentArtwork slug={department.slug} /><p>PEOPLE · CAPACITY · COMMUNITY</p></div></div>
       </section>
 
       <section className="department-content-grid pb-12" aria-label={`${department.shortName} information`}>
