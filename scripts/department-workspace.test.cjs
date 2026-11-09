@@ -41,7 +41,7 @@ test("department evidence panel only displays contracted Observatory series and 
 test("department report drafts can be assembled from register records without inventing outcomes", () => {
   const ui = read("components/DepartmentWorkspace.tsx");
   assert.match(ui, /Build draft from work register/);
-  assert.match(ui, /No work items are marked Completed in the connected register/);
+  assert.match(ui, /No work items are currently marked Completed in the connected register/);
   assert.match(ui, /No proposed or active work items are recorded in the connected register/);
   assert.match(ui, /does not independently verify delivery, outcomes, reach or expenditure/);
   assert.match(ui, /Missing risk assessments are not assumed to be low/);
