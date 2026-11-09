@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { PublicShell } from "@/components/PublicShell";
 import { DepartmentArtwork } from "@/components/DepartmentArtwork";
-import { departments } from "@/lib/departments";
+import { departments, getDepartmentRouteSlug } from "@/lib/departments";
 import { getDepartmentMandateRecords } from "@/lib/mandate-records";
 import { getDepartmentEvidence } from "@/lib/public-evidence";
 
@@ -68,7 +68,7 @@ export default async function PublicHomePage() {
         </div>
         <div className="department-showcase__grid">
           {departments.map((department) => (
-            <Link key={department.slug} href={`/departments/${department.slug}`} className={`department-tile department-tile--${department.slug} group`}>
+            <Link key={department.slug} href={`/departments/${getDepartmentRouteSlug(department.slug)}`} className={`department-tile department-tile--${department.slug} group`}>
               <div className="department-tile__art">
                 <span className="department-tile__number">{department.number}</span>
                 <DepartmentArtwork slug={department.slug} />
