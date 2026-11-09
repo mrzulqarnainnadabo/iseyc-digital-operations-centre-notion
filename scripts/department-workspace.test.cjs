@@ -19,9 +19,19 @@ test("department workspaces use the approved four-department identity and real r
   assert.match(adapter, /Status:\{status:\{name:"Proposed"\}\}/);
   assert.match(adapter, /Status:\{status:\{name:"Draft"\}\}/);
   assert.match(adapter, /timeZone:"Africa\/Lagos"/);
+  assert.match(adapter, /dueSoonWork:dueSoon.length/);
   assert.match(page, /DepartmentWorkspace/);
   for (const tab of ["overview", "work", "reports", "learning", "meetings"]) assert.ok(ui.includes(`"${tab}"`));
   for (const style of ["education", "health", "technology", "civic"]) assert.ok(css.includes(`.department-desk--${style}`));
+});
+
+test("department report drafts can be assembled from register records without inventing outcomes", () => {
+  const ui = read("components/DepartmentWorkspace.tsx");
+  assert.match(ui, /Build draft from work register/);
+  assert.match(ui, /No work items are marked Completed in the connected register/);
+  assert.match(ui, /No proposed or active work items are recorded in the connected register/);
+  assert.match(ui, /does not independently verify delivery, outcomes, reach or expenditure/);
+  assert.match(ui, /Missing risk assessments are not assumed to be low/);
 });
 
 test("learning workspace shows approved modules without implying individual completion", () => {
