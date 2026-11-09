@@ -25,8 +25,9 @@ const systems = [
     number: "03",
     name: "Civic Intelligence Observatory",
     role: "Public evidence",
-    description: "The v1 read-only evidence API responds for a small allowlist of public pilot indicators. Its full public interface still needs release alignment, and the pilot is not a complete national evidence system.",
-    action: "Evidence API verified · interface alignment in progress",
+    description: "A public evidence workspace for published community records, source provenance, geography and documented accountability. It is an early national pilot: listed sources are not proof that data has been ingested, and national indicators must not be read as local evidence.",
+    href: "https://iseyc-civic-intelligence-observatory.vercel.app",
+    action: "Open the Observatory",
     state: "Limited public pilot",
   },
 ];
