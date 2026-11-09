@@ -34,7 +34,7 @@ test("public shell uses the official seal and functional public navigation", () 
     "https://iseyc-civic-intelligence-observatory.vercel.app",
   ]) assert.ok(shell.includes(url));
   assert.match(shell, /label: "Observatory"/);
-  assert.match(shell, /youth-led public intelligence institution for Nigeria/);
+  assert.match(shell, /Youth-led public intelligence institution for Nigeria/);
   assert.doesNotMatch(shell, /Public Information & Civic Intelligence|public-mobile-menu/);
   assert.match(shell, /Skip to content/);
 });
