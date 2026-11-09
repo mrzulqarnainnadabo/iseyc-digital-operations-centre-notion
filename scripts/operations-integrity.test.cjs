@@ -286,3 +286,17 @@ test("external engagement is authenticated, linked and draft-only until human di
   assert.match(notion, /NOTION_MEETING_INVITATIONS_DATABASE_ID/);
   assert.ok(DOC_NAV.some((item) => item.href === "/ops/partners"));
 });
+
+
+test("external engagement list responses do not disclose private email or phone fields to shared-key sessions", () => {
+  const adapter = fs.readFileSync(path.join(root, "lib/external-engagement.ts"), "utf8");
+  const route = fs.readFileSync(path.join(opsRoot, "api/external-engagement/route.ts"), "utf8");
+  assert.match(route, /requireStaffSession/);
+  assert.match(adapter, /row\(p, "Contact", "Official role", "Contact status"\)/);
+  assert.doesNotMatch(adapter, /row\(p, "Contact", "Work email"/);
+  assert.match(adapter, /detail: read\(p\.properties\?\.\["Organisation type"\]\)/);
+  assert.doesNotMatch(adapter, /read\(p\.properties\?\.\["Official email"\]\)/);
+  assert.doesNotMatch(adapter, /read\(p\.properties\?\.\["Work email"\]\)/);
+  assert.match(adapter, /if \(input\.email\) properties\["Work email"\]/);
+  assert.match(adapter, /if \(input\.phone\) properties\["Work phone"\]/);
+});
