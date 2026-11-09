@@ -26,6 +26,9 @@ test("department pages load mandate records without private Notion", () => {
   assert.match(page, /getDepartmentMandateRecords/);
   assert.match(page, /Published community records/);
   assert.match(page, /prevalenceNote/);
+  const prevalenceDisclosureAt = page.indexOf("{mandate.prevalenceNote}");
+  const readyBranchAt = page.indexOf('{mandate.status === "ready"');
+  assert.ok(prevalenceDisclosureAt >= 0 && prevalenceDisclosureAt < readyBranchAt, "prevalence limitation must render before ready/empty/error branching");
   assert.match(page, /classificationNote/);
   assert.match(page, /provisional keyword/);
   assert.match(page, /Contribute information/);
