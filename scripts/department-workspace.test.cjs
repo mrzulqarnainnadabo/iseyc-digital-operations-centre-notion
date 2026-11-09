@@ -18,6 +18,7 @@ test("department workspaces use the approved four-department identity and real r
   assert.match(adapter, /filter:\{property:"Department",select:\{equals:department\}\}/);
   assert.match(adapter, /Status:\{status:\{name:"Proposed"\}\}/);
   assert.match(adapter, /Status:\{status:\{name:"Draft"\}\}/);
+  assert.match(adapter, /timeZone:"Africa\/Lagos"/);
   assert.match(page, /DepartmentWorkspace/);
   for (const tab of ["overview", "work", "reports", "learning", "meetings"]) assert.ok(ui.includes(`"${tab}"`));
   for (const style of ["education", "health", "technology", "civic"]) assert.ok(css.includes(`.department-desk--${style}`));
