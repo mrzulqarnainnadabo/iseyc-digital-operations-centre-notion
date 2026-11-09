@@ -137,7 +137,7 @@ test("department desks connect department work, reporting and filtered meeting a
   assert.match(board, /No meeting is recorded for this date/);
   assert.match(board, /does not create attendance, invitations, minutes or action assignments/);
   assert.match(calendar, /pageSize: 50/);
-  assert.match(board, /first loaded page \\(up to 50 records\\)/);
+  assert.match(board, /first loaded page \(up to 50 records\)/);
   assert.match(seat, /No active appointment record is linked to this session/);
   assert.match(seat, /Generic seat packet/i);
   assert.match(seat, /AI is staff to the seat, never the seat-holder/);
