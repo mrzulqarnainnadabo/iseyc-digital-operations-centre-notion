@@ -167,11 +167,11 @@ test("public intelligence home keeps evidence systems secondary and operations p
   const shell = fs.readFileSync(path.join(root, "components/PublicShell.tsx"), "utf8");
   const opsLayout = fs.readFileSync(path.join(root, "app/ops/layout.tsx"), "utf8");
   assert.match(home, /PublicShell/);
-  assert.ok(home.includes("What is happening across Nigeria?"));
+  assert.ok(home.includes("Building capable people. Stronger communities."));
   assert.match(home, /getDepartmentMandateRecords/);
   assert.match(home, /getDepartmentEvidence/);
-  assert.match(home, /Not yet computed/);
-  assert.match(home, /Not mapped yet in this public view/);
+  assert.match(home, /No national coverage score is claimed/);
+  assert.match(home, /Institutional responsibility mapping remains incomplete/);
   assert.doesNotMatch(home, /requireStaffSession|listMeetings/);
   assert.match(shell, /Civic Mandate/);
   assert.match(shell, /Civic Brain/);
