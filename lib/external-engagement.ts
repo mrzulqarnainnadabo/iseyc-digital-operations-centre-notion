@@ -56,7 +56,7 @@ export async function listExternalInvitations() {
       id: p.id, title: read(x.Invitation) || "Untitled invitation",
       organisation: read(x.Organisation), contact: read(x["External contact"]),
       meeting: read(x.Meeting), status: read(x["Invitation status"]) || "Draft",
-      participation: read(x["Participation type"]), purpose: read(x["Invitation purpose"]),
+      participation: read(x["Participation type"]), purpose: read(x["Invitation purpose"]), subject: read(x["Invitation subject"]), draft: read(x["Invitation draft"]),
       sentOn: read(x["Sent on"]), url: p.url || "",
     };
   });
