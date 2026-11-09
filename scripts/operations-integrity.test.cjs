@@ -184,4 +184,8 @@ test("department applications integration check validates schema without reading
   assert.match(verifier, /"Consent Confirmed": "checkbox"/);
   assert.doesNotMatch(verifier, /databases\.query|pages\.query|pages\.create|pages\.update/);
   assert.match(notion, /NOTION_DEPARTMENT_APPLICATIONS_DATABASE_ID/);
+  const integrationDoc = fs.readFileSync(path.join(root, "docs/DEPARTMENT-APPLICATIONS-INTEGRATION.md"), "utf8");
+  assert.doesNotMatch(integrationDoc, /\\b[0-9a-f]{32}\\b/i, "private Notion database IDs must not be published in documentation");
+  const readme = fs.readFileSync(path.join(root, "README.md"), "utf8");
+  assert.match(readme, /existence and the Vercel integration.s access must be verified/);
 });
