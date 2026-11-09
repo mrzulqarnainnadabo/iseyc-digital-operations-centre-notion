@@ -66,6 +66,8 @@ export async function listExternalInvitations() {
 }
 export async function createOrganisation(input: { name: string; type: string; website?: string; email?: string; phone?: string; location?: string; owner?: string }) {
   const { client, id } = database("organisations");
+  const duplicate = await client.databases.query({ database_id: id, filter: { property: "Organisation", title: { equals: input.name } }, page_size: 1 });
+  if (duplicate.results.length) throw new Error("DUPLICATE_ORGANISATION");
   const properties: Record<string, unknown> = {
     Organisation: { title: [{ text: { content: input.name } }] },
     "Organisation type": { select: { name: input.type } },
@@ -84,6 +86,8 @@ export async function createExternalContact(input: { name: string; organisationI
   const { client, id } = database("contacts");
   const organisation = await client.pages.retrieve({ page_id: input.organisationId }) as any;
   if (organisation.parent?.database_id?.replace(/-/g, "") !== dbId(ENV.organisations)) throw new Error("The selected organisation is not in the approved Partner Organisations register.");
+  const duplicate = await client.databases.query({ database_id: id, filter: { and: [{ property: "Contact", title: { equals: input.name } }, { property: "Organisation", relation: { contains: input.organisationId } }] }, page_size: 1 });
+  if (duplicate.results.length) throw new Error("DUPLICATE_CONTACT");
   const properties: Record<string, unknown> = {
     Contact: { title: [{ text: { content: input.name } }] },
     Organisation: { relation: [{ id: input.organisationId }] },
