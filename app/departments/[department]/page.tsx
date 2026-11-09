@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PublicShell } from "@/components/PublicShell";
 import { DepartmentArtwork } from "@/components/DepartmentArtwork";
-import { departments, getDepartment } from "@/lib/departments";
+import { departments, getDepartment, getDepartmentRouteSlug } from "@/lib/departments";
 import { getDepartmentMandateRecords } from "@/lib/mandate-records";
 import { evidenceClassifications, getDepartmentEvidence, observatoryConnection } from "@/lib/public-evidence";
 
@@ -12,7 +12,7 @@ type Props = { params: Promise<{ department: string }> };
 export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
-  return departments.map(({ slug }) => ({ department: slug }));
+  return departments.map(({ slug }) => ({ department: getDepartmentRouteSlug(slug) }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -22,6 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? {
         title: `${department.name} | ISEYC`,
         description: department.summary,
+        alternates: { canonical: `/departments/${getDepartmentRouteSlug(department.slug)}` },
       }
     : {};
 }
