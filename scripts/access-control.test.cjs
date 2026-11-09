@@ -646,7 +646,7 @@ test("readiness register distinguishes placeholders from implemented workflows",
   assert.ok(readiness.includes("Shared systems"));
   assert.ok(readiness.includes("not fully configured"));
   assert.ok(readiness.includes("transitional shared-key access"));
-  assert.ok(readiness.includes("Do not enter real membership"));
+  assert.ok(readiness.includes("Do not enter restricted personal"));
   assert.ok(dashboard.includes("Environment configuration"));
   assert.ok(dashboard.includes("Not connected"));
   assert.ok(dashboard.includes("Configured"));
