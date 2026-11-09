@@ -219,6 +219,10 @@ test("register forms send only fields accepted by their route and communications
   assert.match(adapter, /detail: "Notes"/);
   assert.match(adapter, /readText\(props\.Notes\).*readText\(props\.Channel\)/);
   assert.match(route, /kind === "media" \? \["title", "detail", "channel"\] : \["title", "detail", "date"\]/);
+  assert.match(route, /kind === "actions" && detail.length < 2/);
+  assert.match(route, /kind === "actions" \|\| kind === "chamber"\) && !date/);
+  assert.match(component, /Due date · required/);
+  assert.match(component, /Session date · required/);
 });
 
 test("external invitation server validation requires an accountable owner role and eligibility filters relationships", () => {
@@ -238,6 +242,7 @@ test("external engagement prevents duplicate records and rejects stale meeting h
   const page = fs.readFileSync(path.join(opsRoot, "partners/page.tsx"), "utf8");
   assert.match(adapter, /DUPLICATE_ORGANISATION/);
   assert.match(adapter, /DUPLICATE_CONTACT/);
+  assert.match(adapter, /does not belong to the selected organisation/);
   assert.match(route, /status: 409/);
   assert.match(page, /result\.meetings\?\.some/);
   assert.match(page, /candidate : result\.meetings\?\.\[0\]/);
