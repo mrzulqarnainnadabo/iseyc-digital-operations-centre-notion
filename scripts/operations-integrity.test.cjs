@@ -15,6 +15,7 @@ require.extensions[".ts"] = (mod, filename) => {
 const { DOC_NAV } = require("../lib/nav.ts");
 const root = path.join(__dirname, "..");
 const opsRoot = path.join(root, "app/ops");
+const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 
 function collectPages(directory, prefix = "/ops") {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
