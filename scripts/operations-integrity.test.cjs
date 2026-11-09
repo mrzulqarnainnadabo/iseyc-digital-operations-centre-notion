@@ -84,17 +84,27 @@ test("operations loading state is announced accessibly", () => {
   assert.match(loading, /Loading operations view/);
 });
 
-test("planned operational modules cannot present placeholders as live workflows", () => {
-  const modules = [
-    ["actions", /data-status="not-operational"/],
-    ["chamber", /data-status="not-operational"/],
-    ["media", /data-status="not-operational"/]
-  ];
-  for (const [name, warning] of modules) {
-    const source = fs.readFileSync(path.join(opsRoot, name, "page.tsx"), "utf8");
-    assert.match(source, warning, `${name} must state its non-operational status`);
-    assert.match(source, /\/ops\/readiness/);
+test("actions, chamber and communications expose authenticated Notion-backed initial workflows", () => {
+  for (const [name, kind] of [["actions","actions"],["chamber","chamber"],["media","media"]]) {
+    const page = fs.readFileSync(path.join(opsRoot, name, "page.tsx"), "utf8");
+    assert.match(page, /requireStaffSession/);
+    assert.match(page, /OperationalRegister/);
+    assert.ok(page.includes(`kind="${kind}"`));
   }
+  const component = fs.readFileSync(path.join(root, "components/OperationalRegister.tsx"), "utf8");
+  assert.match(component, /Save to Notion/);
+  assert.match(component, /human-authorised/);
+  const api = fs.readFileSync(path.join(opsRoot, "api/registers/[kind]/route.ts"), "utf8");
+  assert.match(api, /isSameOriginRequest/);
+  assert.match(api, /requireStaffSession/);
+  assert.match(api, /readBoundedJson/);
+  assert.match(api, /createRegisterDraft/);
+  const adapter = fs.readFileSync(path.join(root, "lib/notion-registers.ts"), "utf8");
+  assert.match(adapter, /NOTION_ACTIONS_DATABASE_ID/);
+  assert.match(adapter, /NOTION_MEDIA_DATABASE_ID/);
+  assert.match(adapter, /NOTION_CHAMBER_DATABASE_ID/);
+  assert.match(adapter, /client\.databases\.query/);
+  assert.match(adapter, /client\.pages\.create/);
 });
 
 
