@@ -94,7 +94,7 @@ export async function createExternalContact(input: { name: string; organisationI
   const page = await client.pages.create({ parent: { database_id: id }, properties: properties as any });
   return { id: page.id, url: (page as any).url || "" };
 }
-export async function createMeetingInvitation(input: { title: string; meetingId: string; organisationId: string; contactId?: string; participation: string; purpose: string; agendaItems?: string; ownerRole: string; channel: string }) {
+export async function createMeetingInvitation(input: { title: string; meetingId: string; organisationId: string; contactId?: string; participation: string; purpose: string; subject: string; draft: string; agendaItems?: string; ownerRole: string; channel: string }) {
   const { client, id } = database("invitations");
   const [meeting, organisation, contact] = await Promise.all([
     client.pages.retrieve({ page_id: input.meetingId }) as Promise<any>,
@@ -115,6 +115,8 @@ export async function createMeetingInvitation(input: { title: string; meetingId:
     "Participation type": { select: { name: input.participation } },
     "Invitation status": { select: { name: "Draft" } },
     "Invitation purpose": { rich_text: [{ text: { content: input.purpose } }] },
+    "Invitation subject": { rich_text: [{ text: { content: input.subject } }] },
+    "Invitation draft": { rich_text: [{ text: { content: input.draft } }] },
     "Invitation owner role": { rich_text: [{ text: { content: input.ownerRole } }] },
     "Invitation channel": { select: { name: input.channel } },
   };
