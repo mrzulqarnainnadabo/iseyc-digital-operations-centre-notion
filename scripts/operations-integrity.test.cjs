@@ -230,6 +230,20 @@ test("external invitation server validation requires an accountable owner role a
   assert.match(page, /loading \|\| !loaded/);
 });
 
+test("external engagement prevents duplicate records and rejects stale meeting handoff IDs", () => {
+  const adapter = fs.readFileSync(path.join(root, "lib/external-engagement.ts"), "utf8");
+  const route = fs.readFileSync(path.join(opsRoot, "api/external-engagement/route.ts"), "utf8");
+  const page = fs.readFileSync(path.join(opsRoot, "partners/page.tsx"), "utf8");
+  assert.match(adapter, /DUPLICATE_ORGANISATION/);
+  assert.match(adapter, /DUPLICATE_CONTACT/);
+  assert.match(route, /status: 409/);
+  assert.match(page, /result\.meetings\?\.some/);
+  assert.match(page, /candidate : result\.meetings\?\.\[0\]/);
+  assert.match(page, /activeView === "directory"/);
+  assert.match(page, /activeView === "invitations"/);
+  assert.match(page, /activeView === "agreements"/);
+});
+
 test("external engagement is authenticated, linked and draft-only until human dispatch", () => {
   const adapter = fs.readFileSync(path.join(root, "lib/external-engagement.ts"), "utf8");
   const route = fs.readFileSync(path.join(opsRoot, "api/external-engagement/route.ts"), "utf8");
