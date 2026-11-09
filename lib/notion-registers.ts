@@ -1,10 +1,10 @@
-import { dbId, notion } from "@/lib/notion";
+import { dbId, notion, assertInternalDb } from "@/lib/notion";
 
 export type RegisterKind = "actions" | "media" | "chamber";
 type Row = { id: string; title: string; status: string; detail: string; date: string; url: string };
 const CONFIG = {
   actions: { env: "NOTION_ACTIONS_DATABASE_ID", title: "Name", status: "Status", detail: "Owner", date: "Due date" },
-  media: { env: "NOTION_MEDIA_DATABASE_ID", title: "Name", status: "Status", detail: "Channel", date: "" },
+  media: { env: "NOTION_MEDIA_DATABASE_ID", title: "Name", status: "Status", detail: "Notes", date: "" },
   chamber: { env: "NOTION_CHAMBER_DATABASE_ID", title: "Name", status: "Status", detail: "Summary", date: "Session date" },
 } as const;
 function config(kind: RegisterKind) { return CONFIG[kind]; }
@@ -21,6 +21,7 @@ function database(kind: RegisterKind) {
   const client = notion();
   const databaseId = dbId(config(kind).env);
   if (!client || !databaseId) throw new Error("This Notion register is not configured.");
+  assertInternalDb(databaseId, config(kind).env);
   return { client, databaseId };
 }
 export function registerConfigured(kind: RegisterKind) {
@@ -33,7 +34,7 @@ export async function listRegister(kind: RegisterKind): Promise<Row[]> {
     const props = p.properties || {};
     return { id: p.id, title: readText(props[config(kind).title]) || "Untitled record",
       status: readText(props[config(kind).status]) || "Unspecified",
-      detail: readText(props[config(kind).detail]), date: config(kind).date ? readText(props[config(kind).date]) : "",
+      detail: kind === "media" ? [readText(props.Notes), readText(props.Channel)].filter(Boolean).join(" · ") : readText(props[config(kind).detail]), date: config(kind).date ? readText(props[config(kind).date]) : "",
       url: typeof p.url === "string" ? p.url : "" };
   });
 }
