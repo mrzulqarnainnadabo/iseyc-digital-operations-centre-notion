@@ -150,6 +150,10 @@ test("department desks connect department work, reporting and filtered meeting a
   assert.match(ui, /not a period-verified plan/);
   assert.match(ui, /Register snapshot only/);
   assert.match(ui, /Additional evidence & decisions/);
+  assert.match(ui, /publicSlug:"software-technology"/);
+  assert.match(ui, /Open department evidence/);
+  assert.match(ui, /Ask Civic Brain/);
+  assert.match(ui, /iseyc-civic-intelligence-observatory\.vercel\.app/);
   assert.match(readiness, /Department workspaces/);
   assert.match(readiness, /Education & Capacity Building/);
   assert.match(calendar, /requireStaffSession/);
