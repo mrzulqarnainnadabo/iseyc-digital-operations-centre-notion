@@ -102,10 +102,10 @@ export default async function DepartmentPage({ params }: Props) {
 
             <p className="mt-3 text-xs leading-5 text-ink-600">{mandate.classificationNote}</p>
             <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-gold-700">Matching: provisional keyword · not institutional taxonomy</p>
+            <p className="mt-3 text-xs leading-5 text-ink-600">{mandate.prevalenceNote}</p>
 
             {mandate.status === "ready" ? (
               <>
-                <p className="mt-3 text-xs leading-5 text-ink-600">{mandate.prevalenceNote}</p>
                 <ul className="mt-4 divide-y divide-line border-y border-line">
                   {mandate.records.map((record) => (
                     <li key={record.id} className="py-4">
