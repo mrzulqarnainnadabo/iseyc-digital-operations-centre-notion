@@ -49,6 +49,11 @@ const contracts = {
     methods: ["GET", "PATCH"],
     required: ["requireStaffSession", "privateJson", "legacySessionCanReadMeeting", "legacySessionCanSetMeetingStatus"],
     forbidden: []
+  },
+  "department-applications/connection/route.ts": {
+    methods: ["GET"],
+    required: ["requireStaffSession", "privateJson", "verifyDepartmentApplicationsConnection"],
+    forbidden: ["pages.query", "pages.create", "Applicant Name", "Applicant Statement"]
   }
 };
 
