@@ -71,6 +71,8 @@ export async function POST(request: NextRequest) {
     return privateJson({ ok: false, error: "Unknown action." }, { status: 400 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "";
-    return privateJson({ ok: false, error: message || "The record could not be saved. Check the Notion integration access and register schema." }, { status: 502 });
+    if (message === "DUPLICATE_ORGANISATION") return privateJson({ ok: false, error: "This organisation is already registered. Open the existing record instead." }, { status: 409 });
+    if (message === "DUPLICATE_CONTACT") return privateJson({ ok: false, error: "This contact is already registered for the selected organisation." }, { status: 409 });
+    return privateJson({ ok: false, error: "The record could not be saved. Check the Notion integration access and register schema." }, { status: 502 });
   }
 }
