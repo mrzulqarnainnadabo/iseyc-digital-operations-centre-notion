@@ -260,7 +260,8 @@ export function configFlags() {
     meetings: Boolean(dbId("NOTION_MEETINGS_DATABASE_ID")),
     media: Boolean(dbId("NOTION_MEDIA_DATABASE_ID")),
     chamber: Boolean(dbId("NOTION_CHAMBER_DATABASE_ID")),
-    actions: Boolean(dbId("NOTION_ACTIONS_DATABASE_ID")),\n    departmentApplications: Boolean(dbId("NOTION_DEPARTMENT_APPLICATIONS_DATABASE_ID")),
+    actions: Boolean(dbId("NOTION_ACTIONS_DATABASE_ID")),
+    departmentApplications: Boolean(dbId("NOTION_DEPARTMENT_APPLICATIONS_DATABASE_ID")),
     staffKey: Boolean(process.env.ISEYC_STAFF_KEY?.trim()),
   };
 }
