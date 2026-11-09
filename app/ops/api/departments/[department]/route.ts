@@ -15,7 +15,7 @@ export async function GET(_request:NextRequest,context:Context) {
   if(!(await requireStaffSession())) return privateJson({ok:false,error:"Unauthorized"},{status:401});
   const {department}=await context.params;
   if(!validDepartment(department)) return privateJson({ok:false,error:"Unknown department."},{status:404});
-  if(!process.env.NOTION_TOKEN?.trim()||!dbId("NOTION_PROGRAMMES_DATABASE_ID")||!dbId("NOTION_DEPARTMENT_REPORTS_DATABASE_ID")) return privateJson({ok:false,error:"Department registers are not configured. No records are shown."},{status:503});
+  if(!process.env.NOTION_TOKEN?.trim()||!dbId("NOTION_PROGRAMMES_DATABASE_ID")||!dbId("NOTION_DEPARTMENT_REPORTS_DATABASE_ID")||!dbId("NOTION_LEARNING_DATABASE_ID")) return privateJson({ok:false,error:"Department registers are not configured. No records are shown."},{status:503});
   try { return privateJson({ok:true,workspace:await getDepartmentWorkspace(department)}); }
   catch { return privateJson({ok:false,error:"Department registers could not be reached. No cached or estimated records are shown."},{status:502}); }
 }
