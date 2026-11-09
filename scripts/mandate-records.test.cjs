@@ -1,0 +1,36 @@
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+
+const root = path.join(__dirname, "..");
+const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
+
+test("mandate feed uses allowlisted public API only", () => {
+  const source = read("lib/mandate-records.ts");
+  assert.match(source, /2027-street-mandate\.vercel\.app/);
+  assert.match(source, /\/api\/v1\/community-records/);
+  assert.match(source, /publicationBoundary !== "published-only"/);
+  assert.match(source, /contractVersion !== CONTRACT/);
+  assert.match(source, /publicationStatus !== "published"/);
+  assert.doesNotMatch(source, /@notionhq\/client|NOTION_TOKEN|listMeetings|requireStaffSession/);
+  assert.match(source, /prevalenceNote/);
+  assert.match(source, /AbortSignal\.timeout\(8000\)/);
+});
+
+test("department pages load mandate records without private Notion", () => {
+  const page = read("app/departments/[department]/page.tsx");
+  assert.match(page, /getDepartmentMandateRecords/);
+  assert.match(page, /Published community records/);
+  assert.match(page, /prevalenceNote/);
+  assert.match(page, /Contribute information/);
+  assert.match(page, /iseyc-civic-brain\.vercel\.app/);
+  assert.doesNotMatch(page, /@\/lib\/notion|requireStaffSession|listMeetings/);
+});
+
+test("department-first home still precedes systems infrastructure", () => {
+  const page = read("app/page.tsx");
+  const departmentsAt = page.indexOf("The institution, by department");
+  const systemsAt = page.indexOf("Digital infrastructure behind the departments");
+  assert.ok(departmentsAt > 0 && systemsAt > departmentsAt);
+});
