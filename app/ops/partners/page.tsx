@@ -19,6 +19,7 @@ export default function ExternalEngagementPage() {
   const [data, setData] = useState<Data>({ organisations: [], contacts: [], meetings: [], invitations: [] });
   const [loading, setLoading] = useState(true);
   const [loaded, setLoaded] = useState(false);
+  const [activeView, setActiveView] = useState<"directory" | "invitations" | "agreements">("invitations");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -105,11 +106,20 @@ export default function ExternalEngagementPage() {
         <div className="rounded-control border border-white/15 bg-white/5 p-3"><p className="text-xs text-white/60">Verified organisations</p><p className="mt-1 text-2xl font-semibold">{loading || !loaded ? "—" : eligibleOrganisations.length}</p><p className="text-xs text-white/60">Eligible for invitation drafts</p></div>
         <div className="rounded-control border border-white/15 bg-white/5 p-3"><p className="text-xs text-white/60">Invitation records</p><p className="mt-1 text-2xl font-semibold">{loading || !loaded ? "—" : data.invitations.length}</p><p className="text-xs text-white/60">Loaded register records</p></div>
       </div>
+      <nav aria-label="External engagement sections" className="mt-5 flex flex-wrap gap-2 border-t border-white/10 pt-4">
+        {(["invitations", "directory", "agreements"] as const).map((view) => (
+          <button key={view} type="button" aria-pressed={activeView === view} onClick={() => setActiveView(view)}
+            className={activeView === view ? "min-h-10 rounded-control bg-white px-4 text-xs font-semibold text-forest-950" : "min-h-10 rounded-control border border-white/20 px-4 text-xs font-semibold text-white/80 hover:bg-white/10"}>
+            {view === "invitations" ? "Invitations" : view === "directory" ? "Organisations & contacts" : "Agreements"}
+          </button>
+        ))}
+      </nav>
     </header>
 
     {error ? <p role="alert" className="rounded-control border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p> : null}
     {notice ? <p role="status" className="rounded-control border border-green-200 bg-green-50 p-3 text-sm text-green-900">{notice}</p> : null}
 
+    {activeView === "directory" ? <>
     <section className="grid gap-4 lg:grid-cols-2">
       <form onSubmit={createOrganisation} className="space-y-3 rounded-card border border-line bg-white p-4 shadow-card sm:p-5">
         <div><p className="text-xs font-semibold uppercase tracking-widest text-gold-700">01 · Organisation directory</p><h2 className="mt-1 font-serif text-xl text-forest-950">Register an organisation</h2><p className="mt-1 text-xs leading-5 text-ink-600">New entries are Prospects and Unverified. Do not mark an institution verified without evidence.</p></div>
@@ -148,7 +158,12 @@ export default function ExternalEngagementPage() {
       </div>
     </section>
 
-    <a href="https://app.notion.com/p/79a64759a3494f6383851afce6b051fa" target="_blank" rel="noreferrer" className="flex min-h-[76px] items-center justify-between gap-4 rounded-card border border-line bg-cream-50 p-4 shadow-card"><span><span className="block text-xs font-semibold uppercase tracking-widest text-gold-700">Governance register</span><strong className="mt-1 block text-sm text-forest-950">Partnership agreements & commitments</strong><span className="mt-1 block text-xs text-ink-600">Formal agreements, authority, deliverables and expiry records</span></span><span className="shrink-0 text-sm font-semibold text-forest-800">Open ↗</span></a>
+</> : null}
+
+    {activeView === "agreements" ? <section className="rounded-card border border-line bg-white p-5 shadow-card sm:p-7"><p className="text-xs font-semibold uppercase tracking-widest text-gold-700">Governance</p><h2 className="mt-2 font-serif text-2xl text-forest-950">Partnership agreements & commitments</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-ink-600">Formal instruments are tracked separately from meeting invitations. Approval, execution and active status require competent authority and documentary evidence.</p><a href="https://app.notion.com/p/79a64759a3494f6383851afce6b051fa" target="_blank" rel="noreferrer" className="mt-5 inline-flex min-h-11 items-center rounded-control bg-forest-900 px-4 text-sm font-semibold text-white">Open agreement register ↗</a></section> : null}
+
+    {activeView === "invitations" ? <>
+        <a href="https://app.notion.com/p/79a64759a3494f6383851afce6b051fa" target="_blank" rel="noreferrer" className="flex min-h-[76px] items-center justify-between gap-4 rounded-card border border-line bg-cream-50 p-4 shadow-card"><span><span className="block text-xs font-semibold uppercase tracking-widest text-gold-700">Governance register</span><strong className="mt-1 block text-sm text-forest-950">Partnership agreements & commitments</strong><span className="mt-1 block text-xs text-ink-600">Formal agreements, authority, deliverables and expiry records</span></span><span className="shrink-0 text-sm font-semibold text-forest-800">Open ↗</span></a>
 
     <form onSubmit={createInvitation} className="space-y-4 rounded-card border border-forest-200 bg-white p-4 shadow-card sm:p-6">
       <div><p className="text-xs font-semibold uppercase tracking-widest text-gold-700">03 · Meeting participation</p><h2 className="mt-1 font-serif text-2xl text-forest-950">Prepare an external invitation</h2><p className="mt-1 text-sm leading-6 text-ink-600">Only approved Standard meetings and verified organisations can be selected. Named contacts must also be verified and active.</p></div>
@@ -172,6 +187,6 @@ export default function ExternalEngagementPage() {
     <section className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-serif text-2xl text-forest-950">Invitation register</h2><p className="text-xs text-ink-600">First page of the connected Notion register.</p></div><button onClick={()=>void refresh()} disabled={loading || busy} className="min-h-10 rounded-control border border-line bg-white px-4 text-sm font-semibold">{loading ? "Refreshing…" : "Refresh"}</button></div>
       {data.invitations.length ? data.invitations.map(x=><article key={x.id} className="rounded-card border border-line bg-white p-4"><div className="flex flex-wrap items-start justify-between gap-2"><h3 className="font-semibold text-forest-950">{x.title}</h3><span className="rounded-full border border-line bg-cream-50 px-2.5 py-1 text-xs">{x.status}</span></div><p className="mt-1 text-xs text-ink-600">{x.participation || "Role not recorded"} · {x.purpose}</p>{x.subject ? <p className="mt-2 text-sm font-semibold text-forest-950">{x.subject}</p> : null}{x.draft ? <p className="mt-1 whitespace-pre-wrap text-sm text-ink-700">{x.draft}</p> : null}<p className="mt-2 text-xs text-ink-600">Meeting: {data.meetings.find(m=>m.id===x.meeting)?.title || x.meeting || "—"} · Organisation: {data.organisations.find(o=>o.id===x.organisation)?.title || x.organisation || "—"}{x.sentOn ? ` · Sent ${x.sentOn}` : ""}</p>{x.url ? <a href={x.url} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-9 items-center text-sm font-semibold text-forest-800 underline">Open Notion invitation ↗</a> : null}</article>) : <p className="rounded-card border border-line bg-white p-4 text-sm text-ink-600">{loading ? "Loading invitations…" : "No invitation records are currently returned."}</p>}
-    </section>
+    </section>    </> : null}
   </div>;
 }
