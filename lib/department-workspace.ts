@@ -22,7 +22,7 @@ function getClientAndDb(env:string) {
   const client = notion();
   const id = dbId(env);
   if (!client || !id) throw new Error("Department registers are not configured for this environment.");
-  assertInternalDb(id, env as "NOTION_PROGRAMMES_DATABASE_ID" | "NOTION_DEPARTMENT_REPORTS_DATABASE_ID");
+  assertInternalDb(id, env as Parameters<typeof assertInternalDb>[1]);
   return { client, id };
 }
 function value(prop:any):string {
@@ -69,7 +69,7 @@ export async function getDepartmentWorkspace(slug:DepartmentSlug) {
   const today=localDate(new Date());
   const sevenDays=localDate(new Date(Date.now()+7*24*60*60*1000));
   const active=work.filter(x=>["Approved","In Progress","Under Review"].includes(x.status));
-  const overdue=work.filter(x=>x.dueDate && x.dueDate<today && !["Completed","Cancelled"].includes(x.status));
+  const overdue=work.filter(x=>x.dueDate && x.dueDate<today && !["Completed","Cancelled","Paused"].includes(x.status));
   const dueSoon=work.filter(x=>x.dueDate && x.dueDate>=today && x.dueDate<=sevenDays && !["Completed","Cancelled"].includes(x.status));
   return {department,work,reports,meetings,learning,evidence,summary:{totalWork:work.length,activeWork:active.length,overdueWork:overdue.length,dueSoonWork:dueSoon.length,draftReports:reports.filter(x=>x.status==="Draft").length,submittedReports:reports.filter(x=>["Submitted","Under Review"].includes(x.status)).length},source:"notion",scope:"first 50 records per register"};
 }
