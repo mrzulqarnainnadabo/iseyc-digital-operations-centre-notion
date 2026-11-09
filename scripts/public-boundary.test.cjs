@@ -9,12 +9,14 @@ const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 test("public root is a public intelligence pulse and does not load restricted operations", () => {
   const page = read("app/page.tsx");
   assert.match(page, /PublicShell/);
-  assert.match(page, /What is happening across Nigeria\\?/);
+  assert.ok(page.includes("What is happening across Nigeria?"));
   assert.match(page, /getDepartmentMandateRecords/);
   assert.match(page, /getDepartmentEvidence/);
   assert.match(page, /provisional keyword match/);
   assert.match(page, /Not yet computed/);
-  assert.doesNotMatch(page, /requireStaffSession|listMeetings|@\\/lib\\/notion/);
+  assert.equal(page.includes("requireStaffSession"), false);
+  assert.equal(page.includes("listMeetings"), false);
+  assert.equal(page.includes("@/lib/notion"), false);
   assert.match(read("app/layout.tsx"), /index: true/);
   assert.match(read("app/ops/layout.tsx"), /index: false/);
   assert.match(read("app/login/layout.tsx"), /index: false/);
@@ -22,7 +24,7 @@ test("public root is a public intelligence pulse and does not load restricted op
 
 test("public shell uses the official seal and functional public navigation", () => {
   const shell = read("components/PublicShell.tsx");
-  assert.match(shell, /src="\\/iseyc-seal\\.svg"/);
+  assert.ok(shell.includes('src="/iseyc-seal.svg"'));
   for (const label of ["Home", "Departments", "Explore", "Report", "Method"]) {
     assert.match(shell, new RegExp(`label: "${label}"`));
   }
