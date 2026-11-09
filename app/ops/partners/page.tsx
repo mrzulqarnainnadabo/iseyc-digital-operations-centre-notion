@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 type Option = { id: string; title: string; detail: string; status: string; url: string; organisationId?: string; verified?: boolean };
 type Invitation = { id: string; title: string; organisation: string; contact: string; meeting: string; status: string; participation: string; purpose: string; subject: string; draft: string; sentOn: string; url: string };
@@ -12,6 +13,8 @@ const field = "mt-1 min-h-11 w-full rounded-control border border-line bg-white 
 const label = "block text-sm font-medium text-ink-800";
 
 export default function ExternalEngagementPage() {
+  const searchParams = useSearchParams();
+  const requestedMeetingId = searchParams.get("meetingId") || "";
   const [data, setData] = useState<Data>({ organisations: [], contacts: [], meetings: [], invitations: [] });
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -50,7 +53,7 @@ export default function ExternalEngagementPage() {
       setData(result as Data);
       setContactOrg(current => current || result.organisations?.[0]?.id || "");
       setInviteOrg(current => current || result.organisations?.find((x: Option) => x.status === "Verified")?.id || "");
-      setMeetingId(current => current || result.meetings?.[0]?.id || "");
+      setMeetingId(current => requestedMeetingId || current || result.meetings?.[0]?.id || "");
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "The service could not be reached.");
     } finally { setLoading(false); }
