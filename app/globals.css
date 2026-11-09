@@ -4,17 +4,17 @@
 
 :root {
   color-scheme: light;
-  --iseyc-forest-950: #123b2f;
-  --iseyc-forest-900: #123b2f;
-  --iseyc-forest-800: #194b3b;
+  --iseyc-forest-950: #071f18;
+  --iseyc-forest-900: #0b2d22;
+  --iseyc-forest-800: #123b2f;
   --iseyc-forest-100: #e8f0ea;
   --iseyc-cream-50: #faf9f5;
   --iseyc-white: #ffffff;
   --iseyc-ink-950: #202923;
-  --iseyc-ink-700: #626d65;
-  --iseyc-ink-600: #626d65;
+  --iseyc-ink-700: #4e5d54;
+  --iseyc-ink-600: #4e5d54;
   --iseyc-gold-600: #a7833f;
-  --iseyc-gold-700: #755f27;
+  --iseyc-gold-700: #80621f;
   --iseyc-border: #e4e6df;
   --iseyc-success: #28664a;
   --iseyc-warning: #93651d;
@@ -26,7 +26,7 @@
 html { scroll-behavior: smooth; }
 body { @apply antialiased; background: var(--iseyc-cream-50); color: var(--iseyc-ink-950); }
 ::selection { background: #d8c49a; color: var(--iseyc-forest-950); }
-:focus-visible { outline: 3px solid #755f27; outline-offset: 3px; }
+:focus-visible { outline: 3px solid #80621f; outline-offset: 3px; }
 button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
