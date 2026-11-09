@@ -75,7 +75,7 @@ button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
   .department-content-grid { grid-template-columns: minmax(0, 1fr) minmax(15rem, 0.8fr); gap: 1.5rem; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .public-nav a, .department-open span { transition: none; }
+  .public-nav a, .department-open span, .dept-card__open { transition: none; }
 }
 
 .evidence-data-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--iseyc-border); }
@@ -87,3 +87,34 @@ button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
 .public-mobile-menu > summary::-webkit-details-marker { display: none; }
 .public-mobile-menu__links a:focus-visible,
 .public-mobile-menu > summary:focus-visible { outline: 3px solid #755f27; outline-offset: 2px; }
+
+/* Department-first home cards */
+.dept-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  border: 1px solid var(--iseyc-border);
+  border-left-width: 4px;
+  border-radius: var(--radius-card);
+  background: var(--iseyc-white);
+  padding: 1.25rem 1.35rem 1.4rem;
+  text-decoration: none;
+  box-shadow: var(--shadow-card);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.dept-card:hover,
+.dept-card:focus-visible {
+  border-color: var(--iseyc-forest-800);
+  box-shadow: 0 2px 4px rgb(16 47 38 / 6%), 0 12px 28px rgb(16 47 38 / 6%);
+}
+.dept-card__open {
+  font-size: 0.75rem;
+  font-weight: 650;
+  color: var(--iseyc-forest-800);
+  transition: transform 150ms ease;
+}
+.group:hover .dept-card__open { transform: translateX(2px); }
+.dept-card--education { border-left-color: #28664a; }
+.dept-card--health { border-left-color: #a7833f; }
+.dept-card--technology { border-left-color: #194b3b; }
+.dept-card--civic { border-left-color: #755f27; }
