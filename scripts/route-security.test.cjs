@@ -49,6 +49,11 @@ const contracts = {
     methods: ["GET", "PATCH"],
     required: ["requireStaffSession", "privateJson", "legacySessionCanReadMeeting", "legacySessionCanSetMeetingStatus"],
     forbidden: []
+  },
+  "department-applications/connection/route.ts": {
+    methods: ["GET"],
+    required: ["requireStaffSession", "privateJson", "verifyDepartmentApplicationsConnection"],
+    forbidden: ["pages.query", "pages.create", "Applicant Name", "Applicant Statement"]
   }
 };
 
@@ -153,4 +158,12 @@ test("staff login throttles repeated failures and clears the local bucket after 
   assert.match(limiter, /failures\.delete\(clientIp\)/);
   assert.match(limiter, /Serverless instances do not share memory/);
   assert.doesNotMatch(login, /headers\.get\(["\']x-forwarded-for["\']/i);
+});
+
+test("department applications connection diagnostic is read-only and returns no applicant records", () => {
+  const source = fs.readFileSync(path.join(apiRoot, "department-applications/connection/route.ts"), "utf8");
+  assertInOrder(source, ["requireStaffSession()", "verifyDepartmentApplicationsConnection()"], "department applications connection check");
+  assert.match(source, /schemaReady/);
+  assert.match(source, /privateJson/);
+  assert.doesNotMatch(source, /pages\.query|pages\.create|Applicant Name|Applicant Statement/);
 });

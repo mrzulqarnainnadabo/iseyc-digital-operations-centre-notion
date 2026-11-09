@@ -175,3 +175,25 @@ test("public home composes public systems while operations retain server-side ac
   assert.match(opsLayout, /redirect\("\/login"\)/);
   assert.doesNotMatch(home, /members nationwide|national impact|campaign/i);
 });
+
+test("department applications integration check validates schema without reading applicant rows", () => {
+  const notion = fs.readFileSync(path.join(root, "lib/notion.ts"), "utf8");
+  const start = notion.indexOf("export async function verifyDepartmentApplicationsConnection");
+  const end = notion.indexOf("export function configFlags", start);
+  assert.ok(start >= 0 && end > start, "connection verifier must be present");
+  const verifier = notion.slice(start, end);
+  assert.match(verifier, /client\.databases\.retrieve/);
+  assert.match(verifier, /"Application Status": "status"/);
+  assert.match(verifier, /"Applicant Name": "rich_text"/);
+  assert.match(verifier, /"Consent Confirmed": "checkbox"/);
+  assert.doesNotMatch(verifier, /databases\.query|pages\.query|pages\.create|pages\.update/);
+  assert.match(notion, /NOTION_DEPARTMENT_APPLICATIONS_DATABASE_ID/);
+  const integrationDoc = fs.readFileSync(path.join(root, "docs/DEPARTMENT-APPLICATIONS-INTEGRATION.md"), "utf8");
+  assert.doesNotMatch(integrationDoc, /\b[0-9a-f]{32}\b/i, "private Notion database IDs must not be published in documentation");
+  const readme = fs.readFileSync(path.join(root, "README.md"), "utf8");
+  assert.match(readme, /existence and the Vercel integration.s access must be verified/);
+  const route = fs.readFileSync(path.join(root, "app/api/department-applications/connection/route.ts"), "utf8");
+  assert.match(route, /result\.configured && result\.accessible && result\.schemaReady/);
+  assert.match(route, /ok: ready/);
+  assert.match(route, /status: ready \? 200 : 503/);
+});
