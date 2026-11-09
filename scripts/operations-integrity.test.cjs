@@ -209,6 +209,16 @@ test("department applications integration check validates schema without reading
 });
 
 
+test("register forms send only fields accepted by their route and communications reads its saved brief", () => {
+  const component = fs.readFileSync(path.join(root, "components/OperationalRegister.tsx"), "utf8");
+  const adapter = fs.readFileSync(path.join(root, "lib/notion-registers.ts"), "utf8");
+  const route = fs.readFileSync(path.join(opsRoot, "api/registers/[kind]/route.ts"), "utf8");
+  assert.match(component, /kind === "media" \? \{ title, detail, channel \} : \{ title, detail, date \}/);
+  assert.match(adapter, /detail: "Notes"/);
+  assert.match(adapter, /readText\(props\.Notes\).*readText\(props\.Channel\)/);
+  assert.match(route, /kind === "media" \? \["title", "detail", "channel"\] : \["title", "detail", "date"\]/);
+});
+
 test("external engagement is authenticated, linked and draft-only until human dispatch", () => {
   const adapter = fs.readFileSync(path.join(root, "lib/external-engagement.ts"), "utf8");
   const route = fs.readFileSync(path.join(opsRoot, "api/external-engagement/route.ts"), "utf8");
