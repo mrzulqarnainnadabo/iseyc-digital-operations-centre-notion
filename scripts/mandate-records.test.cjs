@@ -16,6 +16,9 @@ test("mandate feed uses allowlisted public API only", () => {
   assert.doesNotMatch(source, /@notionhq\/client|NOTION_TOKEN|listMeetings|requireStaffSession/);
   assert.match(source, /prevalenceNote/);
   assert.match(source, /AbortSignal\.timeout\(8000\)/);
+  assert.match(source, /matchingMode: "provisional-keyword"/);
+  assert.match(source, /primaryDepartment/);
+  assert.match(source, /classificationNote/);
 });
 
 test("department pages load mandate records without private Notion", () => {
@@ -23,6 +26,8 @@ test("department pages load mandate records without private Notion", () => {
   assert.match(page, /getDepartmentMandateRecords/);
   assert.match(page, /Published community records/);
   assert.match(page, /prevalenceNote/);
+  assert.match(page, /classificationNote/);
+  assert.match(page, /provisional keyword/);
   assert.match(page, /Contribute information/);
   assert.match(page, /iseyc-civic-brain\.vercel\.app/);
   assert.doesNotMatch(page, /@\/lib\/notion|requireStaffSession|listMeetings/);
