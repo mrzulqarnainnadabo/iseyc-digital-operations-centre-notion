@@ -114,6 +114,17 @@ test("institutional design tokens and reduced-motion accessibility are present",
 });
 
 
+test("department date validation accepts real calendar dates and rejects impossible dates", () => {
+  const { isValidCalendarDate } = require("../lib/date-validation.ts");
+  assert.equal(isValidCalendarDate("2024-02-29"), true);
+  assert.equal(isValidCalendarDate("2026-11-09"), true);
+  assert.equal(isValidCalendarDate("2025-02-29"), false);
+  assert.equal(isValidCalendarDate("2026-02-30"), false);
+  assert.equal(isValidCalendarDate("2026-2-09"), false);
+  assert.equal(isValidCalendarDate("2026-11-09T00:00:00Z"), false);
+  assert.equal(isValidCalendarDate(""), false);
+});
+
 test("department desks connect department work, reporting and filtered meeting activity", () => {
   const department = fs.readFileSync(path.join(root, "lib/department-workspace.ts"), "utf8");
   const page = fs.readFileSync(path.join(opsRoot, "departments/[department]/page.tsx"), "utf8");
