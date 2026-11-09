@@ -61,7 +61,7 @@ export async function getDepartmentWorkspace(slug:DepartmentSlug) {
   const work=workPages.map(mapWork), reports=reportPages.map(mapReport);
   const learning=learningPages.map(mapLearning);
   const meetings=filterLegacyVisibleMeetings(meetingPage.meetings).filter((meeting:MeetingRecord)=>DEPARTMENT_TERMS[slug].some(term=>`${meeting.conveningBody} ${meeting.title}`.toLowerCase().includes(term))).sort((a,b)=>a.meetingDate.localeCompare(b.meetingDate));
-  const today=new Date().toISOString().slice(0,10);
+  const today=new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Lagos",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
   const active=work.filter(x=>["Approved","In Progress","Under Review"].includes(x.status));
   const overdue=work.filter(x=>x.dueDate && x.dueDate<today && !["Completed","Cancelled"].includes(x.status));
   return {department,work,reports,meetings,learning,summary:{totalWork:work.length,activeWork:active.length,overdueWork:overdue.length,draftReports:reports.filter(x=>x.status==="Draft").length,submittedReports:reports.filter(x=>["Submitted","Under Review"].includes(x.status)).length},source:"notion",scope:"first 50 records per register"};
