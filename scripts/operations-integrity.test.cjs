@@ -219,6 +219,17 @@ test("register forms send only fields accepted by their route and communications
   assert.match(route, /kind === "media" \? \["title", "detail", "channel"\] : \["title", "detail", "date"\]/);
 });
 
+test("external invitation server validation requires an accountable owner role and eligibility filters relationships", () => {
+  const route = fs.readFileSync(path.join(opsRoot, "api/external-engagement/route.ts"), "utf8");
+  const adapter = fs.readFileSync(path.join(root, "lib/external-engagement.ts"), "utf8");
+  const page = fs.readFileSync(path.join(opsRoot, "partners/page.tsx"), "utf8");
+  assert.match(route, /ownerRole\.length < 2/);
+  assert.match(adapter, /prop\.type === "date"/);
+  assert.match(adapter, /relationshipStatus: read\(p\.properties\?\.\["Relationship status"\]\)/);
+  assert.match(page, /\["Paused", "Declined", "Former collaborator"\]/);
+  assert.match(page, /loading \|\| !loaded/);
+});
+
 test("external engagement is authenticated, linked and draft-only until human dispatch", () => {
   const adapter = fs.readFileSync(path.join(root, "lib/external-engagement.ts"), "utf8");
   const route = fs.readFileSync(path.join(opsRoot, "api/external-engagement/route.ts"), "utf8");
