@@ -207,3 +207,30 @@ test("department applications integration check validates schema without reading
   assert.match(route, /ok: ready/);
   assert.match(route, /status: ready \? 200 : 503/);
 });
+
+
+test("external engagement is authenticated, linked and draft-only until human dispatch", () => {
+  const adapter = fs.readFileSync(path.join(root, "lib/external-engagement.ts"), "utf8");
+  const route = fs.readFileSync(path.join(opsRoot, "api/external-engagement/route.ts"), "utf8");
+  const page = fs.readFileSync(path.join(opsRoot, "partners/page.tsx"), "utf8");
+  const notion = fs.readFileSync(path.join(root, "lib/notion.ts"), "utf8");
+  assert.match(adapter, /NOTION_PARTNER_ORGANISATIONS_DATABASE_ID/);
+  assert.match(adapter, /NOTION_EXTERNAL_CONTACTS_DATABASE_ID/);
+  assert.match(adapter, /NOTION_MEETING_INVITATIONS_DATABASE_ID/);
+  assert.match(adapter, /Approved/);
+  assert.match(adapter, /Standard/);
+  assert.match(adapter, /Verification status/);
+  assert.match(adapter, /Verified/);
+  assert.match(adapter, /Contact status/);
+  assert.match(adapter, /pages\.create/);
+  assert.match(route, /isSameOriginRequest/);
+  assert.match(route, /requireStaffSession/);
+  assert.match(route, /readBoundedJson/);
+  assert.match(route, /status: "Draft"/);
+  assert.match(route, /Not sent/);
+  assert.match(page, /Create invitation draft/);
+  assert.match(page, /has NOT been sent/);
+  assert.match(page, /verified and active/);
+  assert.match(notion, /NOTION_MEETING_INVITATIONS_DATABASE_ID/);
+  assert.ok(DOC_NAV.some((item) => item.href === "/ops/partners"));
+});
