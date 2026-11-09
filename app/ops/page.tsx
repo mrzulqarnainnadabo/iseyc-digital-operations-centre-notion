@@ -67,7 +67,7 @@ export default async function CommandBriefPage() {
       <section aria-labelledby="council-heading" className="space-y-3">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Governance structure</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Governance structure</p>
             <h2 id="council-heading" className="text-lg font-semibold text-forest-950">Presidential Council</h2>
           </div>
           <span className="text-xs text-ink-600">Seat occupancy not connected</span>
@@ -98,7 +98,7 @@ export default async function CommandBriefPage() {
 
       <section aria-labelledby="shared-heading" className="rounded-card border border-line bg-white p-4 shadow-card sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-5">
         <div className="min-w-0">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Shared function · not a fifth department</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Shared function · not a fifth department</p>
           <h2 id="shared-heading" className="mt-1 text-base font-semibold text-forest-950">Communications coordination</h2>
         </div>
         <div className="mt-3 flex shrink-0 flex-wrap items-center gap-2 sm:mt-0">
@@ -114,7 +114,7 @@ export default async function CommandBriefPage() {
           <span className="mt-4 inline-flex min-h-[44px] items-center text-sm font-semibold text-white">Open</span>
         </Link>
         <Link href="/ops/intake" className="group rounded-card border border-line bg-white p-5 shadow-card hover:border-forest-800">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Notion workflow</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Notion workflow</p>
           <h2 className="mt-1 text-base font-semibold text-forest-950">Meeting intake</h2>
           <span className="mt-4 inline-flex min-h-[44px] items-center rounded-control border border-line px-3 text-sm font-semibold text-forest-800">Start</span>
         </Link>
@@ -122,7 +122,7 @@ export default async function CommandBriefPage() {
 
       <section aria-labelledby="environment-heading" className="rounded-card border border-line bg-white p-4">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Configuration indicators</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Configuration indicators</p>
           <h2 id="environment-heading" className="mt-1 text-sm font-semibold text-forest-950">Environment configuration</h2>
         </div>
         <ul className="mt-3 grid gap-2 text-sm sm:grid-cols-2">

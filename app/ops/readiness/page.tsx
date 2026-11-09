@@ -57,7 +57,7 @@ export default function ReadinessPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <header className="space-y-2">
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-600">Operational governance</p>
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-700">Operational governance</p>
         <h2 className="font-serif text-3xl text-forest-950">Module readiness</h2>
         <p className="max-w-2xl text-sm leading-6 text-ink-700">
           A factual view of what the Digital Operations Centre can do today, what remains a policy foundation,

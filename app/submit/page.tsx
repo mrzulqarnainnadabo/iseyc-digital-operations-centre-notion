@@ -19,7 +19,7 @@ export default function SubmitPage() {
   return (
     <PublicShell>
       <section className="max-w-3xl py-10 sm:py-14">
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-600">Community participation</p>
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-700">Community participation</p>
         <h1 className="mt-3 font-serif text-3xl text-forest-950 sm:text-4xl">Contribute community information</h1>
         <p className="mt-4 text-sm leading-6 text-ink-700">Choose the right process. A community observation records what someone reports seeing; a civic demand records what a community asks public office to deliver. Civic Mandate Nigeria owns both submission workflows and their review states.</p>
       </section>

@@ -20,7 +20,7 @@ const destinations = [
   {
     name: "Civic Intelligence Observatory",
     role: "Public evidence and geography",
-    description: "Explore public-source provenance, geographic context and evidence gaps. The current deployment is not yet aligned with the reviewed main branch, so a public launch link is intentionally withheld.",
+    description: "The public v1 evidence API responds for a small pilot allowlist. The complete user interface still needs release alignment, and its national-level indicators do not establish state, LGA or facility coverage.",
     action: "Release alignment in progress",
     status: "Not yet release-verified",
   },
@@ -30,7 +30,7 @@ export default function ExplorePage() {
   return (
     <PublicShell>
       <section className="max-w-3xl py-10 sm:py-14">
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-600">Public systems</p>
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-700">Public systems</p>
         <h1 className="mt-3 font-serif text-3xl text-forest-950 sm:text-4xl">Explore the ISEYC civic infrastructure</h1>
         <p className="mt-4 text-sm leading-6 text-ink-700">The three systems have different responsibilities and release states. Open a verified public system, or review the method used to interpret information. A system being listed here does not imply national coverage or operational completeness.</p>
       </section>
@@ -38,7 +38,7 @@ export default function ExplorePage() {
         {destinations.map((item, index) => (
           <article key={item.name} className="flex flex-col rounded-card border border-line bg-white p-5 sm:p-6">
             <div className="flex items-center justify-between gap-2">
-              <span className="font-mono text-xs text-gold-600">0{index + 1}</span>
+              <span className="font-mono text-xs text-gold-700">0{index + 1}</span>
               <span className="rounded-full bg-forest-100 px-2.5 py-1 text-[11px] font-semibold text-forest-900">{item.status}</span>
             </div>
             <p className="mt-5 text-xs font-bold uppercase tracking-[0.12em] text-ink-600">{item.role}</p>

@@ -40,7 +40,7 @@ export default function Page() {
     <div className="mx-auto max-w-4xl space-y-7">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-600">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-700">
             Governance · Access control
           </p>
           <h2 className="mt-1 font-serif text-2xl text-forest-950">Officer access</h2>
@@ -88,7 +88,7 @@ export default function Page() {
       </section>
 
       <section className="rounded-card border border-line bg-white p-4 sm:p-5" aria-labelledby="governance-rule">
-        <p className="text-xs font-bold uppercase tracking-wide text-gold-600">Governance rule</p>
+        <p className="text-xs font-bold uppercase tracking-wide text-gold-700">Governance rule</p>
         <h3 id="governance-rule" className="mt-1 font-semibold text-forest-950">
           Administration and decision authority remain separate
         </h3>
