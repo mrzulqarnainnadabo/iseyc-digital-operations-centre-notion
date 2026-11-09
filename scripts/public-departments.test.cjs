@@ -107,3 +107,27 @@ test("department routes are present in the served route manifest", () => {
   assert.ok(routes.routes.some((route) => route.path === "/departments"));
   assert.ok(routes.routes.some((route) => route.path === "/departments/:department"));
 });
+
+
+test("Software & Technology has one canonical public route across homepage, directory and department workspace", () => {
+  const registry = read("lib/departments.ts");
+  const detail = read("app/departments/[department]/page.tsx");
+  const home = read("app/page.tsx");
+  const directory = read("app/departments/page.tsx");
+  const workspace = read("components/DepartmentWorkspace.tsx");
+  assert.match(registry, /slug === "software-technology" \? "technology" : slug/);
+  assert.match(registry, /slug === "technology" \? "software-technology" : slug/);
+  assert.match(detail, /getDepartmentRouteSlug/);
+  assert.match(home, /getDepartmentRouteSlug\(department\.slug\)/);
+  assert.match(directory, /getDepartmentRouteSlug\(department\.slug\)/);
+  assert.match(workspace, /publicSlug:"software-technology"/);
+});
+
+test("Health uses its calm teal identity consistently across public and internal department surfaces", () => {
+  const css = read("app/globals.css");
+  const readiness = read("app/ops/readiness/page.tsx");
+  assert.match(css, /dept-card--health \{ border-left-color: #287a70; \}/);
+  assert.match(css, /department-tile--health\{[^}]*#e5f1ee[^}]*#287a70/);
+  assert.match(css, /department-hero--health\{[^}]*#e5f1ee[^}]*#287a70/);
+  assert.match(readiness, /tone:"border-l-\[#287a70\] bg-\[#e5f1ee\]"/);
+});
