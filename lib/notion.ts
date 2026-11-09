@@ -11,7 +11,7 @@ function canonicalNotionId(id: string): string {
 }
 
 const NOTION_DATABASE_ID_PATTERN = /^[a-f0-9]{32}$/;
-type InternalDatabaseEnv = "NOTION_MEETINGS_DATABASE_ID" | "NOTION_DEPARTMENT_APPLICATIONS_DATABASE_ID";
+type InternalDatabaseEnv = "NOTION_MEETINGS_DATABASE_ID" | "NOTION_DEPARTMENT_APPLICATIONS_DATABASE_ID" | "NOTION_PROGRAMMES_DATABASE_ID" | "NOTION_DEPARTMENT_REPORTS_DATABASE_ID";
 
 export function dbId(envName: string): string {
   const candidate = canonicalNotionId(process.env[envName] || "");
@@ -262,6 +262,8 @@ export function configFlags() {
     chamber: Boolean(dbId("NOTION_CHAMBER_DATABASE_ID")),
     actions: Boolean(dbId("NOTION_ACTIONS_DATABASE_ID")),
     departmentApplications: Boolean(dbId("NOTION_DEPARTMENT_APPLICATIONS_DATABASE_ID")),
+    programmes: Boolean(dbId("NOTION_PROGRAMMES_DATABASE_ID")),
+    departmentReports: Boolean(dbId("NOTION_DEPARTMENT_REPORTS_DATABASE_ID")),
     staffKey: Boolean(process.env.ISEYC_STAFF_KEY?.trim()),
   };
 }
