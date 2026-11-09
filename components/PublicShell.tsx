@@ -13,6 +13,7 @@ const links = [
 const products = [
   { href: "https://2027-street-mandate.vercel.app", label: "Civic Mandate" },
   { href: "https://iseyc-civic-brain.vercel.app", label: "Civic Brain" },
+  { href: "https://iseyc-civic-intelligence-observatory.vercel.app", label: "Civic Intelligence Observatory" },
 ];
 
 export function PublicShell({ children }: { children: React.ReactNode }) {
@@ -60,7 +61,6 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
                   {product.label}<span aria-hidden="true">↗</span>
                 </a>
               ))}
-              <span className="inline-flex min-h-[44px] items-center text-xs text-ink-600" aria-label="Observatory release pending">Observatory · release alignment pending</span>
             </nav>
           </div>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line pt-3 text-xs text-ink-600">

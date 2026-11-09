@@ -29,10 +29,11 @@ test("public shell uses the official seal, clear navigation and verified product
   for (const url of [
     "https://2027-street-mandate.vercel.app",
     "https://iseyc-civic-brain.vercel.app",
+    "https://iseyc-civic-intelligence-observatory.vercel.app",
   ]) assert.ok(shell.includes(url));
   // Intentionally withhold unverified Observatory production URL
   assert.doesNotMatch(shell, /iseyc-civic-intelligence-observatory-p5rb607x3\.vercel\.app/);
-  assert.match(shell, /Observatory · release alignment pending/);
+  assert.match(shell, /label: "Civic Intelligence Observatory"/);
   assert.match(shell, /ISEYC · Non-partisan/);
   assert.match(shell, /Skip to content/);
 });
