@@ -6,13 +6,18 @@ const PAGE_SIZE = 20;
 const CACHE_TTL_MS = 10 * 60 * 1000;
 const FAILURE_TTL_MS = 60 * 1000;
 
-/** Conservative duty/text hints — not a taxonomy claim. */
+/**
+ * Provisional keyword hints for pilot routing only.
+ * Not an institutional duty taxonomy. Prefer a reviewed duty field when available.
+ */
 const departmentHints: Record<Department["slug"], string[]> = {
   education: ["education", "school", "teacher", "literacy", "learning", "youth development", "apprenticeship", "skills", "training"],
   health: ["health", "hospital", "clinic", "medicine", "maternal", "medical", "well-being", "wellbeing"],
-  technology: ["digital", "technology", "software", "connectivity", "internet", "ict", "digital infrastructure"],
-  civic: ["civic", "security", "governance", "accountability", "road", "transport", "power", "water", "public service"],
+  technology: ["digital infrastructure", "digital", "technology", "software", "connectivity", "internet", "ict"],
+  civic: ["civic", "security", "governance", "accountability", "road", "transport", "power", "water", "public service", "justice"],
 };
+
+const DEPARTMENT_ORDER: Department["slug"][] = ["education", "health", "technology", "civic"];
 
 export type MandatePublicRecord = {
   id: string;
@@ -33,6 +38,9 @@ export type MandateDepartmentFeed = {
   truncatedUpstream: boolean;
   retrievedAt: string | null;
   prevalenceNote: string;
+  /** Always provisional until a reviewed Mandate duty taxonomy exists. */
+  matchingMode: "provisional-keyword";
+  classificationNote: string;
 };
 
 type CacheEntry = { expiresAt: number; feed: MandateDepartmentFeed };
@@ -45,14 +53,39 @@ declare global {
 const cache = globalThis.__idccMandateFeedCache ?? (globalThis.__idccMandateFeedCache = new Map());
 const pending = globalThis.__idccMandateFeedPending ?? (globalThis.__idccMandateFeedPending = new Map());
 
+const CLASSIFICATION_NOTE =
+  "Records are shown here using provisional keyword matching against published text and duty labels. This is not an official ISEYC department taxonomy. A record is listed under at most one primary department.";
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function matchesDepartment(record: MandatePublicRecord, slug: Department["slug"]): boolean {
+function scoreDepartment(record: MandatePublicRecord, slug: Department["slug"]): number {
   const hints = departmentHints[slug];
-  const haystack = `${record.duty ?? ""} ${record.sector ?? ""} ${record.text}`.toLowerCase();
-  return hints.some((hint) => haystack.includes(hint));
+  const duty = (record.duty ?? "").toLowerCase();
+  const sector = (record.sector ?? "").toLowerCase();
+  const text = record.text.toLowerCase();
+  let score = 0;
+  for (const hint of hints) {
+    if (duty.includes(hint)) score += 4;
+    if (sector.includes(hint)) score += 3;
+    if (text.includes(hint)) score += 1;
+  }
+  return score;
+}
+
+/** Exclusive primary department: highest score wins; ties break by department order. */
+function primaryDepartment(record: MandatePublicRecord): Department["slug"] | null {
+  let best: Department["slug"] | null = null;
+  let bestScore = 0;
+  for (const slug of DEPARTMENT_ORDER) {
+    const score = scoreDepartment(record, slug);
+    if (score > bestScore) {
+      bestScore = score;
+      best = slug;
+    }
+  }
+  return bestScore > 0 ? best : null;
 }
 
 function parseRecord(candidate: unknown): MandatePublicRecord | null {
@@ -73,6 +106,22 @@ function parseRecord(candidate: unknown): MandatePublicRecord | null {
   };
 }
 
+function emptyFeed(
+  status: MandateDepartmentFeed["status"],
+  prevalenceNote: string,
+): MandateDepartmentFeed {
+  return {
+    status,
+    records: [],
+    totalPublished: null,
+    truncatedUpstream: false,
+    retrievedAt: null,
+    prevalenceNote,
+    matchingMode: "provisional-keyword",
+    classificationNote: CLASSIFICATION_NOTE,
+  };
+}
+
 async function refreshDepartmentRecords(slug: Department["slug"]): Promise<MandateDepartmentFeed> {
   const prevalenceNote =
     "These are published Civic Mandate records only. They are not a measure of national need, prevalence or public opinion.";
@@ -85,24 +134,24 @@ async function refreshDepartmentRecords(slug: Department["slug"]): Promise<Manda
       cache: "no-store",
       signal: AbortSignal.timeout(8000),
     });
-    if (!response.ok) {
-      return { status: "unavailable", records: [], totalPublished: null, truncatedUpstream: false, retrievedAt: null, prevalenceNote };
-    }
+    if (!response.ok) return emptyFeed("unavailable", prevalenceNote);
+
     const payload: unknown = await response.json();
     if (!isRecord(payload) || payload.contractVersion !== CONTRACT || payload.publicationBoundary !== "published-only") {
-      return { status: "invalid", records: [], totalPublished: null, truncatedUpstream: false, retrievedAt: null, prevalenceNote };
+      return emptyFeed("invalid", prevalenceNote);
     }
-    if (!Array.isArray(payload.records)) {
-      return { status: "invalid", records: [], totalPublished: null, truncatedUpstream: false, retrievedAt: null, prevalenceNote };
-    }
+    if (!Array.isArray(payload.records)) return emptyFeed("invalid", prevalenceNote);
+
     const parsed: MandatePublicRecord[] = [];
     for (const item of payload.records) {
       const record = parseRecord(item);
       if (record) parsed.push(record);
     }
-    const matched = parsed.filter((record) => matchesDepartment(record, slug)).slice(0, 6);
+
+    const matched = parsed.filter((record) => primaryDepartment(record) === slug).slice(0, 6);
     const totalPublished = typeof payload.total === "number" && Number.isFinite(payload.total) ? payload.total : null;
     const truncatedUpstream = payload.truncatedUpstream === true;
+
     return {
       status: matched.length ? "ready" : "empty",
       records: matched,
@@ -110,13 +159,15 @@ async function refreshDepartmentRecords(slug: Department["slug"]): Promise<Manda
       truncatedUpstream,
       retrievedAt: new Date().toISOString(),
       prevalenceNote: typeof payload.prevalenceNote === "string" ? payload.prevalenceNote : prevalenceNote,
+      matchingMode: "provisional-keyword",
+      classificationNote: CLASSIFICATION_NOTE,
     };
   } catch {
-    return { status: "unavailable", records: [], totalPublished: null, truncatedUpstream: false, retrievedAt: null, prevalenceNote };
+    return emptyFeed("unavailable", prevalenceNote);
   }
 }
 
-/** Published-only Mandate records, keyword-filtered for a department. Fail-closed on contract mismatch. */
+/** Published-only Mandate records with provisional exclusive keyword routing. Fail-closed on contract mismatch. */
 export async function getDepartmentMandateRecords(slug: Department["slug"]): Promise<MandateDepartmentFeed> {
   const now = Date.now();
   const cached = cache.get(slug);
