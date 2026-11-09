@@ -131,3 +131,23 @@ test("Health uses its calm teal identity consistently across public and internal
   assert.match(css, /department-hero--health\{[^}]*#e5f1ee[^}]*#287a70/);
   assert.match(readiness, /tone:"border-l-\[#287a70\] bg-\[#e5f1ee\]"/);
 });
+
+
+test("ISEYC institutional branding uses the supplied official seal and one approved identity system", () => {
+  const wordmark = read("public/iseyc-wordmark.svg");
+  const seal = read("public/iseyc-seal.svg");
+  const shell = read("components/PublicShell.tsx");
+  const layout = read("app/layout.tsx");
+  const css = read("app/globals.css");
+  const standard = read("docs/ISEYC-BRAND-SYSTEM.md");
+  assert.match(wordmark, /href="\/iseyc-seal\.svg"/);
+  assert.match(wordmark, /Empowering Youth, Shaping Communities/);
+  assert.match(seal, /official seal/);
+  assert.match(shell, /src="\/iseyc-wordmark\.svg"/);
+  assert.match(shell, /UNDERSTANDING PUBLIC NEEDS/);
+  assert.match(layout, /icons: \{ icon: "\/iseyc-seal\.svg"/);
+  assert.match(css, /--iseyc-forest-950: #071f18/);
+  assert.match(css, /--iseyc-forest-900: #0b2d22/);
+  assert.match(css, /--iseyc-gold-700: #80621f/);
+  assert.match(standard, /The supplied official ISEYC seal remains the source of truth/);
+});
