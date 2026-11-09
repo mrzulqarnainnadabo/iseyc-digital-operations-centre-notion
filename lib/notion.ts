@@ -238,7 +238,7 @@ export async function verifyDepartmentApplicationsConnection(): Promise<Departme
     "Applicant Name": "rich_text",
     Email: "email",
     Phone: "phone_number",
-    "Application Status": "select",
+    "Application Status": "status",
     "Submitted At": "date",
     "Consent Confirmed": "checkbox",
   };
