@@ -208,3 +208,100 @@ The next implementation sequence is:
 5. Implement Chamber session controls and decision handoff after chair/secretary authority is defined.
 6. Replace shared-key access with individual identity and appointment-backed permissions.
 7. Add durable audit, monitoring, backup/restore and release gates.
+
+
+## 12. External organisations, invitations and partnership engagement
+
+The DCC must support external institutional participation as a first-class meeting workflow. An external organisation may be invited to an internal meeting, consultation, technical session, programme activity, roundtable or partnership discussion. External participation does not grant internal membership, voting rights, Chamber access, access to restricted papers, or authority to represent ISEYC.
+
+### Organisation and contact records
+
+Maintain a canonical organisation record and separate contact-person records where the approved data model supports them. Do not use the legacy Sponsors or Other Clubs contact lists as the DCC's authoritative partner register: their current schemas contain only basic contact fields and do not capture institutional verification, engagement history, invitation permissions, confidentiality or agreement status.
+
+An organisation record should capture:
+- Registered/display name, organisation type, official website and public contact channel.
+- Country/state/location and institutional remit.
+- Verification state, source URL/evidence and verification date.
+- Relationship owner within ISEYC and responsible department/office.
+- Engagement category: prospective partner, invited participant, active collaborator, funder/sponsor, service provider, research institution, public institution, civil-society organisation or other.
+- Relationship status and last reviewed date.
+- Conflict, safeguarding, reputational, privacy or political-neutrality flags where relevant, with restricted access for sensitive notes.
+
+A contact record should capture name, official role, organisation link, work email/phone, preferred contact channel, source and verification date, consent/contact preference where applicable, and the ISEYC officer responsible for the relationship. Personal contact information must not be exposed to all meeting participants by default.
+
+### Meeting invitation record
+
+Each invitee is a separate record linked to the meeting and organisation. Capture:
+- Organisation and named contact, or clearly labelled generic institutional office when no individual is known.
+- Invitation purpose and expected contribution.
+- Participation type: observer, presenter, technical contributor, panelist, resource person, institutional representative, prospective partner, host or other explicitly defined role.
+- Agenda item(s) relevant to the invitee.
+- Invitation owner and authorising office.
+- Invitation channel, sent date, sender and a copy/reference of the invitation.
+- Response state: Draft, Awaiting approval, Approved to send, Sent, Accepted, Declined, Tentative, No response, Withdrawn, Attended, Did not attend.
+- Response timestamp and any conditions or accessibility requirements.
+- Access pack and document permissions, with expiry and least-privilege scope.
+- Follow-up owner, due date and outcome.
+
+An invitation must not be marked Sent until a human officer confirms the actual dispatch and records its channel/reference. A calendar invite or email draft is not proof of dispatch. A response is not proof of attendance. Attendance is recorded by the meeting secretary. Do not infer RSVP from email delivery, and do not automatically add external contacts to internal Notion workspaces.
+
+### Invitation approval and dispatch
+
+Before external invitations are sent, the workflow checks:
+1. The meeting is approved for external participation by its authorised convenor.
+2. The invitee's organisation and contact are sufficiently verified for the purpose.
+3. The invitation wording, agenda scope, documents and requested contribution are approved by the responsible officer.
+4. Confidentiality, safeguarding, privacy and non-partisanship checks are complete.
+5. The recipient list and document access are limited to what the invitee needs.
+6. The dispatching officer is authorised and the dispatch record is retained.
+
+For a meeting involving multiple organisations, each organisation receives its own invitation record, appropriate recipient handling and response state. Do not expose other invitees' personal email addresses through a shared recipient list.
+
+### External participation during the meeting
+
+The secretary records the organisation, participant name/role, attendance times where appropriate, agenda items attended, contribution or presentation reference, any declared interest/conflict, and any follow-up requested. External participants are clearly distinguished from ISEYC officers, members, observers and guests. Their attendance does not count toward internal quorum or voting unless an approved governing instrument explicitly says otherwise.
+
+External participants receive only approved, purpose-specific documents. Restricted Chamber papers, internal deliberations, personnel records and private member data remain excluded unless an authorised disclosure decision is recorded.
+
+### Partnership pipeline — separate from meeting status
+
+An external meeting may produce a lead, but not an automatic partnership. Track the relationship separately through:
+- Prospect identified.
+- Due diligence / institutional verification.
+- Introductory engagement.
+- Concept note or proposal requested.
+- Proposal under development.
+- Internal review.
+- Negotiation / clarification.
+- Agreement approved by the competent authority.
+- Agreement executed and effective.
+- Active delivery / monitoring.
+- Completed, declined, paused, expired or terminated.
+
+Only the competent authority may approve or execute an MoU, grant, sponsorship, data-sharing arrangement, procurement, financial commitment or formal partnership. Store the signed instrument, authority basis, signatories, scope, term, obligations, deliverables, reporting, financial/data commitments, safeguarding and termination provisions. A positive meeting, verbal expression of interest, email exchange or invitation acceptance must never be represented as an active partnership.
+
+### Post-meeting follow-up
+
+Within two working days of the meeting, the responsible ISEYC officer records:
+- Attendance and participation outcome.
+- Key points and commitments, attributed to the relevant organisation/contact.
+- Documents or information promised, with due dates.
+- ISEYC actions and external follow-ups as separate action records.
+- Whether a concept note, second meeting, due diligence or no further action is required.
+- The next contact owner and follow-up date.
+
+External organisations do not become DCC users merely because they were invited. If a secure external collaboration space is later introduced, it must use separate external identities, explicit resource-level permissions, expiry, revocation and audit. Do not expose the internal executive workspace.
+
+### Release requirements for external engagement
+
+Before enabling this workflow in production, verify:
+- A dedicated approved Partner Organisations register and External Contacts register exist, with documented schemas and data owners.
+- Meeting-to-invitation and invitation-to-organisation relationships are durable and queryable.
+- Invitation status is updated only by authenticated, authorised actions.
+- Dispatch evidence is captured without claiming that the application itself sent an email unless a connected mail provider confirms it.
+- External access is separate from internal executive access.
+- RSVP, attendance and partnership agreement are distinct states.
+- Data retention, consent, contact correction and deletion handling are defined.
+- Tests cover duplicate invitations, wrong recipients, withdrawn invitations, expired access, privacy leakage and unapproved partnership claims.
+
+Until the dedicated registers and access controls are available, the DCC may prepare invitation briefs and drafts but must label them as drafts and must not claim to have sent invitations or established partnerships.
