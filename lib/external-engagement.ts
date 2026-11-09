@@ -43,7 +43,7 @@ export async function listExternalOptions() {
   const [orgPages, contactPages, meetings] = await Promise.all([
     query("organisations"), query("contacts"), listMeetings({ pageSize: 50 }),
   ]);
-  const organisations = orgPages.map((p: any) => row(p, "Organisation", "Organisation type", "Verification status"));
+  const organisations = orgPages.map((p: any) => ({ ...row(p, "Organisation", "Organisation type", "Verification status"), detail: [read(p.properties?.["Organisation type"]), read(p.properties?.["Official email"])].filter(Boolean).join(" · ") }));
   const contacts = contactPages.map((p: any) => ({ ...row(p, "Contact", "Work email", "Contact status"), organisationId: read(p.properties?.Organisation).split(",")[0] || "", verified: p.properties?.Verified?.checkbox === true }));
   const meetingOptions = meetings.meetings.filter((m: MeetingRecord) => m.status === "Approved" && m.sensitivity === "Standard").map((m: MeetingRecord) => ({ id: m.id, title: m.title, detail: m.meetingDate, status: m.status, url: "" }));
   return { organisations, contacts, meetings: meetingOptions };
@@ -106,6 +106,7 @@ export async function createMeetingInvitation(input: { title: string; meetingId:
   if (read(meetingProps.Status) !== "Approved" || read(meetingProps.Sensitivity) !== "Standard") throw new Error("External invitations require an Approved, Standard-sensitivity meeting.");
   if (organisation.parent?.database_id?.replace(/-/g, "") !== dbId(ENV.organisations)) throw new Error("The selected organisation is not in the approved Partner Organisations register.");
   if (read(organisation.properties?.["Verification status"]) !== "Verified") throw new Error("The organisation must be verified before an invitation can be prepared.");
+  if (["Paused", "Declined", "Former collaborator"].includes(read(organisation.properties?.["Relationship status"]))) throw new Error("The organisation relationship is paused, declined or former and cannot receive a new invitation.");
   if (input.contactId && contact?.parent?.database_id?.replace(/-/g, "") !== dbId(ENV.contacts)) throw new Error("The selected contact is not in the approved External Contacts register.");
   if (input.contactId && (contact.properties?.Verified?.checkbox !== true || read(contact.properties?.["Contact status"]) !== "Active" || !["Official institutional channel", "Consent recorded"].includes(read(contact.properties?.["Consent / contact basis"])))) throw new Error("The named contact must be verified, active and have a recorded contact basis before invitation.");
   const properties: Record<string, unknown> = {
