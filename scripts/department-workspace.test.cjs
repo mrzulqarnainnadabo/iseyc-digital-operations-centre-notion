@@ -1,0 +1,61 @@
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const root = path.join(__dirname, "..");
+const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
+
+test("department workspaces use the approved four-department identity and real registers", () => {
+  const adapter = read("lib/department-workspace.ts");
+  const page = read("app/ops/departments/[department]/page.tsx");
+  const ui = read("components/DepartmentWorkspace.tsx");
+  const css = read("app/globals.css");
+  for (const name of ["Education & Capacity Building", "Health & Well-being", "Software & Technology", "Civic Department"]) assert.ok(adapter.includes(name));
+  assert.match(adapter, /NOTION_PROGRAMMES_DATABASE_ID/);
+  assert.match(adapter, /NOTION_DEPARTMENT_REPORTS_DATABASE_ID/);
+  assert.match(adapter, /filter:\{property:"Department",select:\{equals:department\}\}/);
+  assert.match(adapter, /Status:\{status:\{name:"Proposed"\}\}/);
+  assert.match(adapter, /Status:\{status:\{name:"Draft"\}\}/);
+  assert.match(page, /DepartmentWorkspace/);
+  for (const tab of ["overview", "work", "reports", "meetings"]) assert.ok(ui.includes(`"${tab}"`));
+  for (const style of ["education", "health", "technology", "civic"]) assert.ok(css.includes(`.department-desk--${style}`));
+});
+
+test("department programme intake requires owner, intended outcome, acceptance criteria and dated delivery", () => {
+  const adapter = read("lib/department-workspace.ts");
+  const route = read("app/ops/api/departments/[department]/route.ts");
+  const ui = read("components/DepartmentWorkspace.tsx");
+  assert.match(adapter, /input\.owner\.trim\(\)\.length<2/);
+  assert.match(adapter, /input\.outcome\.trim\(\)\.length<8/);
+  assert.match(adapter, /input\.acceptance\.trim\(\)\.length<5/);
+  assert.match(adapter, /input\.dueDate<input\.startDate/);
+  assert.match(route, /requireStaffSession/);
+  assert.match(route, /isSameOriginRequest/);
+  assert.match(route, /readBoundedJson/);
+  assert.match(ui, /Accountable role/);
+  assert.match(ui, /Acceptance criteria/);
+  assert.match(ui, /Save proposed work/);
+});
+
+test("department reporting preserves limitations and keeps reports in Draft until human review", () => {
+  const adapter = read("lib/department-workspace.ts");
+  const route = read("app/ops/api/departments/[department]/route.ts");
+  const ui = read("components/DepartmentWorkspace.tsx");
+  assert.match(adapter, /Data Limitations/);
+  assert.match(adapter, /Status:\{status:\{name:"Draft"\}\}/);
+  assert.match(adapter, /input\.periodEnd<input\.periodStart/);
+  assert.match(route, /Draft — not submitted or accepted/);
+  assert.match(ui, /Data limitations/);
+  assert.match(ui, /Save report draft/);
+  assert.match(ui, /Submission and acceptance require the authorised review process/);
+});
+
+test("department workspace fails closed and never substitutes demo records", () => {
+  const route = read("app/ops/api/departments/[department]/route.ts");
+  const ui = read("components/DepartmentWorkspace.tsx");
+  assert.match(route, /No records are shown/);
+  assert.match(route, /No cached or estimated records are shown/);
+  assert.match(ui, /setWorkspace\(null\)/);
+  assert.match(ui, /No programme or work records yet/);
+  assert.match(ui, /Register unavailable; no records are shown/);
+});
