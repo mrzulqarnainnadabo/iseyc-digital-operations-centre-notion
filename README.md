@@ -72,6 +72,12 @@ Use the keys and descriptions in `.env.example` as the source of truth. Configur
 7. Deploy only after review and explicit release approval.
 8. Verify the deployed application, role access and rollback path before activation.
 
+## Department applications intake — connection check only
+
+The connection diagnostic expects an approved private Notion source named **ISEYC Department Applications — Intake Register**. Its existence and the Vercel integration's access must be verified by an authorised administrator. Configure `NOTION_DEPARTMENT_APPLICATIONS_DATABASE_ID` alongside the existing server-side `NOTION_TOKEN` only in the correct Vercel project. The protected read-only diagnostic is `GET /ops/api/department-applications/connection`; it checks database access and required property types without reading applicant rows. See [the integration and activation boundary](docs/DEPARTMENT-APPLICATIONS-INTEGRATION.md).
+
+This does not activate public submissions or applicant review. The transitional shared staff key is not sufficient authority to expose applicant personal information. Individual revocable sessions and server-side role/resource authorization remain release gates.
+
 ## Institutional readiness gates
 
 Before multiple officers are onboarded:
