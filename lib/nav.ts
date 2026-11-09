@@ -9,6 +9,7 @@ export const DOC_NAV: NavItem[] = [
   { label: "Home", href: "/ops", group: "Command" },
   { label: "Queue", href: "/ops/queue", group: "Command" },
   { label: "Intake", href: "/ops/intake", group: "Command" },
+  { label: "Calendar", href: "/ops/calendar", group: "Command" },
   { label: "Departments", href: "/ops/readiness", group: "Departments" },
   { label: "Communications", href: "/ops/media", group: "Shared function" },
   { label: "Chamber", href: "/ops/chamber", group: "Module slots" },

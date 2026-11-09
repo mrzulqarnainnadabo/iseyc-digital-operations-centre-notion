@@ -114,12 +114,25 @@ test("institutional design tokens and reduced-motion accessibility are present",
 });
 
 
-test("department desks and Day-1 packet do not imply staffing or appointments", () => {
+test("department desks show sourced meeting activity without implying staffing or task completion", () => {
   const department = fs.readFileSync(path.join(opsRoot, "departments/[department]/page.tsx"), "utf8");
+  const calendar = fs.readFileSync(path.join(opsRoot, "calendar/page.tsx"), "utf8");
+  const board = fs.readFileSync(path.join(opsRoot, "calendar/CalendarBoard.tsx"), "utf8");
   const seat = fs.readFileSync(path.join(opsRoot, "seat/page.tsx"), "utf8");
-  assert.match(department, /Not operational/);
-  assert.match(department, /task register not connected/i);
-  assert.match(department, /data-source-state="not-connected"/);
+  assert.match(department, /task register/i);
+  assert.match(department, /Not connected/);
+  assert.match(department, /listMeetings/);
+  assert.match(department, /filterLegacyVisibleMeetings/);
+  assert.match(department, /No matching department meetings/);
+  assert.match(department, /not inferred from login identity/);
+  assert.match(calendar, /requireStaffSession/);
+  assert.match(calendar, /listMeetings/);
+  assert.match(board, /No meeting is recorded for this date/);
+  assert.match(board, /does not create attendance, invitations, minutes or action assignments/);
+  assert.match(calendar, /pageSize: 50/);
+  assert.match(board, /first loaded page \(up to 50 records\)/);
+  assert.match(board, /This month · loaded page/);
+  assert.match(board, /meetings with a valid scheduled date in this loaded page/);
   for (const name of [
     "Education & Capacity Building",
     "Health & Well-being",
