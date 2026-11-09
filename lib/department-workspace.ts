@@ -1,6 +1,7 @@
 import { dbId, notion, assertInternalDb, listMeetings, type MeetingRecord } from "@/lib/notion";
 import { filterLegacyVisibleMeetings } from "@/lib/legacy-session-boundary";
 import { getDepartmentEvidence } from "@/lib/public-evidence";
+import { isValidCalendarDate } from "@/lib/date-validation";
 
 export const DEPARTMENT_LABELS = {
   education: "Education & Capacity Building",
@@ -72,7 +73,7 @@ export async function getDepartmentWorkspace(slug:DepartmentSlug) {
   const dueSoon=work.filter(x=>x.dueDate && x.dueDate>=today && x.dueDate<=sevenDays && !["Completed","Cancelled"].includes(x.status));
   return {department,work,reports,meetings,learning,evidence,summary:{totalWork:work.length,activeWork:active.length,overdueWork:overdue.length,dueSoonWork:dueSoon.length,draftReports:reports.filter(x=>x.status==="Draft").length,submittedReports:reports.filter(x=>["Submitted","Under Review"].includes(x.status)).length},source:"notion",scope:"first 50 records per register"};
 }
-function dateOk(s:string) { return /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(s+"T00:00:00.000Z")) && new Date(s+"T00:00:00.000Z").toISOString().slice(0,10)===s; }
+const dateOk = isValidCalendarDate;
 export async function createDepartmentWork(slug:DepartmentSlug,input:{title:string;type:string;priority:string;owner:string;outcome:string;startDate:string;dueDate:string;acceptance:string;risk:string}) {
   const {client,id}=getClientAndDb(PROGRAMMES_ENV);
   const types=["Programme","Project","Training","Research","Operations","Community Engagement"];
