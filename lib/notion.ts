@@ -11,7 +11,7 @@ function canonicalNotionId(id: string): string {
 }
 
 const NOTION_DATABASE_ID_PATTERN = /^[a-f0-9]{32}$/;
-type InternalDatabaseEnv = "NOTION_MEETINGS_DATABASE_ID";
+type InternalDatabaseEnv = "NOTION_MEETINGS_DATABASE_ID" | "NOTION_DEPARTMENT_APPLICATIONS_DATABASE_ID";
 
 export function dbId(envName: string): string {
   const candidate = canonicalNotionId(process.env[envName] || "");
@@ -201,13 +201,66 @@ export async function setMeetingStatus(
   });
 }
 
+export type DepartmentApplicationsConnection = {
+  configured: boolean;
+  accessible: boolean;
+  schemaReady: boolean;
+  missingProperties: string[];
+};
+
+/**
+ * Verify the dedicated Notion integration can retrieve the department
+ * applications database and that its expected intake schema is present.
+ * This intentionally does not query or expose applicant rows.
+ */
+export async function verifyDepartmentApplicationsConnection(): Promise<DepartmentApplicationsConnection> {
+  const client = notion();
+  const database_id = dbId("NOTION_DEPARTMENT_APPLICATIONS_DATABASE_ID");
+  if (!client || !database_id) {
+    return {
+      configured: false,
+      accessible: false,
+      schemaReady: false,
+      missingProperties: [],
+    };
+  }
+  assertInternalDb(database_id, "NOTION_DEPARTMENT_APPLICATIONS_DATABASE_ID");
+
+  const database: any = await client.databases.retrieve({ database_id });
+  const properties = database?.properties;
+  if (!properties || typeof properties !== "object" || Array.isArray(properties)) {
+    throw new Error("Department applications database returned an invalid schema.");
+  }
+
+  const required: Record<string, string> = {
+    Application: "title",
+    Department: "select",
+    "Applicant Name": "rich_text",
+    Email: "email",
+    Phone: "phone_number",
+    "Application Status": "select",
+    "Submitted At": "date",
+    "Consent Confirmed": "checkbox",
+  };
+  const missingProperties = Object.entries(required)
+    .filter(([name, type]) => properties[name]?.type !== type)
+    .map(([name]) => name);
+
+  return {
+    configured: true,
+    accessible: true,
+    schemaReady: missingProperties.length === 0,
+    missingProperties,
+  };
+}
+
 export function configFlags() {
   return {
     token: Boolean(process.env.NOTION_TOKEN?.trim()),
     meetings: Boolean(dbId("NOTION_MEETINGS_DATABASE_ID")),
     media: Boolean(dbId("NOTION_MEDIA_DATABASE_ID")),
     chamber: Boolean(dbId("NOTION_CHAMBER_DATABASE_ID")),
-    actions: Boolean(dbId("NOTION_ACTIONS_DATABASE_ID")),
+    actions: Boolean(dbId("NOTION_ACTIONS_DATABASE_ID")),\n    departmentApplications: Boolean(dbId("NOTION_DEPARTMENT_APPLICATIONS_DATABASE_ID")),
     staffKey: Boolean(process.env.ISEYC_STAFF_KEY?.trim()),
   };
 }
