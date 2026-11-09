@@ -102,8 +102,12 @@ export async function createMeetingInvitation(input: { title: string; meetingId:
     input.contactId ? client.pages.retrieve({ page_id: input.contactId }) as Promise<any> : Promise.resolve(null),
   ]);
   if (meeting.parent?.database_id?.replace(/-/g, "") !== dbId("NOTION_MEETINGS_DATABASE_ID")) throw new Error("The selected meeting is not in the approved DOC Meetings register.");
+  const meetingProps = meeting.properties || {};
+  if (read(meetingProps.Status) !== "Approved" || read(meetingProps.Sensitivity) !== "Standard") throw new Error("External invitations require an Approved, Standard-sensitivity meeting.");
   if (organisation.parent?.database_id?.replace(/-/g, "") !== dbId(ENV.organisations)) throw new Error("The selected organisation is not in the approved Partner Organisations register.");
+  if (read(organisation.properties?.["Verification status"]) !== "Verified") throw new Error("The organisation must be verified before an invitation can be prepared.");
   if (input.contactId && contact?.parent?.database_id?.replace(/-/g, "") !== dbId(ENV.contacts)) throw new Error("The selected contact is not in the approved External Contacts register.");
+  if (input.contactId && (contact.properties?.Verified?.checkbox !== true || read(contact.properties?.["Contact status"]) !== "Active")) throw new Error("The named contact must be verified and active before invitation.");
   const properties: Record<string, unknown> = {
     Invitation: { title: [{ text: { content: input.title } }] },
     Meeting: { relation: [{ id: input.meetingId }] },
