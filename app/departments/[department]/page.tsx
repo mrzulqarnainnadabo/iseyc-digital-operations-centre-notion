@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PublicShell } from "@/components/PublicShell";
-import { departments, getDepartment } from "@/lib/departments";
+import { DepartmentArtwork } from "@/components/DepartmentArtwork";
+import { departments, getDepartment, getDepartmentRouteSlug } from "@/lib/departments";
 import { getDepartmentMandateRecords } from "@/lib/mandate-records";
 import { evidenceClassifications, getDepartmentEvidence, observatoryConnection } from "@/lib/public-evidence";
 
@@ -11,7 +12,7 @@ type Props = { params: Promise<{ department: string }> };
 export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
-  return departments.map(({ slug }) => ({ department: slug }));
+  return departments.map(({ slug }) => ({ department: getDepartmentRouteSlug(slug) }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -21,6 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? {
         title: `${department.name} | ISEYC`,
         description: department.summary,
+        alternates: { canonical: `/departments/${getDepartmentRouteSlug(department.slug)}` },
       }
     : {};
 }
@@ -36,11 +38,11 @@ export default async function DepartmentPage({ params }: Props) {
 
   return (
     <PublicShell>
-      <section className="department-hero py-10 sm:py-14">
+      <section className={`department-hero department-hero--${department.slug} py-10 sm:py-14`}>
         <Link href="/departments" className="back-link">
           ← All departments
         </Link>
-        <p className="eyebrow mt-8">Department {department.number} · ISEYC</p>
+        <div className="department-hero__layout"><div><p className="eyebrow mt-8">Department {department.number} · ISEYC</p>
         <h1 className="editorial-title mt-4 max-w-4xl">{department.name}</h1>
         <p className="mt-5 max-w-2xl text-base leading-7 text-ink-700">{department.introduction}</p>
         <div className="mt-6 flex flex-wrap gap-3">
@@ -58,7 +60,7 @@ export default async function DepartmentPage({ params }: Props) {
           >
             Explain with Civic Brain ↗
           </a>
-        </div>
+        </div></div><div className="department-hero__visual"><DepartmentArtwork slug={department.slug} /><p>PEOPLE · CAPACITY · COMMUNITY</p></div></div>
       </section>
 
       <section className="department-content-grid pb-12" aria-label={`${department.shortName} information`}>
@@ -70,14 +72,15 @@ export default async function DepartmentPage({ params }: Props) {
             </div>
             <span className="hidden font-mono text-xs text-ink-600 sm:block">{department.priorities.length} themes</span>
           </div>
-          <div className="priority-list">
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {department.priorities.map((priority, index) => (
-              <article key={priority.title} className="priority-row">
-                <span className="priority-index">0{index + 1}</span>
-                <div>
-                  <h3 className="font-semibold text-forest-950">{priority.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-ink-700">{priority.detail}</p>
-                </div>
+              <article key={priority.title} className="rounded-card border border-line bg-white p-4 shadow-card">
+                <span className="font-mono text-xs text-gold-700">0{index + 1}</span>
+                <h3 className="mt-3 font-semibold text-forest-950">{priority.title}</h3>
+                <details className="mt-2 text-sm text-ink-600">
+                  <summary className="min-h-9 cursor-pointer font-semibold text-forest-800">Explore this focus</summary>
+                  <p className="pb-2 leading-6">{priority.detail}</p>
+                </details>
               </article>
             ))}
           </div>
@@ -107,7 +110,7 @@ export default async function DepartmentPage({ params }: Props) {
             {mandate.status === "ready" ? (
               <>
                 <ul className="mt-4 divide-y divide-line border-y border-line">
-                  {mandate.records.map((record) => (
+                  {mandate.records.slice(0, 3).map((record) => (
                     <li key={record.id} className="py-4">
                       <p className="text-sm leading-6 text-forest-950">{record.text}</p>
                       <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-ink-600">
@@ -178,7 +181,9 @@ export default async function DepartmentPage({ params }: Props) {
                 <p className="mt-3 text-xs leading-5 text-ink-600">
                   Reference years shown in ascending order. Missing years are not zero. The endpoint does not provide a publication date for these observations.
                 </p>
-                <dl className="mt-4 space-y-3 border-t border-line pt-4 text-xs leading-5">
+                <details className="mt-4 border-t border-line pt-3">
+                  <summary className="min-h-9 cursor-pointer text-xs font-semibold text-forest-800">Source, method & limitations</summary>
+                  <dl className="mt-3 space-y-3 text-xs leading-5">
                   <div>
                     <dt className="font-semibold text-forest-950">Publisher</dt>
                     <dd className="text-ink-700">{evidence.indicator.sourcePublisher}</dd>
@@ -212,7 +217,8 @@ export default async function DepartmentPage({ params }: Props) {
                       </ul>
                     </dd>
                   </div>
-                </dl>
+                  </dl>
+                </details>
                 <a
                   className="mt-4 inline-flex min-h-[44px] items-center font-semibold text-forest-800 underline"
                   href={evidence.indicator.sourceUrl}
@@ -251,9 +257,8 @@ export default async function DepartmentPage({ params }: Props) {
             )}
           </section>
 
-          <section className="evidence-panel" aria-labelledby="questions-title">
-            <p className="eyebrow">Reading checklist</p>
-            <h2 id="questions-title" className="mt-2 font-serif text-xl text-forest-950">Before drawing a conclusion</h2>
+          <details className="evidence-panel">
+            <summary className="cursor-pointer text-sm font-semibold text-forest-900">Research checks before drawing a conclusion</summary>
             <ul className="mt-4 space-y-3">
               {department.evidenceQuestions.map((question) => (
                 <li key={question} className="flex gap-3 text-sm leading-6 text-ink-700">
@@ -262,35 +267,33 @@ export default async function DepartmentPage({ params }: Props) {
                 </li>
               ))}
             </ul>
-          </section>
+          </details>
         </aside>
       </section>
 
       <section className="classification-section mb-12" aria-labelledby="classification-title">
         <div className="max-w-2xl">
-          <p className="eyebrow">Shared civic intelligence framework</p>
-          <h2 id="classification-title" className="mt-2 font-serif text-2xl text-forest-950">Four evidence labels. Four different meanings.</h2>
-          <p className="mt-3 text-sm leading-6 text-ink-700">
-            These are the classifications IDCC will use when records are connected. They are not claims that evidence of each type is currently available.
-          </p>
+          <p className="eyebrow">Evidence standard</p>
+          <h2 id="classification-title" className="mt-2 font-serif text-2xl text-forest-950">Evidence is labelled by what it can prove.</h2>
+          <p className="mt-2 text-sm leading-6 text-ink-700">A community report, an official announcement and a verified outcome are not interchangeable.</p>
         </div>
-        <div className="classification-list mt-6">
-          {evidenceClassifications.map((classification, index) => (
-            <article key={classification.id} className="classification-row">
-              <span className="font-mono text-xs text-gold-700">0{index + 1}</span>
-              <div>
-                <h3 className="font-semibold text-forest-950">{classification.label}</h3>
-                <p className="mt-1 text-sm leading-6 text-ink-700">{classification.note}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-        <p className="mt-5 border-t border-line pt-4 text-xs leading-5 text-ink-600">
+        <details className="mt-4 border-t border-line pt-3">
+          <summary className="min-h-9 cursor-pointer text-sm font-semibold text-forest-800">View the four evidence classifications</summary>
+          <div className="classification-list mt-4">
+            {evidenceClassifications.map((classification, index) => (
+              <article key={classification.id} className="classification-row">
+                <span className="font-mono text-xs text-gold-700">0{index + 1}</span>
+                <div>
+                  <h3 className="font-semibold text-forest-950">{classification.label}</h3>
+                  <p className="mt-1 text-sm leading-6 text-ink-700">{classification.note}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </details>
+        <p className="mt-4 border-t border-line pt-3 text-xs leading-5 text-ink-600">
           Community reports do not establish prevalence. Announcements do not prove implementation. Published statistics do not automatically describe current conditions. See the{" "}
-          <Link className="font-semibold text-forest-800 underline" href="/method">
-            evidence method
-          </Link>
-          .
+          <Link className="font-semibold text-forest-800 underline" href="/method">evidence method</Link>.
         </p>
       </section>
     </PublicShell>

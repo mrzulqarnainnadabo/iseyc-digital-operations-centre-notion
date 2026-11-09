@@ -13,7 +13,7 @@ export const observatoryConnection = {
   status: "limited" as const,
   label: "Limited public Observatory data connected",
   endpoint: "GET /api/evidence/observations?indicatorId={allowlisted-indicator}",
-  detail: "The live Observatory v1 endpoint is verified for two relevant World Bank pilot series: national primary-school gross enrollment and national under-five mortality estimates. The current catalog has no department-matched software/technology or civic-service indicators. This is a limited pilot, not a broad departmental feed or state/LGA coverage.",
+  detail: "The live World Bank indicator endpoint is a two-series national pilot. A separate curated snapshot endpoint now supplies dated publisher records to all four department workspaces. These are distinct evidence types, not a broad live feed or state/LGA coverage.",
 };
 
 const OBSERVATORY_BASE_URL = "https://iseyc-civic-intelligence-observatory.vercel.app";
@@ -202,5 +202,152 @@ export async function getDepartmentEvidence(departmentSlug: Department["slug"]):
     return result;
   } finally {
     pendingRefreshes.delete(indicatorId);
+  }
+}
+
+
+export type DepartmentSnapshotMetric = {
+  label: string;
+  value: string;
+  unit: string;
+  period: string;
+  measurementType?: string | null;
+};
+export type DepartmentSnapshotRecord = {
+  id: string;
+  title: string;
+  publisher: string;
+  sourceId: string;
+  sourceUrl: string;
+  referencePeriod: string;
+  retrievedAt: string;
+  geography: { level: string; label: string };
+  evidenceType: string;
+  metrics: DepartmentSnapshotMetric[];
+  limitations: string[];
+  interpretation: string;
+};
+export type DepartmentSnapshotFeed = {
+  status: "ready" | "empty" | "unavailable" | "invalid" | "not-integrated";
+  records: DepartmentSnapshotRecord[];
+  retrievedAt?: string;
+  note?: string;
+};
+
+const SNAPSHOT_API = "https://iseyc-civic-intelligence-observatory.vercel.app/api/evidence/snapshots";
+const SNAPSHOT_DEPARTMENTS: Partial<Record<Department["slug"], string>> = {
+  education: "education",
+  health: "health",
+  technology: "software-technology",
+  civic: "civic",
+};
+const SNAPSHOT_SOURCE_HOSTS: Record<string, string> = {
+  "who-gho-nigeria": "www.who.int",
+  "nimc-enrolment-oct-2025": "nimc.gov.ng",
+  "nitda-dl4all-dashboard": "dashboard.digitalliteracy.nitda.gov.ng",
+  "naseni-innovation-hub": "innovation.naseni.gov.ng",
+  "nbs-gdp-quarterly": "microdata.nigerianstat.gov.ng",
+  "isn-hub-assessment-2026": "isnhubs.org.ng",
+  "fme-annual-school-census": "emis.education.gov.ng",
+  "worldbank-ndu-2026-10": "www.worldbank.org",
+};
+const SNAPSHOT_CACHE_MS = 15 * 60 * 1000;
+const SNAPSHOT_FAILURE_CACHE_MS = 60 * 1000;
+type SnapshotCacheEntry = { expiresAt: number; result: DepartmentSnapshotFeed };
+declare global {
+  var __idccDepartmentSnapshotCache: Map<string, SnapshotCacheEntry> | undefined;
+  var __idccDepartmentSnapshotPending: Map<string, Promise<DepartmentSnapshotFeed>> | undefined;
+}
+const departmentSnapshotCache = globalThis.__idccDepartmentSnapshotCache ?? (globalThis.__idccDepartmentSnapshotCache = new Map());
+const departmentSnapshotPending = globalThis.__idccDepartmentSnapshotPending ?? (globalThis.__idccDepartmentSnapshotPending = new Map());
+
+function validSnapshotRecord(value: unknown, departmentId: string): value is DepartmentSnapshotRecord {
+  if (!isRecord(value) || typeof value.id !== "string" || typeof value.title !== "string" ||
+      typeof value.publisher !== "string" || typeof value.sourceId !== "string" ||
+      typeof value.sourceUrl !== "string" || typeof value.referencePeriod !== "string" ||
+      typeof value.retrievedAt !== "string" || !isDate(value.retrievedAt) ||
+      !isRecord(value.geography) || typeof value.geography.level !== "string" ||
+      typeof value.geography.label !== "string" || typeof value.evidenceType !== "string" ||
+      !Array.isArray(value.metrics) || value.metrics.length < 1 || value.metrics.length > 20 ||
+      !Array.isArray(value.limitations) || value.limitations.length < 1 ||
+      typeof value.interpretation !== "string") return false;
+  const expectedHost = SNAPSHOT_SOURCE_HOSTS[value.sourceId];
+  if (!expectedHost) return false;
+  try {
+    const source = new URL(value.sourceUrl);
+    if (source.protocol !== "https:" || source.hostname !== expectedHost) return false;
+  } catch { return false; }
+  const assigned = typeof value.departmentId === "string"
+    ? [value.departmentId]
+    : Array.isArray(value.departmentIds) ? value.departmentIds : [];
+  if (!assigned.includes(departmentId)) return false;
+  return value.metrics.every((metric) => isRecord(metric) &&
+    typeof metric.label === "string" && typeof metric.value === "string" &&
+    typeof metric.unit === "string" && typeof metric.period === "string" &&
+    (metric.measurementType === undefined || typeof metric.measurementType === "string")) &&
+    value.limitations.every((item) => typeof item === "string" && item.length <= 2000);
+}
+
+async function refreshDepartmentSnapshots(departmentId: string, fetchImpl: typeof fetch): Promise<DepartmentSnapshotFeed> {
+  try {
+    const endpoint = new URL(SNAPSHOT_API);
+    endpoint.searchParams.set("departmentId", departmentId);
+    const response = await fetchImpl(endpoint, {
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!response.ok) return { status: "unavailable", records: [] };
+    const payload: unknown = await response.json();
+    if (!isRecord(payload) || payload.contractVersion !== "1.0.0" ||
+        payload.source !== "iseyc-observatory-national-snapshots-v1" ||
+        (payload.status !== "ok" && payload.status !== "empty") ||
+        !Array.isArray(payload.records) || payload.records.length > 12) {
+      return { status: "invalid", records: [] };
+    }
+    const records: DepartmentSnapshotRecord[] = [];
+    const ids = new Set<string>();
+    for (const item of payload.records) {
+      if (!validSnapshotRecord(item, departmentId) || ids.has(item.id)) return { status: "invalid", records: [] };
+      ids.add(item.id);
+      records.push(item);
+    }
+    if (payload.status === "ok" && records.length === 0) return { status: "invalid", records: [] };
+    if (payload.status === "empty" && records.length > 0) return { status: "invalid", records: [] };
+    return {
+      status: records.length ? "ready" : "empty",
+      records,
+      retrievedAt: typeof payload.retrievedAt === "string" && isDate(payload.retrievedAt) ? payload.retrievedAt : undefined,
+      note: typeof payload.note === "string" ? payload.note : undefined,
+    };
+  } catch {
+    return { status: "unavailable", records: [] };
+  }
+}
+
+/** Dated publisher snapshots for the selected department; invalid or missing feeds never become zeroes or demo data. */
+export async function getDepartmentSnapshots(
+  departmentSlug: Department["slug"],
+  fetchImpl: typeof fetch = fetch,
+): Promise<DepartmentSnapshotFeed> {
+  const departmentId = SNAPSHOT_DEPARTMENTS[departmentSlug];
+  if (!departmentId) return { status: "not-integrated", records: [] };
+  const now = Date.now();
+  const cached = departmentSnapshotCache.get(departmentId);
+  if (cached && now < cached.expiresAt) return cached.result;
+  const inflight = departmentSnapshotPending.get(departmentId);
+  if (inflight) return inflight;
+  const work = refreshDepartmentSnapshots(departmentId, fetchImpl);
+  departmentSnapshotPending.set(departmentId, work);
+  try {
+    const result = await work;
+    const failure = result.status === "unavailable" || result.status === "invalid";
+    departmentSnapshotCache.set(departmentId, {
+      expiresAt: Date.now() + (failure ? SNAPSHOT_FAILURE_CACHE_MS : SNAPSHOT_CACHE_MS),
+      result,
+    });
+    return result;
+  } finally {
+    departmentSnapshotPending.delete(departmentId);
   }
 }

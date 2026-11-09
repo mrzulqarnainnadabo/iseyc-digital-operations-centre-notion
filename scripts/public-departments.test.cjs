@@ -5,20 +5,20 @@ const path = require("node:path");
 const root = path.join(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 
-test("public intelligence homepage leads with reports, evidence, coverage honesty and departments", () => {
+test("public homepage establishes ISEYC and departments before supporting intelligence", () => {
   const home = read("app/page.tsx");
   const shell = read("components/PublicShell.tsx");
   const registry = read("lib/departments.ts");
   assert.match(home, /PublicShell/);
   assert.match(home, /getDepartmentMandateRecords/);
   assert.match(home, /getDepartmentEvidence/);
-  assert.match(home, /What is happening across Nigeria\?/);
+  assert.match(home, /Building capable people\. Stronger communities\./);
   assert.match(home, /What communities report\. What evidence supports\. What is still unknown\./);
-  assert.match(home, /Published only/);
-  assert.match(home, /Not yet computed/);
-  assert.match(home, /provisional keyword match · not institutional taxonomy/);
+  assert.match(home, /published records only/);
+  assert.match(home, /No national coverage score is claimed/);
+  assert.match(home, /Provisional keyword match · not institutional taxonomy/);
   assert.match(home, /not a measure of national need/);
-  assert.match(home, /Not mapped yet in this public view/);
+  assert.match(home, /Institutional responsibility mapping remains incomplete/);
   assert.doesNotMatch(home, /requireStaffSession|listMeetings|@\/lib\/notion/);
   for (const label of ["Education & Capacity Building", "Health & Well-being", "Software & Technology", "Civic Department"]) {
     assert.ok(home.includes("departments.map"));
@@ -29,9 +29,10 @@ test("public intelligence homepage leads with reports, evidence, coverage honest
   }
   assert.doesNotMatch(shell, /Public Information & Civic Intelligence/);
   assert.doesNotMatch(shell, /public-mobile-menu/);
-  const reportsPosition = home.indexOf('aria-label="Reports and evidence"');
+  const institutionPosition = home.indexOf('aria-labelledby="home-title"');
   const departmentsPosition = home.indexOf('aria-labelledby="departments-heading"');
-  assert.ok(reportsPosition >= 0 && departmentsPosition > reportsPosition, "reports and evidence must precede department entry");
+  const intelligencePosition = home.indexOf('aria-labelledby="intelligence-title"');
+  assert.ok(institutionPosition >= 0 && departmentsPosition > institutionPosition && intelligencePosition > departmentsPosition, "institution and departments must precede supporting intelligence");
 });
 
 test("department detail routes are public and never query private operations records", () => {
@@ -105,4 +106,50 @@ test("department routes are present in the served route manifest", () => {
   const routes = JSON.parse(read("public/manus-routes.json"));
   assert.ok(routes.routes.some((route) => route.path === "/departments"));
   assert.ok(routes.routes.some((route) => route.path === "/departments/:department"));
+});
+
+
+test("Software & Technology has one canonical public route across homepage, directory and department workspace", () => {
+  const registry = read("lib/departments.ts");
+  const detail = read("app/departments/[department]/page.tsx");
+  const home = read("app/page.tsx");
+  const directory = read("app/departments/page.tsx");
+  const workspace = read("components/DepartmentWorkspace.tsx");
+  assert.match(registry, /slug === "software-technology" \? "technology" : slug/);
+  assert.match(registry, /slug === "technology" \? "software-technology" : slug/);
+  assert.match(detail, /getDepartmentRouteSlug/);
+  assert.match(home, /getDepartmentRouteSlug\(department\.slug\)/);
+  assert.match(directory, /getDepartmentRouteSlug\(department\.slug\)/);
+  assert.match(workspace, /publicSlug:"software-technology"/);
+});
+
+test("Health uses its calm teal identity consistently across public and internal department surfaces", () => {
+  const css = read("app/globals.css");
+  const readiness = read("app/ops/readiness/page.tsx");
+  assert.match(css, /dept-card--health \{ border-left-color: #287a70; \}/);
+  assert.match(css, /department-tile--health\{[^}]*#e5f1ee[^}]*#287a70/);
+  assert.match(css, /department-hero--health\{[^}]*#e5f1ee[^}]*#287a70/);
+  assert.match(readiness, /tone:"border-l-\[#287a70\] bg-\[#e5f1ee\]"/);
+});
+
+
+test("ISEYC institutional branding uses the supplied official seal and one approved identity system", () => {
+  const wordmark = read("public/iseyc-wordmark.svg");
+  const seal = read("public/iseyc-seal.svg");
+  const shell = read("components/PublicShell.tsx");
+  const layout = read("app/layout.tsx");
+  const css = read("app/globals.css");
+  const standard = read("docs/ISEYC-BRAND-SYSTEM.md");
+  const architecture = read("public/iseyc-system-architecture.svg");
+  assert.match(wordmark, /href="data:image\/png;base64,/);
+  assert.match(wordmark, /Empowering Youth, Shaping Communities/);
+  assert.match(seal, /official seal/);
+  assert.match(shell, /src="\/iseyc-wordmark\.svg"/);
+  assert.match(shell, /UNDERSTANDING PUBLIC NEEDS/);
+  assert.match(layout, /icons: \{ icon: "\/iseyc-seal\.svg"/);
+  assert.match(css, /--iseyc-forest-950: #071f18/);
+  assert.match(css, /--iseyc-forest-900: #0b2d22/);
+  assert.match(css, /--iseyc-gold-700: #80621f/);
+  assert.match(standard, /The supplied official ISEYC seal remains the source of truth/);
+  for (const label of ["Civic Mandate", "Civic Intelligence", "Civic Brain", "Education", "Health", "Software", "Civic Department", "Digital Operations Centre", "No fabricated data"]) assert.ok(architecture.includes(label));
 });

@@ -36,12 +36,13 @@ test("department pages load mandate records without private Notion", () => {
   assert.doesNotMatch(page, /@\/lib\/notion|requireStaffSession|listMeetings/);
 });
 
-test("public intelligence pulse leads with reports before department exploration", () => {
+test("public homepage leads with the institution and departments before supporting intelligence", () => {
   const page = read("app/page.tsx");
-  const reportsAt = page.indexOf('aria-label="Reports and evidence"');
+  const institutionAt = page.indexOf('aria-labelledby="home-title"');
   const departmentsAt = page.indexOf('aria-labelledby="departments-heading"');
-  assert.ok(reportsAt >= 0 && departmentsAt > reportsAt);
+  const intelligenceAt = page.indexOf('aria-labelledby="intelligence-title"');
+  assert.ok(institutionAt >= 0 && departmentsAt > institutionAt && intelligenceAt > departmentsAt);
   assert.match(page, /getDepartmentMandateRecords/);
   assert.match(page, /getDepartmentEvidence/);
-  assert.match(page, /Not yet computed/);
+  assert.match(page, /No national coverage score is claimed/);
 });

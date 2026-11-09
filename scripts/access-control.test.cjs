@@ -643,10 +643,10 @@ test("every operational page inherits the authenticated operations layout", () =
 test("readiness register distinguishes placeholders from implemented workflows", () => {
   const readiness = fs.readFileSync(require("node:path").join(__dirname, "../app/ops/readiness/page.tsx"), "utf8");
   const dashboard = fs.readFileSync(require("node:path").join(__dirname, "../app/ops/page.tsx"), "utf8");
-  assert.ok(readiness.includes("Placeholder"));
-  assert.ok(readiness.includes("Not connected"));
-  assert.ok(readiness.includes("not verified individual identity"));
-  assert.ok(readiness.includes("Do not enter real membership"));
+  assert.ok(readiness.includes("Shared systems"));
+  assert.ok(readiness.includes("not fully configured"));
+  assert.ok(readiness.includes("transitional shared-key access"));
+  assert.ok(readiness.includes("Do not enter restricted personal"));
   assert.ok(dashboard.includes("Environment configuration"));
   assert.ok(dashboard.includes("Not connected"));
   assert.ok(dashboard.includes("Configured"));

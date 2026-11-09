@@ -9,11 +9,11 @@ const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 test("public root is a public intelligence pulse and does not load restricted operations", () => {
   const page = read("app/page.tsx");
   assert.match(page, /PublicShell/);
-  assert.ok(page.includes("What is happening across Nigeria?"));
+  assert.ok(page.includes("Building capable people. Stronger communities."));
   assert.match(page, /getDepartmentMandateRecords/);
   assert.match(page, /getDepartmentEvidence/);
-  assert.match(page, /provisional keyword match/);
-  assert.match(page, /Not yet computed/);
+  assert.match(page, /Provisional keyword match · not institutional taxonomy/);
+  assert.match(page, /No national coverage score is claimed/);
   assert.equal(page.includes("requireStaffSession"), false);
   assert.equal(page.includes("listMeetings"), false);
   assert.equal(page.includes("@/lib/notion"), false);
@@ -24,7 +24,7 @@ test("public root is a public intelligence pulse and does not load restricted op
 
 test("public shell uses the official seal and functional public navigation", () => {
   const shell = read("components/PublicShell.tsx");
-  assert.ok(shell.includes('src="/iseyc-seal.svg"'));
+  assert.ok(shell.includes('src="/iseyc-wordmark.svg"'));
   for (const label of ["Home", "Departments", "Explore", "Report", "Method"]) {
     assert.match(shell, new RegExp(`label: "${label}"`));
   }
@@ -34,7 +34,7 @@ test("public shell uses the official seal and functional public navigation", () 
     "https://iseyc-civic-intelligence-observatory.vercel.app",
   ]) assert.ok(shell.includes(url));
   assert.match(shell, /label: "Observatory"/);
-  assert.match(shell, /Youth-led public intelligence institution for Nigeria/);
+  assert.match(shell, /ISEYC · Non-partisan civic intelligence institution/);
   assert.doesNotMatch(shell, /Public Information & Civic Intelligence|public-mobile-menu/);
   assert.match(shell, /Skip to content/);
 });

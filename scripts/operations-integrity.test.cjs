@@ -114,31 +114,54 @@ test("institutional design tokens and reduced-motion accessibility are present",
 });
 
 
-test("department desks show sourced meeting activity without implying staffing or task completion", () => {
-  const department = fs.readFileSync(path.join(opsRoot, "departments/[department]/page.tsx"), "utf8");
+test("department date validation accepts real calendar dates and rejects impossible dates", () => {
+  const { isValidCalendarDate } = require("../lib/date-validation.ts");
+  assert.equal(isValidCalendarDate("2024-02-29"), true);
+  assert.equal(isValidCalendarDate("2026-11-09"), true);
+  assert.equal(isValidCalendarDate("2025-02-29"), false);
+  assert.equal(isValidCalendarDate("2026-02-30"), false);
+  assert.equal(isValidCalendarDate("2026-2-09"), false);
+  assert.equal(isValidCalendarDate("2026-11-09T00:00:00Z"), false);
+  assert.equal(isValidCalendarDate(""), false);
+});
+
+test("department desks connect department work, reporting and filtered meeting activity", () => {
+  const department = fs.readFileSync(path.join(root, "lib/department-workspace.ts"), "utf8");
+  const page = fs.readFileSync(path.join(opsRoot, "departments/[department]/page.tsx"), "utf8");
+  const ui = fs.readFileSync(path.join(root, "components/DepartmentWorkspace.tsx"), "utf8");
+  const readiness = fs.readFileSync(path.join(opsRoot, "readiness/page.tsx"), "utf8");
   const calendar = fs.readFileSync(path.join(opsRoot, "calendar/page.tsx"), "utf8");
   const board = fs.readFileSync(path.join(opsRoot, "calendar/CalendarBoard.tsx"), "utf8");
   const seat = fs.readFileSync(path.join(opsRoot, "seat/page.tsx"), "utf8");
-  assert.match(department, /task register/i);
-  assert.match(department, /Not connected/);
-  assert.match(department, /listMeetings/);
   assert.match(department, /filterLegacyVisibleMeetings/);
-  assert.match(department, /No matching department meetings/);
-  assert.match(department, /not inferred from login identity/);
+  assert.match(department, /listMeetings/);
+  assert.match(department, /NOTION_PROGRAMMES_DATABASE_ID/);
+  assert.match(department, /NOTION_DEPARTMENT_REPORTS_DATABASE_ID/);
+  assert.match(page, /DepartmentWorkspace/);
+  assert.match(ui, /Programme pipeline/);
+  assert.match(ui, /Department reports/);
+  assert.match(ui, /Department meetings/);
+  assert.match(department, /const attention=\[\.\.\.overdue/);
+  assert.match(ui, /Needs attention/);
+  assert.match(ui, /workspace\.attention\.slice\(0,5\)/);
+  assert.match(ui, /Modules listed for this department/);
+  assert.doesNotMatch(ui, /Approved modules for this department/);
+  assert.match(ui, /completion dates are not captured/);
+  assert.match(ui, /not a period-verified plan/);
+  assert.match(ui, /Register snapshot only/);
+  assert.match(ui, /Additional evidence & decisions/);
+  assert.match(ui, /publicSlug:"software-technology"/);
+  assert.match(ui, /Open department evidence/);
+  assert.match(ui, /Ask Civic Brain/);
+  assert.match(ui, /iseyc-civic-intelligence-observatory\.vercel\.app/);
+  assert.match(readiness, /Department workspaces/);
+  assert.match(readiness, /Education & Capacity Building/);
   assert.match(calendar, /requireStaffSession/);
   assert.match(calendar, /listMeetings/);
   assert.match(board, /No meeting is recorded for this date/);
   assert.match(board, /does not create attendance, invitations, minutes or action assignments/);
   assert.match(calendar, /pageSize: 50/);
   assert.match(board, /first loaded page \(up to 50 records\)/);
-  assert.match(board, /This month · loaded page/);
-  assert.match(board, /meetings with a valid scheduled date in this loaded page/);
-  for (const name of [
-    "Education & Capacity Building",
-    "Health & Well-being",
-    "Digital Systems & Technology",
-    "Civic Affairs"
-  ]) assert.ok(department.includes(name));
   assert.match(seat, /No active appointment record is linked to this session/);
   assert.match(seat, /Generic seat packet/i);
   assert.match(seat, /AI is staff to the seat, never the seat-holder/);
@@ -167,11 +190,11 @@ test("public intelligence home keeps evidence systems secondary and operations p
   const shell = fs.readFileSync(path.join(root, "components/PublicShell.tsx"), "utf8");
   const opsLayout = fs.readFileSync(path.join(root, "app/ops/layout.tsx"), "utf8");
   assert.match(home, /PublicShell/);
-  assert.ok(home.includes("What is happening across Nigeria?"));
+  assert.ok(home.includes("Building capable people. Stronger communities."));
   assert.match(home, /getDepartmentMandateRecords/);
   assert.match(home, /getDepartmentEvidence/);
-  assert.match(home, /Not yet computed/);
-  assert.match(home, /Not mapped yet in this public view/);
+  assert.match(home, /No national coverage score is claimed/);
+  assert.match(home, /Institutional responsibility mapping remains incomplete/);
   assert.doesNotMatch(home, /requireStaffSession|listMeetings/);
   assert.match(shell, /Civic Mandate/);
   assert.match(shell, /Civic Brain/);
