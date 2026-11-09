@@ -57,7 +57,7 @@ export default function ExternalEngagementPage() {
       setLoaded(true);
       setContactOrg(current => current || result.organisations?.[0]?.id || "");
       setInviteOrg(current => current && result.organisations?.some((x: Option) => x.id === current && eligibleOrganisation(x)) ? current : result.organisations?.find(eligibleOrganisation)?.id || "");
-      setMeetingId(current => requestedMeetingId || current || result.meetings?.[0]?.id || "");
+      setMeetingId(current => { const candidate = requestedMeetingId || current; return result.meetings?.some((x: Option) => x.id === candidate) ? candidate : result.meetings?.[0]?.id || ""; });
     } catch (cause) {
       setLoaded(false);
       setData({ organisations: [], contacts: [], meetings: [], invitations: [] });
