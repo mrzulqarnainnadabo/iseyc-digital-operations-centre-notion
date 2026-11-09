@@ -107,7 +107,7 @@ export async function createMeetingInvitation(input: { title: string; meetingId:
   if (organisation.parent?.database_id?.replace(/-/g, "") !== dbId(ENV.organisations)) throw new Error("The selected organisation is not in the approved Partner Organisations register.");
   if (read(organisation.properties?.["Verification status"]) !== "Verified") throw new Error("The organisation must be verified before an invitation can be prepared.");
   if (input.contactId && contact?.parent?.database_id?.replace(/-/g, "") !== dbId(ENV.contacts)) throw new Error("The selected contact is not in the approved External Contacts register.");
-  if (input.contactId && (contact.properties?.Verified?.checkbox !== true || read(contact.properties?.["Contact status"]) !== "Active")) throw new Error("The named contact must be verified and active before invitation.");
+  if (input.contactId && (contact.properties?.Verified?.checkbox !== true || read(contact.properties?.["Contact status"]) !== "Active" || !["Official institutional channel", "Consent recorded"].includes(read(contact.properties?.["Consent / contact basis"])))) throw new Error("The named contact must be verified, active and have a recorded contact basis before invitation.");
   const properties: Record<string, unknown> = {
     Invitation: { title: [{ text: { content: input.title } }] },
     Meeting: { relation: [{ id: input.meetingId }] },
