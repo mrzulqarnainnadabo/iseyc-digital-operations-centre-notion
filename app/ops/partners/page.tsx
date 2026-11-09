@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type Option = { id: string; title: string; detail: string; status: string; url: string; organisationId?: string; verified?: boolean };
-type Invitation = { id: string; title: string; organisation: string; contact: string; meeting: string; status: string; participation: string; purpose: string; sentOn: string; url: string };
+type Invitation = { id: string; title: string; organisation: string; contact: string; meeting: string; status: string; participation: string; purpose: string; subject: string; draft: string; sentOn: string; url: string };
 type Data = { organisations: Option[]; contacts: Option[]; meetings: Option[]; invitations: Invitation[] };
 
 const organisationTypes = ["Government institution", "Civil society organisation", "University or research institution", "Private sector", "Development partner", "Professional association", "Community organisation", "Media organisation", "Other"];
@@ -35,6 +35,8 @@ export default function ExternalEngagementPage() {
   const [inviteContact, setInviteContact] = useState("");
   const [inviteType, setInviteType] = useState("Institutional representative");
   const [invitePurpose, setInvitePurpose] = useState("");
+  const [inviteSubject, setInviteSubject] = useState("");
+  const [inviteDraft, setInviteDraft] = useState("");
   const [agendaItems, setAgendaItems] = useState("");
   const [inviteOwner, setInviteOwner] = useState("");
   const [inviteChannel, setInviteChannel] = useState("Email");
@@ -82,7 +84,7 @@ export default function ExternalEngagementPage() {
   function createInvitation(e: FormEvent) {
     e.preventDefault();
     const title = data.organisations.find(x => x.id === inviteOrg)?.title || "External organisation";
-    void submit("invitation", { title: `${title} — ${inviteType}`, meetingId, organisationId: inviteOrg, contactId: inviteContact, participation: inviteType, purpose: invitePurpose, agendaItems, ownerRole: inviteOwner, channel: inviteChannel }, () => { setInvitePurpose(""); setAgendaItems(""); setInviteContact(""); }, "Invitation draft created and linked to the approved meeting. It has NOT been sent.");
+    void submit("invitation", { title: `${title} — ${inviteType}`, meetingId, organisationId: inviteOrg, contactId: inviteContact, participation: inviteType, purpose: invitePurpose, subject: inviteSubject, draft: inviteDraft, agendaItems, ownerRole: inviteOwner, channel: inviteChannel }, () => { setInvitePurpose(""); setInviteSubject(""); setInviteDraft(""); setAgendaItems(""); setInviteContact(""); }, "Invitation draft created and linked to the approved meeting. It has NOT been sent.");
   }
 
   return <div className="mx-auto max-w-6xl space-y-6">
@@ -149,15 +151,17 @@ export default function ExternalEngagementPage() {
         <label className={label}>Participation type<select value={inviteType} onChange={e=>setInviteType(e.target.value)} className={field}>{participationTypes.map(x=><option key={x}>{x}</option>)}</select></label>
       </div>
       <label className={label}>Invitation purpose<textarea required minLength={5} maxLength={1000} rows={3} value={invitePurpose} onChange={e=>setInvitePurpose(e.target.value)} placeholder="Why is this organisation being invited, and what contribution is expected?" className="mt-1 w-full rounded-control border border-line p-3 text-sm"/></label>
+      <label className={label}>Invitation subject<input required minLength={5} maxLength={180} value={inviteSubject} onChange={e=>setInviteSubject(e.target.value)} placeholder="Formal invitation to participate in…" className={field}/></label>
+      <label className={label}>Invitation message draft<textarea required minLength={20} maxLength={1800} rows={6} value={inviteDraft} onChange={e=>setInviteDraft(e.target.value)} placeholder="Prepare the organisation-specific invitation. Include meeting purpose, date, participation request, response deadline and contact details. Keep it as a draft for review." className="mt-1 w-full rounded-control border border-line p-3 text-sm leading-6"/></label>
       <label className={label}>Relevant agenda items<textarea maxLength={800} rows={2} value={agendaItems} onChange={e=>setAgendaItems(e.target.value)} placeholder="Specify only the agenda items relevant to this invitee." className="mt-1 w-full rounded-control border border-line p-3 text-sm"/></label>
       <div className="grid gap-3 sm:grid-cols-2"><label className={label}>Invitation owner role<input required value={inviteOwner} onChange={e=>setInviteOwner(e.target.value)} placeholder="e.g. Secretary, Partnerships Officer" className={field}/></label><label className={label}>Intended invitation channel<select value={inviteChannel} onChange={e=>setInviteChannel(e.target.value)} className={field}><option>Email</option><option>Official letter</option><option>Phone</option><option>Other</option></select></label></div>
       <div className="rounded-control border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950"><strong>Draft only.</strong> Creating this record does not send an email or letter, grant document access, confirm attendance or establish a partnership. Approval and dispatch remain separate human-controlled steps.</div>
-      <button disabled={busy || !meetingId || !inviteOrg || invitePurpose.trim().length<5 || !inviteOwner.trim()} className="min-h-12 w-full rounded-control bg-forest-900 px-5 text-sm font-semibold text-white disabled:opacity-50">{busy ? "Saving…" : "Create invitation draft"}</button>
+      <button disabled={busy || !meetingId || !inviteOrg || invitePurpose.trim().length<5 || inviteSubject.trim().length<5 || inviteDraft.trim().length<20 || !inviteOwner.trim()} className="min-h-12 w-full rounded-control bg-forest-900 px-5 text-sm font-semibold text-white disabled:opacity-50">{busy ? "Saving…" : "Create invitation draft"}</button>
     </form>
 
     <section className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-serif text-2xl text-forest-950">Invitation register</h2><p className="text-xs text-ink-600">First page of the connected Notion register.</p></div><button onClick={()=>void refresh()} disabled={loading || busy} className="min-h-10 rounded-control border border-line bg-white px-4 text-sm font-semibold">{loading ? "Refreshing…" : "Refresh"}</button></div>
-      {data.invitations.length ? data.invitations.map(x=><article key={x.id} className="rounded-card border border-line bg-white p-4"><div className="flex flex-wrap items-start justify-between gap-2"><h3 className="font-semibold text-forest-950">{x.title}</h3><span className="rounded-full border border-line bg-cream-50 px-2.5 py-1 text-xs">{x.status}</span></div><p className="mt-1 text-xs text-ink-600">{x.participation || "Role not recorded"} · {x.purpose}</p><p className="mt-2 text-xs text-ink-600">Meeting ref: {x.meeting || "—"} · Organisation ref: {x.organisation || "—"}</p>{x.url ? <a href={x.url} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-9 items-center text-sm font-semibold text-forest-800 underline">Open Notion invitation ↗</a> : null}</article>) : <p className="rounded-card border border-line bg-white p-4 text-sm text-ink-600">{loading ? "Loading invitations…" : "No invitation records are currently returned."}</p>}
+      {data.invitations.length ? data.invitations.map(x=><article key={x.id} className="rounded-card border border-line bg-white p-4"><div className="flex flex-wrap items-start justify-between gap-2"><h3 className="font-semibold text-forest-950">{x.title}</h3><span className="rounded-full border border-line bg-cream-50 px-2.5 py-1 text-xs">{x.status}</span></div><p className="mt-1 text-xs text-ink-600">{x.participation || "Role not recorded"} · {x.purpose}</p>{x.subject ? <p className="mt-2 text-sm font-semibold text-forest-950">{x.subject}</p> : null}{x.draft ? <p className="mt-1 whitespace-pre-wrap text-sm text-ink-700">{x.draft}</p> : null}<p className="mt-2 text-xs text-ink-600">Meeting ref: {x.meeting || "—"} · Organisation ref: {x.organisation || "—"}</p>{x.url ? <a href={x.url} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-9 items-center text-sm font-semibold text-forest-800 underline">Open Notion invitation ↗</a> : null}</article>) : <p className="rounded-card border border-line bg-white p-4 text-sm text-ink-600">{loading ? "Loading invitations…" : "No invitation records are currently returned."}</p>}
     </section>
   </div>;
 }
