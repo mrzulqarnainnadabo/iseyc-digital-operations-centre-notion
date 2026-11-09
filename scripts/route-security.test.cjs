@@ -17,7 +17,7 @@ function collectRoutes(directory, prefix = "") {
 const contracts = {
   "auth/login/route.ts": {
     methods: ["POST"],
-    required: ["isSameOriginRequest", "readBoundedJson", "readStaffKeyInput", "privateJson"],
+    required: ["isSameOriginRequest", "readBoundedJson", "readStaffKeyInput", "isLoginRateLimited", "recordLoginFailure", "clearLoginFailures", "privateJson"],
     forbidden: ["requireStaffSession"]
   },
   "auth/logout/route.ts": {
@@ -129,4 +129,28 @@ test("meeting pagination rejects malformed continuation cursors before calling N
   assert.ok(source.includes("cursor && !/^[0-9a-f]{8}-"));
   assert.ok(source.includes("Invalid page cursor"));
   assert.ok(source.includes("status: 400"));
+});
+
+
+test("staff login throttles repeated failures and clears the local bucket after success", () => {
+  const login = fs.readFileSync(path.join(apiRoot, "auth/login/route.ts"), "utf8");
+  const limiter = fs.readFileSync(path.join(__dirname, "../lib/login-rate-limit.ts"), "utf8");
+  assertInOrder(login, [
+    'req.headers.get("x-real-ip")',
+    "isLoginRateLimited(clientIp)",
+    "readBoundedJson(req",
+    "isValidStaffKey(key)",
+    "recordLoginFailure(clientIp)",
+    "clearLoginFailures(clientIp)",
+    "signSession(key)"
+  ], "staff login throttling");
+  assert.match(login, /status: 429/);
+  assert.match(login, /"Retry-After": "900"/);
+  assert.match(limiter, /WINDOW_MS = 15 \* 60 \* 1000/);
+  assert.match(limiter, /MAX_FAILURES = 5/);
+  assert.match(limiter, /MAX_CLIENTS = 5000/);
+  assert.match(limiter, /prune\(now\)/);
+  assert.match(limiter, /failures\.delete\(clientIp\)/);
+  assert.match(limiter, /Serverless instances do not share memory/);
+  assert.doesNotMatch(login, /headers\.get\(["\']x-forwarded-for["\']/i);
 });
