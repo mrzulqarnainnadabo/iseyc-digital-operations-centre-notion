@@ -61,10 +61,13 @@ export async function getDepartmentWorkspace(slug:DepartmentSlug) {
   const work=workPages.map(mapWork), reports=reportPages.map(mapReport);
   const learning=learningPages.map(mapLearning);
   const meetings=filterLegacyVisibleMeetings(meetingPage.meetings).filter((meeting:MeetingRecord)=>DEPARTMENT_TERMS[slug].some(term=>`${meeting.conveningBody} ${meeting.title}`.toLowerCase().includes(term))).sort((a,b)=>a.meetingDate.localeCompare(b.meetingDate));
-  const today=new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Lagos",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+  const localDate=(date:Date)=>new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Lagos",year:"numeric",month:"2-digit",day:"2-digit"}).format(date);
+  const today=localDate(new Date());
+  const sevenDays=localDate(new Date(Date.now()+7*24*60*60*1000));
   const active=work.filter(x=>["Approved","In Progress","Under Review"].includes(x.status));
   const overdue=work.filter(x=>x.dueDate && x.dueDate<today && !["Completed","Cancelled"].includes(x.status));
-  return {department,work,reports,meetings,learning,summary:{totalWork:work.length,activeWork:active.length,overdueWork:overdue.length,draftReports:reports.filter(x=>x.status==="Draft").length,submittedReports:reports.filter(x=>["Submitted","Under Review"].includes(x.status)).length},source:"notion",scope:"first 50 records per register"};
+  const dueSoon=work.filter(x=>x.dueDate && x.dueDate>=today && x.dueDate<=sevenDays && !["Completed","Cancelled"].includes(x.status));
+  return {department,work,reports,meetings,learning,summary:{totalWork:work.length,activeWork:active.length,overdueWork:overdue.length,dueSoonWork:dueSoon.length,draftReports:reports.filter(x=>x.status==="Draft").length,submittedReports:reports.filter(x=>["Submitted","Under Review"].includes(x.status)).length},source:"notion",scope:"first 50 records per register"};
 }
 function dateOk(s:string) { return /^\\d{4}-\\d{2}-\\d{2}$/.test(s) && !Number.isNaN(Date.parse(s+"T00:00:00.000Z")) && new Date(s+"T00:00:00.000Z").toISOString().slice(0,10)===s; }
 export async function createDepartmentWork(slug:DepartmentSlug,input:{title:string;type:string;priority:string;owner:string;outcome:string;startDate:string;dueDate:string;acceptance:string;risk:string}) {
