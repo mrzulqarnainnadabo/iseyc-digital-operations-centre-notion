@@ -15,8 +15,8 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
   const [loaded, setLoaded] = useState(false);
   async function refresh() {
     setBusy(true); setError("");
-    try { const r = await fetch(`/ops/api/registers/${kind}`, { cache: "no-store" }); const j = await r.json(); if (!r.ok) throw new Error(j.error || "Could not load register."); setRows(j.records || []); setLoaded(true); }
-    catch (e) { setError(e instanceof Error ? e.message : "Could not load register."); setLoaded(false); }
+    try { const r = await fetch(`/ops/api/registers/${kind}`, { cache: "no-store" }); const j = await r.json(); if (!r.ok) throw new Error(j.error || "Could not load register."); if (!Array.isArray(j.records)) throw new Error("The register returned an invalid response. No records are shown."); setRows(j.records); setLoaded(true); }
+    catch (e) { setRows([]); setError(e instanceof Error ? e.message : "Could not load register."); setLoaded(false); }
     finally { setBusy(false); }
   }
   useEffect(() => { void refresh(); }, [kind]);
