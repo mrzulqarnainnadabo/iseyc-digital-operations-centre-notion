@@ -14,6 +14,8 @@ test("department workspaces use the approved four-department identity and real r
   assert.match(adapter, /NOTION_PROGRAMMES_DATABASE_ID/);
   assert.match(adapter, /NOTION_DEPARTMENT_REPORTS_DATABASE_ID/);
   assert.match(adapter, /NOTION_LEARNING_DATABASE_ID/);
+  assert.match(adapter, /getDepartmentEvidence/);
+  assert.match(adapter, /evidenceSlug=slug==="digital-systems"\?"technology"/);
   assert.match(adapter, /All Departments/);
   assert.match(adapter, /filter:\{property:"Department",select:\{equals:department\}\}/);
   assert.match(adapter, /Status:\{status:\{name:"Proposed"\}\}/);
@@ -23,6 +25,15 @@ test("department workspaces use the approved four-department identity and real r
   assert.match(page, /DepartmentWorkspace/);
   for (const tab of ["overview", "work", "reports", "learning", "meetings"]) assert.ok(ui.includes(`"${tab}"`));
   for (const style of ["education", "health", "technology", "civic"]) assert.ok(css.includes(`.department-desk--${style}`));
+});
+
+test("department evidence panel only displays contracted Observatory series and explicit gaps", () => {
+  const ui = read("components/DepartmentWorkspace.tsx");
+  assert.match(ui, /National evidence signal/);
+  assert.match(ui, /No verified department-matched indicator is connected/);
+  assert.match(ui, /No proxy or forecast is substituted/);
+  assert.match(ui, /Method & limitations/);
+  assert.match(ui, /Open source/);
 });
 
 test("department report drafts can be assembled from register records without inventing outcomes", () => {
