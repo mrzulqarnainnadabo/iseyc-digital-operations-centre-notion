@@ -1,7 +1,7 @@
 import { dbId, notion, assertInternalDb, type MeetingRecord } from "@/lib/notion";
 import { listMeetings } from "@/lib/notion";
 
-export type ExternalOption = { id: string; title: string; detail: string; status: string; url: string; organisationId?: string; verified?: boolean };
+export type ExternalOption = { id: string; title: string; detail: string; status: string; url: string; organisationId?: string; verified?: boolean; relationshipStatus?: string };
 const ENV = {
   organisations: "NOTION_PARTNER_ORGANISATIONS_DATABASE_ID",
   contacts: "NOTION_EXTERNAL_CONTACTS_DATABASE_ID",
@@ -21,6 +21,9 @@ function read(prop: any): string {
   if (prop.type === "title") return (prop.title || []).map((x: any) => x.plain_text || "").join("");
   if (prop.type === "rich_text") return (prop.rich_text || []).map((x: any) => x.plain_text || "").join("");
   if (prop.type === "select") return prop.select?.name || "";
+  if (prop.type === "status") return prop.status?.name || "";
+  if (prop.type === "date") return prop.date?.start || "";
+  if (prop.type === "checkbox") return prop.checkbox === true ? "true" : "false";
   if (prop.type === "email") return prop.email || "";
   if (prop.type === "phone_number") return prop.phone_number || "";
   if (prop.type === "url") return prop.url || "";
@@ -43,7 +46,7 @@ export async function listExternalOptions() {
   const [orgPages, contactPages, meetings] = await Promise.all([
     query("organisations"), query("contacts"), listMeetings({ pageSize: 50 }),
   ]);
-  const organisations = orgPages.map((p: any) => ({ ...row(p, "Organisation", "Organisation type", "Verification status"), detail: [read(p.properties?.["Organisation type"]), read(p.properties?.["Official email"])].filter(Boolean).join(" · ") }));
+  const organisations = orgPages.map((p: any) => ({ ...row(p, "Organisation", "Organisation type", "Verification status"), relationshipStatus: read(p.properties?.["Relationship status"]), detail: [read(p.properties?.["Organisation type"]), read(p.properties?.["Official email"])].filter(Boolean).join(" · ") }));
   const contacts = contactPages.map((p: any) => ({ ...row(p, "Contact", "Work email", "Contact status"), organisationId: read(p.properties?.Organisation).split(",")[0] || "", verified: p.properties?.Verified?.checkbox === true }));
   const meetingOptions = meetings.meetings.filter((m: MeetingRecord) => m.status === "Approved" && m.sensitivity === "Standard").map((m: MeetingRecord) => ({ id: m.id, title: m.title, detail: m.meetingDate, status: m.status, url: "" }));
   return { organisations, contacts, meetings: meetingOptions };
