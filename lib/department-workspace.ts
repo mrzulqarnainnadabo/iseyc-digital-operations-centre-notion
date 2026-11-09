@@ -1,5 +1,6 @@
 import { dbId, notion, assertInternalDb, listMeetings, type MeetingRecord } from "@/lib/notion";
 import { filterLegacyVisibleMeetings } from "@/lib/legacy-session-boundary";
+import { getDepartmentEvidence } from "@/lib/public-evidence";
 
 export const DEPARTMENT_LABELS = {
   education: "Education & Capacity Building",
@@ -57,7 +58,8 @@ function mapReport(p:any):Report {
 }
 export async function getDepartmentWorkspace(slug:DepartmentSlug) {
   const department=DEPARTMENT_LABELS[slug];
-  const [workPages,reportPages,meetingPage,learningPages]=await Promise.all([listForDepartment(PROGRAMMES_ENV,department),listForDepartment(REPORTS_ENV,department),listMeetings({pageSize:50}),listLearningForDepartment(department)]);
+  const evidenceSlug=slug==="digital-systems"?"technology":slug==="civic-affairs"?"civic":slug;
+  const [workPages,reportPages,meetingPage,learningPages,evidence]=await Promise.all([listForDepartment(PROGRAMMES_ENV,department),listForDepartment(REPORTS_ENV,department),listMeetings({pageSize:50}),listLearningForDepartment(department),getDepartmentEvidence(evidenceSlug)]);
   const work=workPages.map(mapWork), reports=reportPages.map(mapReport);
   const learning=learningPages.map(mapLearning);
   const meetings=filterLegacyVisibleMeetings(meetingPage.meetings).filter((meeting:MeetingRecord)=>DEPARTMENT_TERMS[slug].some(term=>`${meeting.conveningBody} ${meeting.title}`.toLowerCase().includes(term))).sort((a,b)=>a.meetingDate.localeCompare(b.meetingDate));
@@ -67,7 +69,7 @@ export async function getDepartmentWorkspace(slug:DepartmentSlug) {
   const active=work.filter(x=>["Approved","In Progress","Under Review"].includes(x.status));
   const overdue=work.filter(x=>x.dueDate && x.dueDate<today && !["Completed","Cancelled"].includes(x.status));
   const dueSoon=work.filter(x=>x.dueDate && x.dueDate>=today && x.dueDate<=sevenDays && !["Completed","Cancelled"].includes(x.status));
-  return {department,work,reports,meetings,learning,summary:{totalWork:work.length,activeWork:active.length,overdueWork:overdue.length,dueSoonWork:dueSoon.length,draftReports:reports.filter(x=>x.status==="Draft").length,submittedReports:reports.filter(x=>["Submitted","Under Review"].includes(x.status)).length},source:"notion",scope:"first 50 records per register"};
+  return {department,work,reports,meetings,learning,evidence,summary:{totalWork:work.length,activeWork:active.length,overdueWork:overdue.length,dueSoonWork:dueSoon.length,draftReports:reports.filter(x=>x.status==="Draft").length,submittedReports:reports.filter(x=>["Submitted","Under Review"].includes(x.status)).length},source:"notion",scope:"first 50 records per register"};
 }
 function dateOk(s:string) { return /^\\d{4}-\\d{2}-\\d{2}$/.test(s) && !Number.isNaN(Date.parse(s+"T00:00:00.000Z")) && new Date(s+"T00:00:00.000Z").toISOString().slice(0,10)===s; }
 export async function createDepartmentWork(slug:DepartmentSlug,input:{title:string;type:string;priority:string;owner:string;outcome:string;startDate:string;dueDate:string;acceptance:string;risk:string}) {
