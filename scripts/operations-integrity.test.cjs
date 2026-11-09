@@ -238,6 +238,9 @@ test("external engagement is authenticated, linked and draft-only until human di
   assert.match(page, /Create invitation draft/);
   assert.match(page, /has NOT been sent/);
   assert.match(page, /verified and active/);
+  const meetingReview = fs.readFileSync(path.join(opsRoot, "review/[id]/page.tsx"), "utf8");
+  assert.match(meetingReview, /Prepare external invitations/);
+  assert.match(meetingReview, /meeting.status === "Approved"/);
   assert.match(notion, /NOTION_MEETING_INVITATIONS_DATABASE_ID/);
   assert.ok(DOC_NAV.some((item) => item.href === "/ops/partners"));
 });
