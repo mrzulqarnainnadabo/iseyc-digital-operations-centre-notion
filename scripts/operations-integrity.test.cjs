@@ -222,6 +222,8 @@ test("external engagement is authenticated, linked and draft-only until human di
   assert.match(adapter, /Verification status/);
   assert.match(adapter, /Verified/);
   assert.match(adapter, /Contact status/);
+  assert.match(adapter, /Former collaborator/);
+  assert.match(adapter, /Relationship status/);
   assert.match(adapter, /pages\.create/);
   assert.match(route, /isSameOriginRequest/);
   assert.match(route, /requireStaffSession/);
