@@ -10,31 +10,35 @@ const principles = [
 export default function MethodPage() {
   return (
     <PublicShell>
-      <section className="max-w-3xl py-10 sm:py-14">
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-700">Method and limitations</p>
+      <section className="max-w-3xl py-8 sm:py-10">
+        <p className="eyebrow">Method · Independence</p>
         <h1 className="mt-3 font-serif text-3xl text-forest-950 sm:text-4xl">How to read the public record</h1>
-        <p className="mt-4 text-sm leading-6 text-ink-700">ISEYC connects community information with public evidence. The system must preserve where information came from, what it can establish and what remains unknown.</p>
+        <p className="mt-3 text-sm leading-6 text-ink-700">Every finding keeps its source, geography, date and limitations attached. Missing evidence remains visible.</p>
       </section>
-      <section className="grid gap-3 pb-10 sm:grid-cols-2">
+      <section className="mb-6 rounded-card border border-forest-900 bg-forest-950 p-5 text-white">
+        <h2 className="text-base font-semibold">Editorial independence</h2>
+        <p className="mt-2 text-sm leading-6 text-white/85">Funding does not buy favourable findings. Donors, partners, parties and public agencies cannot purchase featured conclusions or edit published records and evidence presentations. AI output never publishes itself; privileged decisions remain subject to human review.</p>
+      </section>
+      <section className="grid gap-3 pb-8 sm:grid-cols-2">
         {principles.map(([title, description]) => (
-          <article key={title} className="rounded-card border border-line bg-white p-5">
+          <article key={title} className="rounded-card border border-line bg-white p-4">
             <h2 className="font-semibold text-forest-950">{title}</h2>
             <p className="mt-2 text-sm leading-6 text-ink-700">{description}</p>
           </article>
         ))}
       </section>
-      <section className="mb-12 rounded-card border border-line bg-white p-5 sm:p-6">
-        <h2 className="text-lg font-semibold text-forest-950">Important distinctions</h2>
+      <section className="mb-10 rounded-card border border-line bg-white p-5">
+        <h2 className="text-base font-semibold text-forest-950">Evidence boundaries</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-ink-700">
           <li>Published does not mean independently verified.</li>
           <li>An announcement does not prove implementation.</li>
           <li>A budget allocation does not prove expenditure or delivery.</li>
           <li>An empty feed means no records were returned; it does not mean zero need.</li>
           <li>A pilot does not establish national prevalence or representativeness.</li>
-          <li>Disputed figures remain visible until an authoritative reconciliation is available.</li>
+          <li>National indicators are not state, LGA or facility proof.</li>
           <li>AI-generated explanations are not institutional decisions or approved findings.</li>
         </ul>
-        <p className="mt-5 border-t border-line pt-4 text-xs leading-5 text-ink-600">The Observatory is an early-stage national pilot, not a national statistics office, a representative survey or a complete national evidence system.</p>
+        <p className="mt-4 border-t border-line pt-3 text-xs leading-5 text-ink-600">The Observatory remains an early-stage pilot, not a national statistics office, representative survey or complete national evidence system.</p>
       </section>
     </PublicShell>
   );

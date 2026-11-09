@@ -36,9 +36,12 @@ test("department pages load mandate records without private Notion", () => {
   assert.doesNotMatch(page, /@\/lib\/notion|requireStaffSession|listMeetings/);
 });
 
-test("department-first home still precedes systems infrastructure", () => {
+test("public intelligence pulse leads with reports before department exploration", () => {
   const page = read("app/page.tsx");
-  const departmentsAt = page.indexOf("The institution, by department");
-  const systemsAt = page.indexOf("Digital infrastructure behind the departments");
-  assert.ok(departmentsAt > 0 && systemsAt > departmentsAt);
+  const reportsAt = page.indexOf('aria-label="Reports and evidence"');
+  const departmentsAt = page.indexOf('aria-labelledby="departments-heading"');
+  assert.ok(reportsAt >= 0 && departmentsAt > reportsAt);
+  assert.match(page, /getDepartmentMandateRecords/);
+  assert.match(page, /getDepartmentEvidence/);
+  assert.match(page, /Not yet computed/);
 });
