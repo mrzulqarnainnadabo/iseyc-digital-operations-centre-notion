@@ -305,3 +305,10 @@ Before enabling this workflow in production, verify:
 - Tests cover duplicate invitations, wrong recipients, withdrawn invitations, expired access, privacy leakage and unapproved partnership claims.
 
 Until the dedicated registers and access controls are available, the DCC may prepare invitation briefs and drafts but must label them as drafts and must not claim to have sent invitations or established partnerships.
+
+
+### Formal partnership and commitment register
+
+The Notion workspace now includes a dedicated **DCC — Partnership Agreements & Commitments** register, related to Partner Organisations, originating Meetings and Meeting Invitations. Use it for MoUs, partnership agreements, sponsorships, research collaborations, data-sharing arrangements and service agreements. The register records competent authority, approval reference, signatory roles, execution/effective/expiry dates, signed instrument, obligations, deliverables, reporting cadence, financial commitments and safeguarding/privacy conditions.
+
+A record may be created as a lead or draft, but the status must not be set to Approved, Executed or Active without the relevant authority and documentary evidence. The register's existence does not mean the application currently supports its full workflow; the app integration remains a separate implementation and release gate.
