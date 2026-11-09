@@ -71,14 +71,15 @@ export default async function DepartmentPage({ params }: Props) {
             </div>
             <span className="hidden font-mono text-xs text-ink-600 sm:block">{department.priorities.length} themes</span>
           </div>
-          <div className="priority-list">
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {department.priorities.map((priority, index) => (
-              <article key={priority.title} className="priority-row">
-                <span className="priority-index">0{index + 1}</span>
-                <div>
-                  <h3 className="font-semibold text-forest-950">{priority.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-ink-700">{priority.detail}</p>
-                </div>
+              <article key={priority.title} className="rounded-card border border-line bg-white p-4 shadow-card">
+                <span className="font-mono text-xs text-gold-700">0{index + 1}</span>
+                <h3 className="mt-3 font-semibold text-forest-950">{priority.title}</h3>
+                <details className="mt-2 text-sm text-ink-600">
+                  <summary className="min-h-9 cursor-pointer font-semibold text-forest-800">Explore this focus</summary>
+                  <p className="pb-2 leading-6">{priority.detail}</p>
+                </details>
               </article>
             ))}
           </div>
@@ -108,7 +109,7 @@ export default async function DepartmentPage({ params }: Props) {
             {mandate.status === "ready" ? (
               <>
                 <ul className="mt-4 divide-y divide-line border-y border-line">
-                  {mandate.records.map((record) => (
+                  {mandate.records.slice(0, 3).map((record) => (
                     <li key={record.id} className="py-4">
                       <p className="text-sm leading-6 text-forest-950">{record.text}</p>
                       <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-ink-600">
@@ -252,9 +253,8 @@ export default async function DepartmentPage({ params }: Props) {
             )}
           </section>
 
-          <section className="evidence-panel" aria-labelledby="questions-title">
-            <p className="eyebrow">Reading checklist</p>
-            <h2 id="questions-title" className="mt-2 font-serif text-xl text-forest-950">Before drawing a conclusion</h2>
+          <details className="evidence-panel">
+            <summary className="cursor-pointer text-sm font-semibold text-forest-900">Research checks before drawing a conclusion</summary>
             <ul className="mt-4 space-y-3">
               {department.evidenceQuestions.map((question) => (
                 <li key={question} className="flex gap-3 text-sm leading-6 text-ink-700">
@@ -263,7 +263,7 @@ export default async function DepartmentPage({ params }: Props) {
                 </li>
               ))}
             </ul>
-          </section>
+          </details>
         </aside>
       </section>
 
