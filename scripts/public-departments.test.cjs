@@ -5,20 +5,33 @@ const path = require("node:path");
 const root = path.join(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 
-test("public home and navigation expose all four named departments", () => {
+test("public intelligence homepage leads with reports, evidence, coverage honesty and departments", () => {
   const home = read("app/page.tsx");
   const shell = read("components/PublicShell.tsx");
   const registry = read("lib/departments.ts");
+  assert.match(home, /PublicShell/);
+  assert.match(home, /getDepartmentMandateRecords/);
+  assert.match(home, /getDepartmentEvidence/);
+  assert.match(home, /What is happening across Nigeria\?/);
+  assert.match(home, /What communities report\. What evidence supports\. What is still unknown\./);
+  assert.match(home, /Published only/);
+  assert.match(home, /Not yet computed/);
+  assert.match(home, /provisional keyword match · not institutional taxonomy/);
+  assert.match(home, /not a measure of national need/);
+  assert.match(home, /Not mapped yet in this public view/);
+  assert.doesNotMatch(home, /requireStaffSession|listMeetings|@\/lib\/notion/);
   for (const label of ["Education & Capacity Building", "Health & Well-being", "Software & Technology", "Civic Department"]) {
     assert.ok(home.includes("departments.map"));
     assert.ok(registry.includes(label), `Missing department: ${label}`);
   }
-  assert.match(shell, /href: "\/departments", label: "Departments"/);
-  assert.match(home, /Four departments\. One institution\. Clear public information\./);
-  assert.match(home, /Digital infrastructure behind the departments/);
+  for (const label of ["Home", "Departments", "Explore", "Report", "Method"]) {
+    assert.match(shell, new RegExp(`label: "${label}"`));
+  }
+  assert.doesNotMatch(shell, /Public Information & Civic Intelligence/);
+  assert.doesNotMatch(shell, /public-mobile-menu/);
+  const reportsPosition = home.indexOf('aria-label="Reports and evidence"');
   const departmentsPosition = home.indexOf('aria-labelledby="departments-heading"');
-  const systemsPosition = home.indexOf('aria-labelledby="systems-heading"');
-  assert.ok(departmentsPosition >= 0 && systemsPosition > departmentsPosition, "departments must precede supporting systems");
+  assert.ok(reportsPosition >= 0 && departmentsPosition > reportsPosition, "reports and evidence must precede department entry");
 });
 
 test("department detail routes are public and never query private operations records", () => {
