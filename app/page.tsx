@@ -139,6 +139,11 @@ export default async function PublicHomePage() {
               </article>
             ))}
           </div>
+          <div className="mt-4 rounded-card border border-line bg-cream-50 p-4">
+            <p className="text-xs font-semibold text-ink-600">Institutional responsibility</p>
+            <p className="mt-1 text-sm font-semibold text-forest-950">Not mapped yet in this public view</p>
+            <p className="mt-1 text-xs leading-5 text-ink-600">A community report or provisional duty label does not by itself establish which office is accountable.</p>
+          </div>
           <a href="https://iseyc-civic-intelligence-observatory.vercel.app" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex min-h-[44px] items-center text-sm font-semibold text-forest-800 hover:underline">Open Observatory ↗</a>
         </div>
       </section>
