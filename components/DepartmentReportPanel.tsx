@@ -11,11 +11,10 @@ import type {
 type Props = { departmentId: OpsDepartmentId; departmentName: string };
 
 const REPORT_TYPES: ReportType[] = [
-  "Activity",
-  "Programme",
-  "Monthly department",
-  "Coordination",
-  "Other",
+  "Weekly",
+  "Monthly",
+  "Quarterly",
+  "Annual",
 ];
 
 export default function DepartmentReportPanel({ departmentId, departmentName }: Props) {
@@ -26,8 +25,9 @@ export default function DepartmentReportPanel({ departmentId, departmentName }: 
   const [loaded, setLoaded] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [title, setTitle] = useState("");
-  const [reportType, setReportType] = useState<ReportType>("Activity");
-  const [period, setPeriod] = useState("");
+  const [reportType, setReportType] = useState<ReportType>("Monthly");
+  const [periodStart, setPeriodStart] = useState("");
+  const [periodEnd, setPeriodEnd] = useState("");
   const [summary, setSummary] = useState("");
   const [challenges, setChallenges] = useState("");
   const [outstandingActions, setOutstandingActions] = useState("");
@@ -90,7 +90,8 @@ export default function DepartmentReportPanel({ departmentId, departmentName }: 
           title,
           departmentId,
           reportType,
-          period,
+          periodStart,
+          periodEnd,
           summary,
           challenges,
           outstandingActions,
@@ -100,12 +101,13 @@ export default function DepartmentReportPanel({ departmentId, departmentName }: 
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || "Could not save report.");
       setTitle("");
-      setPeriod("");
+      setPeriodStart("");
+      setPeriodEnd("");
       setSummary("");
       setChallenges("");
       setOutstandingActions("");
       setRecommendations("");
-      setReportType("Activity");
+      setReportType("Monthly");
       await refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not save report.");
@@ -144,29 +146,33 @@ export default function DepartmentReportPanel({ departmentId, departmentName }: 
             <input required minLength={3} maxLength={180} value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
           </label>
           <label className="block text-sm font-semibold text-ink-800">
-            Report type
+            Reporting cycle
             <select value={reportType} onChange={(e) => setReportType(e.target.value as ReportType)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal">
               {REPORT_TYPES.map((t) => (<option key={t} value={t}>{t}</option>))}
             </select>
           </label>
+                    <label className="block text-sm font-semibold text-ink-800">
+            Period start
+            <input type="date" value={periodStart} onChange={(e) => setPeriodStart(e.target.value)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
+          </label>
           <label className="block text-sm font-semibold text-ink-800">
-            Period
-            <input maxLength={120} value={period} onChange={(e) => setPeriod(e.target.value)} placeholder="e.g. 2026-11" className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
+            Period end
+            <input type="date" value={periodEnd} onChange={(e) => setPeriodEnd(e.target.value)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
           </label>
           <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
-            Summary
+            Completed work
             <textarea maxLength={1800} rows={3} value={summary} onChange={(e) => setSummary(e.target.value)} className="mt-1 w-full rounded-control border border-line bg-white px-3 py-2 text-sm font-normal" />
           </label>
           <label className="block text-sm font-semibold text-ink-800">
-            Challenges
+            Risks & blockers
             <textarea maxLength={1800} rows={2} value={challenges} onChange={(e) => setChallenges(e.target.value)} className="mt-1 w-full rounded-control border border-line bg-white px-3 py-2 text-sm font-normal" />
           </label>
           <label className="block text-sm font-semibold text-ink-800">
-            Outstanding actions
+            Decisions required
             <textarea maxLength={1800} rows={2} value={outstandingActions} onChange={(e) => setOutstandingActions(e.target.value)} className="mt-1 w-full rounded-control border border-line bg-white px-3 py-2 text-sm font-normal" />
           </label>
           <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
-            Recommendations
+            Outcomes / evidence
             <textarea maxLength={1800} rows={2} value={recommendations} onChange={(e) => setRecommendations(e.target.value)} className="mt-1 w-full rounded-control border border-line bg-white px-3 py-2 text-sm font-normal" />
           </label>
           <div className="flex flex-wrap gap-2 sm:col-span-2">
@@ -191,7 +197,7 @@ export default function DepartmentReportPanel({ departmentId, departmentName }: 
               <p className="font-semibold text-forest-950">{row.title}</p>
               <StatusBadge status={row.status} />
             </div>
-            <p className="mt-1 text-xs text-ink-600">{row.reportType}{row.period ? ` · ${row.period}` : ""}</p>
+            <p className="mt-1 text-xs text-ink-600">{row.reportType}{row.periodStart || row.periodEnd ? ` · ${row.periodStart || "—"} to ${row.periodEnd || "—"}` : ""}</p>
             {row.summary ? <p className="mt-1 text-sm text-ink-700">{row.summary}</p> : null}
           </li>
         ))}

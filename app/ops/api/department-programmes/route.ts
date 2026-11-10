@@ -99,15 +99,10 @@ export async function POST(request: NextRequest) {
     "title",
     "departmentId",
     "objectives",
-    "targetCommunity",
-    "geography",
-    "activities",
     "deliverables",
     "startDate",
     "endDate",
     "accountableRole",
-    "evidenceNote",
-    "status",
   ];
   if (Object.keys(input).some((key) => !allowed.includes(key))) {
     return privateJson({ ok: false, error: "Unexpected fields." }, { status: 400 });
@@ -122,17 +117,6 @@ export async function POST(request: NextRequest) {
   }
   if (!isOpsDepartmentId(departmentId)) {
     return privateJson({ ok: false, error: "Select a valid department." }, { status: 400 });
-  }
-  const statusRaw = typeof input.status === "string" ? input.status : "Draft";
-  if (statusRaw !== "Planning" && statusRaw !== "Draft") {
-    return privateJson(
-      {
-        ok: false,
-        error:
-          "Only Planning or Draft programme records may be created under the transitional shared-key session.",
-      },
-      { status: 400 }
-    );
   }
   const str = (key: string, max: number) =>
     typeof input[key] === "string" ? (input[key] as string).trim().slice(0, max) : "";
@@ -159,15 +143,10 @@ export async function POST(request: NextRequest) {
       title,
       departmentId,
       objectives: str("objectives", 1800),
-      targetCommunity: str("targetCommunity", 500),
-      geography: str("geography", 500),
-      activities: str("activities", 1800),
       deliverables: str("deliverables", 1800),
       startDate: startDate || undefined,
       endDate: endDate || undefined,
       accountableRole: accountableRole || undefined,
-      evidenceNote: str("evidenceNote", 1800),
-      status: statusRaw,
     });
     return privateJson(
       {

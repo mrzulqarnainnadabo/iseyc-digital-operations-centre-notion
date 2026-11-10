@@ -2,26 +2,21 @@ import { dbId, notion, assertInternalDb, textProp } from "@/lib/notion";
 import {
   isOpsDepartmentId,
   type OpsDepartmentId,
-  type ProgrammeRecord,
-  type ProgrammeStatus,
   departmentIdFromNotionSelect,
 } from "@/lib/department-operations";
 
 const ENV = "NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID" as const;
-
 const DEPARTMENT_SELECT: Record<OpsDepartmentId, string> = {
-  education: "Education",
-  health: "Health",
-  "digital-systems": "Digital Systems",
-  "civic-affairs": "Civic Affairs",
+  education: "Education & Capacity Building",
+  health: "Health & Well-being",
+  "digital-systems": "Digital Systems & Technology",
+  "civic-affairs": "Civic Affairs & Public Accountability",
 };
-
-const DRAFT_STATUSES = new Set(["Planning", "Draft"]);
 
 function database() {
   const client = notion();
   const databaseId = dbId(ENV);
-  if (!client || !databaseId) throw new Error("Department programmes register is not configured.");
+  if (!client || !databaseId) throw new Error("Department programmes and work register is not configured.");
   assertInternalDb(databaseId, ENV);
   return { client, databaseId };
 }
@@ -30,38 +25,41 @@ export function departmentProgrammesConfigured(): boolean {
   return Boolean(process.env.NOTION_TOKEN?.trim() && dbId(ENV));
 }
 
+function departmentFilter(departmentId?: OpsDepartmentId) {
+  return departmentId && isOpsDepartmentId(departmentId)
+    ? { property: "Department", select: { equals: DEPARTMENT_SELECT[departmentId] } }
+    : undefined;
+}
+
+import type { ProgrammeRecord, ProgrammeStatus } from "@/lib/department-operations";
+
+const PROGRAMME_TYPE_FILTER = { property: "Work Type", select: { equals: "Programme" } };
+
 function mapStatus(raw: string): ProgrammeStatus {
   const allowed: ProgrammeStatus[] = [
-    "Planning",
-    "Draft",
-    "Active",
-    "On hold",
-    "Completed",
-    "Closed",
-    "Unspecified",
+    "Proposed", "Approved", "In Progress", "Under Review",
+    "Completed", "Paused", "Cancelled", "Unspecified",
   ];
   return (allowed.includes(raw as ProgrammeStatus) ? raw : "Unspecified") as ProgrammeStatus;
 }
 
 function mapRow(page: any): ProgrammeRecord {
   const props = page.properties || {};
-  const deptRaw = textProp(props.Department);
-  const departmentId = departmentIdFromNotionSelect(deptRaw);
   return {
     id: page.id,
-    title: textProp(props.Name) || "Untitled programme",
-    description: textProp(props.Description) || "",
-    objectives: textProp(props.Objectives) || "",
-    departmentId,
-    targetCommunity: textProp(props["Target community"]) || "",
-    geography: textProp(props.Geography) || "",
-    activities: textProp(props.Activities) || "",
-    deliverables: textProp(props.Deliverables) || "",
-    startDate: textProp(props["Start date"]) || "",
-    endDate: textProp(props["End date"]) || "",
-    accountableRole: textProp(props["Accountable role"]) || "",
+    title: textProp(props["Programme / Work Item"]) || "Untitled programme",
+    description: "",
+    objectives: textProp(props["Intended Outcome"]),
+    departmentId: departmentIdFromNotionSelect(textProp(props.Department)),
+    targetCommunity: "",
+    geography: "",
+    activities: "",
+    deliverables: textProp(props["Acceptance Criteria"]),
+    startDate: textProp(props["Start Date"]),
+    endDate: textProp(props["Due Date"]),
+    accountableRole: textProp(props["Accountable Role"]),
     status: mapStatus(textProp(props.Status)),
-    evidenceNote: textProp(props["Evidence notes"]) || "",
+    evidenceNote: textProp(props["Acceptance Criteria"]),
     url: typeof page.url === "string" ? page.url : "",
   };
 }
@@ -71,94 +69,49 @@ export async function listDepartmentProgrammes(options: {
   cursor?: string;
 }): Promise<{ rows: ProgrammeRecord[]; nextCursor: string | null; hasMore: boolean }> {
   const { client, databaseId } = database();
-  const filter =
-    options.departmentId && isOpsDepartmentId(options.departmentId)
-      ? {
-          property: "Department",
-          select: { equals: DEPARTMENT_SELECT[options.departmentId] },
-        }
-      : undefined;
+  const department = departmentFilter(options.departmentId);
   const response = await client.databases.query({
     database_id: databaseId,
     page_size: 50,
+    filter: department
+      ? { and: [PROGRAMME_TYPE_FILTER, department] }
+      : PROGRAMME_TYPE_FILTER,
     ...(options.cursor ? { start_cursor: options.cursor } : {}),
-    ...(filter ? { filter } : {}),
   });
   const rows = response.results
-    .filter((p: any) => p.object === "page")
-    .map((p: any) => mapRow(p));
-  return {
-    rows,
-    nextCursor: response.next_cursor || null,
-    hasMore: response.has_more === true,
-  };
+    .filter((page: any) => page.object === "page")
+    .map((page: any) => mapRow(page));
+  return { rows, nextCursor: response.next_cursor || null, hasMore: response.has_more === true };
 }
 
 export async function createDepartmentProgrammeDraft(input: {
   title: string;
   departmentId: OpsDepartmentId;
   objectives?: string;
-  targetCommunity?: string;
-  geography?: string;
-  activities?: string;
   deliverables?: string;
   startDate?: string;
   endDate?: string;
   accountableRole?: string;
-  evidenceNote?: string;
-  status?: "Planning" | "Draft";
 }): Promise<{ id: string; url: string; status: string }> {
   const { client, databaseId } = database();
-  if (!isOpsDepartmentId(input.departmentId)) {
-    throw new Error("Invalid department.");
-  }
-  const status = input.status && DRAFT_STATUSES.has(input.status) ? input.status : "Draft";
+  if (!isOpsDepartmentId(input.departmentId)) throw new Error("Invalid department.");
   const properties: Record<string, unknown> = {
-    Name: { title: [{ text: { content: input.title.trim().slice(0, 180) } }] },
+    "Programme / Work Item": { title: [{ text: { content: input.title.trim().slice(0, 180) } }] },
     Department: { select: { name: DEPARTMENT_SELECT[input.departmentId] } },
-    Status: { select: { name: status } },
+    "Work Type": { select: { name: "Programme" } },
+    Status: { status: { name: "Proposed" } },
   };
   if (input.objectives) {
-    properties.Objectives = {
-      rich_text: [{ text: { content: input.objectives.slice(0, 1800) } }],
-    };
-  }
-  if (input.targetCommunity) {
-    properties["Target community"] = {
-      rich_text: [{ text: { content: input.targetCommunity.slice(0, 500) } }],
-    };
-  }
-  if (input.geography) {
-    properties.Geography = {
-      rich_text: [{ text: { content: input.geography.slice(0, 500) } }],
-    };
-  }
-  if (input.activities) {
-    properties.Activities = {
-      rich_text: [{ text: { content: input.activities.slice(0, 1800) } }],
-    };
+    properties["Intended Outcome"] = { rich_text: [{ text: { content: input.objectives.slice(0, 1800) } }] };
   }
   if (input.deliverables) {
-    properties.Deliverables = {
-      rich_text: [{ text: { content: input.deliverables.slice(0, 1800) } }],
-    };
+    properties["Acceptance Criteria"] = { rich_text: [{ text: { content: input.deliverables.slice(0, 1800) } }] };
   }
   if (input.accountableRole) {
-    properties["Accountable role"] = {
-      rich_text: [{ text: { content: input.accountableRole.slice(0, 180) } }],
-    };
+    properties["Accountable Role"] = { rich_text: [{ text: { content: input.accountableRole.slice(0, 180) } }] };
   }
-  if (input.evidenceNote) {
-    properties["Evidence notes"] = {
-      rich_text: [{ text: { content: input.evidenceNote.slice(0, 1800) } }],
-    };
-  }
-  if (input.startDate) properties["Start date"] = { date: { start: input.startDate } };
-  if (input.endDate) properties["End date"] = { date: { start: input.endDate } };
-
-  const page = await client.pages.create({
-    parent: { database_id: databaseId },
-    properties: properties as any,
-  });
-  return { id: page.id, url: (page as any).url || "", status };
+  if (input.startDate) properties["Start Date"] = { date: { start: input.startDate } };
+  if (input.endDate) properties["Due Date"] = { date: { start: input.endDate } };
+  const page = await client.pages.create({ parent: { database_id: databaseId }, properties: properties as any });
+  return { id: page.id, url: (page as any).url || "", status: "Proposed" };
 }

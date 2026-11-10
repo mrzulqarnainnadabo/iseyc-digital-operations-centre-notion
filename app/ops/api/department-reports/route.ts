@@ -17,13 +17,13 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const CURSOR_RE = /^[a-f0-9-]{32,36}$/i;
-const REPORT_TYPES: ReportType[] = [
-  "Activity",
-  "Programme",
-  "Monthly department",
-  "Coordination",
-  "Other",
-];
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+function validDate(value: string): boolean {
+  if (!DATE_RE.test(value)) return false;
+  const parsed = Date.parse(value + "T00:00:00.000Z");
+  return Number.isFinite(parsed) && new Date(parsed).toISOString().slice(0, 10) === value;
+}
+const REPORT_TYPES: ReportType[] = ["Weekly", "Monthly", "Quarterly", "Annual"];
 
 export async function GET(request: NextRequest) {
   if (!(await requireStaffSession())) {
@@ -102,7 +102,8 @@ export async function POST(request: NextRequest) {
     "title",
     "departmentId",
     "reportType",
-    "period",
+    "periodStart",
+    "periodEnd",
     "summary",
     "challenges",
     "outstandingActions",
@@ -122,9 +123,17 @@ export async function POST(request: NextRequest) {
   if (!isOpsDepartmentId(departmentId)) {
     return privateJson({ ok: false, error: "Select a valid department." }, { status: 400 });
   }
-  const reportTypeRaw = typeof input.reportType === "string" ? input.reportType : "Activity";
+  const reportTypeRaw = typeof input.reportType === "string" ? input.reportType : "Monthly";
   if (!REPORT_TYPES.includes(reportTypeRaw as ReportType)) {
-    return privateJson({ ok: false, error: "Invalid report type." }, { status: 400 });
+    return privateJson({ ok: false, error: "Select a valid reporting cycle." }, { status: 400 });
+  }
+  const periodStart = typeof input.periodStart === "string" ? input.periodStart.trim() : "";
+  const periodEnd = typeof input.periodEnd === "string" ? input.periodEnd.trim() : "";
+  if ((periodStart && !validDate(periodStart)) || (periodEnd && !validDate(periodEnd))) {
+    return privateJson({ ok: false, error: "Reporting period dates must be valid YYYY-MM-DD dates." }, { status: 400 });
+  }
+  if (periodStart && periodEnd && periodEnd < periodStart) {
+    return privateJson({ ok: false, error: "Reporting period end cannot be earlier than its start." }, { status: 400 });
   }
   const str = (key: string, max: number) =>
     typeof input[key] === "string" ? (input[key] as string).trim().slice(0, max) : "";
@@ -133,7 +142,8 @@ export async function POST(request: NextRequest) {
       title,
       departmentId,
       reportType: reportTypeRaw as ReportType,
-      period: str("period", 120),
+      periodStart: periodStart || undefined,
+      periodEnd: periodEnd || undefined,
       summary: str("summary", 1800),
       challenges: str("challenges", 1800),
       outstandingActions: str("outstandingActions", 1800),

@@ -14,7 +14,6 @@ export const dynamic = "force-dynamic";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const CURSOR_RE = /^[a-f0-9-]{32,36}$/i;
-const ID_RE = /^[a-f0-9-]{32,36}$/i;
 
 function validDate(value: string): boolean {
   if (!DATE_RE.test(value)) return false;
@@ -99,14 +98,10 @@ export async function POST(request: NextRequest) {
   const allowed = [
     "title",
     "departmentId",
-    "programmeId",
     "objective",
     "deliverable",
     "dueDate",
-    "dependencies",
     "accountableRole",
-    "progressNote",
-    "evidenceNote",
   ];
   if (Object.keys(input).some((key) => !allowed.includes(key))) {
     return privateJson({ ok: false, error: "Unexpected fields." }, { status: 400 });
@@ -122,14 +117,6 @@ export async function POST(request: NextRequest) {
   if (!isOpsDepartmentId(departmentId)) {
     return privateJson({ ok: false, error: "Select a valid department." }, { status: 400 });
   }
-  const programmeId =
-    typeof input.programmeId === "string" ? input.programmeId.trim() : "";
-  if (programmeId && !ID_RE.test(programmeId)) {
-    return privateJson(
-      { ok: false, error: "Programme relation must be a valid Notion page id." },
-      { status: 400 }
-    );
-  }
   const dueDate = typeof input.dueDate === "string" ? input.dueDate.trim() : "";
   if (dueDate && !validDate(dueDate)) {
     return privateJson({ ok: false, error: "Due date must be YYYY-MM-DD." }, { status: 400 });
@@ -140,20 +127,16 @@ export async function POST(request: NextRequest) {
     const created = await createDepartmentWorkPlanDraft({
       title,
       departmentId,
-      programmeId: programmeId || undefined,
       objective: str("objective", 1800),
       deliverable: str("deliverable", 1800),
       dueDate: dueDate || undefined,
-      dependencies: str("dependencies", 500),
       accountableRole: str("accountableRole", 180),
-      progressNote: str("progressNote", 1800),
-      evidenceNote: str("evidenceNote", 1800),
     });
     return privateJson(
       {
         ok: true,
         created,
-        status: "Planned",
+        status: "Proposed",
         note: "Completion claims require evidence; role titles are not appointments.",
       },
       { status: 201 }

@@ -18,7 +18,6 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
   const [deliverable, setDeliverable] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [accountableRole, setAccountableRole] = useState("");
-  const [programmeId, setProgrammeId] = useState("");
 
   const refresh = useCallback(
     async (append = false) => {
@@ -78,7 +77,6 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
         accountableRole,
       };
       if (dueDate) body.dueDate = dueDate;
-      if (programmeId.trim()) body.programmeId = programmeId.trim();
       const r = await fetch("/ops/api/department-workplans", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -91,7 +89,6 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
       setDeliverable("");
       setDueDate("");
       setAccountableRole("");
-      setProgrammeId("");
       await refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not save work-plan item.");
@@ -109,18 +106,18 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
           </p>
           <h2 className="mt-1 font-serif text-xl text-forest-950">Work plans & deliverables</h2>
           <p className="mt-1 text-sm leading-6 text-ink-600">
-            Items start as Planned. Completion claims require evidence. Role titles are not appointments.
+            Items start as Proposed. Completion claims require evidence. Role titles are not appointments.
           </p>
         </div>
         <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-900">
-          {configured === false ? "Not connected" : configured ? "Connected · Planned only" : "Checking…"}
+          {configured === false ? "Not connected" : configured ? "Connected · Proposed only" : "Checking…"}
         </span>
       </div>
 
       {configured !== false ? (
         <details className="rounded-xl border border-[#dfe6df] bg-[#fafbf8] p-3">
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-[#194b3b]">
-            <span>Add a work-plan item<span className="mt-1 block text-xs font-normal text-[#68736b]">New items are saved as Planned. They are not proof that work has started.</span></span>
+            <span>Add a work-plan item<span className="mt-1 block text-xs font-normal text-[#68736b]">New items are saved as Proposed. They are not proof that work has started.</span></span>
             <span aria-hidden="true" className="text-lg text-[#a7833f]">＋</span>
           </summary>
           <div className="mt-3">
@@ -145,10 +142,7 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
             Accountable role · title only
             <input maxLength={180} value={accountableRole} onChange={(e) => setAccountableRole(e.target.value)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
           </label>
-          <label className="block text-sm font-semibold text-ink-800">
-            Programme id · optional
-            <input maxLength={36} value={programmeId} onChange={(e) => setProgrammeId(e.target.value)} placeholder="Notion page id when known" className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
-          </label>
+          
           <div className="flex flex-wrap gap-2 sm:col-span-2">
             <button type="submit" disabled={busy || !title.trim()} className="min-h-11 rounded-control bg-forest-900 px-4 text-sm font-semibold text-white disabled:opacity-50">{busy ? "Saving…" : "Save work-plan item"}</button>
             <button type="button" onClick={() => void refresh()} disabled={busy} className="min-h-11 rounded-control border border-line px-4 text-sm font-semibold disabled:opacity-50">Refresh</button>
@@ -158,7 +152,7 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
         </details>
       ) : (
         <p className="rounded-control border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
-          Configure <code className="text-xs">NOTION_DEPARTMENT_WORKPLANS_DATABASE_ID</code>. No work-plan records are invented while disconnected.
+          Configure <code className="text-xs">NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID</code>. Work-plan items use the shared register’s Operations work type; no separate work-plan database is assumed.
         </p>
       )}
 

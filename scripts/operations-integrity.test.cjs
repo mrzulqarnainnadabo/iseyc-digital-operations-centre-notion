@@ -532,22 +532,26 @@ test("department draft forms are collapsed until requested and clearly explain t
     assert.match(source, /<details className=/, `${name} form should be collapsible`);
     assert.match(source, /<summary/, `${name} form needs a visible disclosure label`);
   }
-  assert.match(programme, /Save programme draft/);
+  assert.match(programme, /Save programme proposal/);
   assert.match(workplan, /Save work-plan item/);
   assert.match(report, /Save report draft/);
-  assert.match(programme, /Creation is limited to Planning/);
+  assert.match(programme, /Creation is limited to Proposed/);
   assert.match(report, /Draft only/);
 });
 
-test("department work plans cannot link programmes across departments or unrelated databases", () => {
+test("department work plans use the existing shared register's Operations work type without fictitious relations", () => {
   const adapter = read("lib/notion-department-workplans.ts");
   const route = read("app/ops/api/department-workplans/route.ts");
+  const panel = read("components/DepartmentWorkPlanPanel.tsx");
   assert.match(adapter, /NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID/);
-  assert.match(adapter, /client\.pages\.retrieve/);
-  assert.match(adapter, /relatedProgramme\.parent\?\.database_id/);
-  assert.match(adapter, /relatedDepartment !== DEPARTMENT_SELECT\[input\.departmentId\]/);
-  assert.match(adapter, /same department/);
-  assert.match(route, /Programme relation must be a valid Notion page id/);
+  assert.match(adapter, /WORK_TYPE_FILTER = .*Operations/);
+  assert.match(adapter, /"Programme \/ Work Item"/);
+  assert.match(adapter, /"Intended Outcome"/);
+  assert.match(adapter, /"Acceptance Criteria"/);
+  assert.match(adapter, /Status: \{ status: \{ name: "Proposed" \} \}/);
+  assert.doesNotMatch(adapter, /client\.pages\.retrieve|properties\.Programme =/);
+  assert.doesNotMatch(route, /programmeId|Programme relation/);
+  assert.doesNotMatch(panel, /programmeId|Programme id/);
 });
 
 test("department programme dates reject an end date before the start date", () => {
