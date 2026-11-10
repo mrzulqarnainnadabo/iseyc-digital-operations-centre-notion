@@ -9,7 +9,7 @@ test("public home and navigation expose all four named departments", () => {
   const home = read("app/page.tsx");
   const shell = read("components/PublicShell.tsx");
   const registry = read("lib/departments.ts");
-  for (const label of ["Education & Capacity Building", "Health & Well-being", "Digital Systems & Technology", "Civic Affairs & Public Accountability"]) {
+  for (const label of ["Education and Capacity Building", "Department of Health and Well-being", "Software and Technology", "Civic Department"]) {
     assert.ok(home.includes("departments.map"));
     assert.ok(registry.includes(label), `Missing department: ${label}`);
   }
