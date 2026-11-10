@@ -46,10 +46,14 @@ test("Notion adapters use the actual live register titles, property types and se
   const programmes = read("lib/notion-department-programmes.ts");
   const workplans = read("lib/notion-department-workplans.ts");
   const reports = read("lib/notion-department-reports.ts");
+  for (const source of [programmes, workplans, reports]) {
+    assert.match(source, /"Education & Capacity Building"/);
+    assert.match(source, /"Health & Well-being"/);
+    assert.match(source, /"Digital Systems & Technology"/);
+    assert.match(source, /"Civic Affairs & Public Accountability"/);
+  }
   for (const source of [programmes, workplans]) {
     assert.match(source, /"Programme \/ Work Item"/);
-    assert.match(source, /"Education & Capacity Building"/);
-    assert.match(source, /"Digital Systems & Technology"/);
     assert.match(source, /Status: \{ status: \{ name: "Proposed" \} \}/);
   }
   assert.match(programmes, /"Work Type": \{ select: \{ name: "Programme" \} \}/);
