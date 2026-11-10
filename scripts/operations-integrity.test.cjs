@@ -265,6 +265,22 @@ test("external engagement prevents duplicate records and rejects stale meeting h
   assert.match(page, /activeView === "agreements"/);
 });
 
+test("external invitation register uses validated cursor pagination and preserves loaded records", () => {
+  const adapter = read("lib/external-engagement.ts");
+  const route = read("app/ops/api/external-engagement/route.ts");
+  const page = read("app/ops/partners/page.tsx");
+  assert.match(adapter, /start_cursor/);
+  assert.match(adapter, /next_cursor/);
+  assert.match(adapter, /has_more/);
+  assert.match(adapter, /listExternalInvitations\(cursor\?\)/);
+  assert.match(route, /Invalid invitation pagination cursor/);
+  assert.match(route, /invitationsNextCursor/);
+  assert.match(route, /invitationsHasMore/);
+  assert.match(page, /Load more invitations/);
+  assert.match(page, /\[\.\.\.current\.invitations, \.\.\.result\.invitations\]/);
+  assert.match(page, /invitationsScope: "cursor-paginated"/);
+});
+
 test("external engagement is authenticated, linked and draft-only until human dispatch", () => {
   const adapter = fs.readFileSync(path.join(root, "lib/external-engagement.ts"), "utf8");
   const route = fs.readFileSync(path.join(opsRoot, "api/external-engagement/route.ts"), "utf8");
