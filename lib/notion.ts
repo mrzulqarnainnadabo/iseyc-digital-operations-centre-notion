@@ -11,7 +11,7 @@ function canonicalNotionId(id: string): string {
 }
 
 const NOTION_DATABASE_ID_PATTERN = /^[a-f0-9]{32}$/;
-type InternalDatabaseEnv = "NOTION_MEETINGS_DATABASE_ID" | "NOTION_DEPARTMENT_APPLICATIONS_DATABASE_ID";
+type InternalDatabaseEnv = "NOTION_MEETINGS_DATABASE_ID" | "NOTION_DEPARTMENT_APPLICATIONS_DATABASE_ID" | "NOTION_PARTNER_ORGANISATIONS_DATABASE_ID" | "NOTION_EXTERNAL_CONTACTS_DATABASE_ID" | "NOTION_MEETING_INVITATIONS_DATABASE_ID" | "NOTION_ACTIONS_DATABASE_ID" | "NOTION_MEDIA_DATABASE_ID" | "NOTION_CHAMBER_DATABASE_ID" | "NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID" | "NOTION_DEPARTMENT_WORKPLANS_DATABASE_ID" | "NOTION_DEPARTMENT_REPORTS_DATABASE_ID";
 
 export function dbId(envName: string): string {
   const candidate = canonicalNotionId(process.env[envName] || "");
@@ -62,6 +62,7 @@ export type MeetingRecord = {
 export type MeetingPage = {
   meetings: MeetingRecord[];
   nextCursor: string | null;
+  hasMore: boolean;
 };
 
 /**
@@ -75,7 +76,7 @@ export async function listMeetings(options: {
 } = {}): Promise<MeetingPage> {
   const client = notion();
   const database_id = dbId("NOTION_MEETINGS_DATABASE_ID");
-  if (!client || !database_id) return { meetings: [], nextCursor: null };
+  if (!client || !database_id) return { meetings: [], nextCursor: null, hasMore: false };
   assertInternalDb(database_id, "NOTION_MEETINGS_DATABASE_ID");
 
   const pageSize = Math.min(50, Math.max(1, Math.floor(options.pageSize ?? 25)));
@@ -112,6 +113,7 @@ export async function listMeetings(options: {
   return {
     meetings,
     nextCursor: res.has_more ? res.next_cursor ?? null : null,
+    hasMore: res.has_more === true,
   };
 }
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { StatusBadge } from "@/components/StatusBadge";
+import DepartmentArchitectureDiagram from "@/components/DepartmentArchitectureDiagram";
 
 const modules = [
   {
@@ -26,23 +27,37 @@ const modules = [
   {
     name: "Digital Chamber",
     route: "/ops/chamber",
-    state: "Not operational",
-    detail: "Placeholder only. Meeting sessions, attendance, minutes and decisions are not implemented.",
-    dependency: "Chamber records, workflow transitions, authorized actors and audit trail.",
+    state: "Partial",
+    detail: "Live session list and scheduling of sessions with date and summary are connected. Attendance, minutes, formal decisions and authorised closure remain disabled under shared-key sessions.",
+    dependency: "Verified individual identity, appointment authority, attendance records, minutes workflow and durable audit.",
   },
   {
     name: "Action register",
     route: "/ops/actions",
-    state: "Not operational",
-    detail: "No operational action ownership, due dates, evidence or closure workflow is connected. Placeholder only.",
-    dependency: "Approved decision linkage, responsible owners, review and closure evidence.",
+    state: "Partial",
+    detail: "Live list and creation of Open actions with accountable role and due date are connected. Evidence attachment, review escalation and authorised closure remain disabled.",
+    dependency: "Verified appointments, decision linkage, evidence storage and closure authority.",
   },
   {
     name: "Media & Content Command",
     route: "/ops/media",
+    state: "Partial",
+    detail: "Live editorial list and creation of Draft records with channel and notes are connected. Editorial approval, publication and dispatch remain disabled under shared-key sessions.",
+    dependency: "Verified editorial roles, approval history, publication evidence and individual identity.",
+  },
+  {
+    name: "External engagement",
+    route: "/ops/partners",
+    state: "Partial",
+    detail: "Organisation and contact directories, invitation drafts linked to approved meetings, and partnership agreement register views are connected. Invitation dispatch, RSVP handling and agreement execution remain disabled.",
+    dependency: "Verified organisations and contacts, approved meeting eligibility, individual dispatch authority and durable audit.",
+  },
+  {
+    name: "Department programmes & work plans",
+    route: "/ops/departments/education",
     state: "Not operational",
-    detail: "No editorial queue, approval workflow or publication evidence is connected. Placeholder only.",
-    dependency: "Draft records, editorial permissions, human approval and publication history.",
+    detail: "Programme, work-plan and report APIs and department UI panels are implemented. Live Notion persistence requires NOTION_DEPARTMENT_*_DATABASE_ID and integration share. No programme instances are invented when disconnected.",
+    dependency: "Create and share DCC Department Programmes, Work Plans and Reports databases; set NOTION_DEPARTMENT_*_DATABASE_ID; department-scoped access with verified appointments.",
   },
   {
     name: "Audit & security operations",
@@ -61,7 +76,7 @@ export default function ReadinessPage() {
         <h2 className="font-serif text-3xl text-forest-950">Module readiness</h2>
         <p className="max-w-2xl text-sm leading-6 text-ink-700">
           A factual view of what the Digital Operations Centre can do today, what remains a policy foundation,
-          and what is still a placeholder. A configured database or visible page does not mean a workflow is operational.
+          and what is still a Placeholder. Modules marked Partial have live list/create paths but blocked authority steps. A configured database or visible page does not mean a workflow is operational.
         </p>
       </header>
 
@@ -90,6 +105,37 @@ export default function ReadinessPage() {
           </article>
         ))}
       </div>
+
+      <DepartmentArchitectureDiagram />
+
+      <section className="space-y-3">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-700">Departments</p>
+          <h2 className="font-serif text-2xl text-forest-950">Department workspaces</h2>
+          <p className="mt-1 max-w-2xl text-sm leading-6 text-ink-700">
+            Each department workspace states its institutional responsibilities, links to shared operational
+            registers and keeps authority boundaries explicit. Programme registers and appointed ownership
+            remain unconnected until Notion env is configured.
+          </p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {[
+            { id: "education", name: "Education & Capacity Building" },
+            { id: "health", name: "Health & Well-being" },
+            { id: "digital-systems", name: "Digital Systems & Technology" },
+            { id: "civic-affairs", name: "Civic Affairs" },
+          ].map((dept) => (
+            <Link
+              key={dept.id}
+              href={`/ops/departments/${dept.id}`}
+              className="rounded-card border border-line bg-white p-4 shadow-card transition-colors hover:border-forest-800"
+            >
+              <p className="font-semibold text-forest-950">{dept.name}</p>
+              <p className="mt-1 text-sm text-ink-600">Open department workspace →</p>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       <footer className="rounded-card border border-line bg-cream-50 p-4">
         <p className="text-sm font-semibold text-ink-950">Institutional rule</p>

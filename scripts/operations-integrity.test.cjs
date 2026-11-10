@@ -15,6 +15,7 @@ require.extensions[".ts"] = (mod, filename) => {
 const { DOC_NAV } = require("../lib/nav.ts");
 const root = path.join(__dirname, "..");
 const opsRoot = path.join(root, "app/ops");
+const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 
 function collectPages(directory, prefix = "/ops") {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -84,19 +85,46 @@ test("operations loading state is announced accessibly", () => {
   assert.match(loading, /Loading operations view/);
 });
 
-test("planned operational modules cannot present placeholders as live workflows", () => {
-  const modules = [
-    ["actions", /data-status="not-operational"/],
-    ["chamber", /data-status="not-operational"/],
-    ["media", /data-status="not-operational"/]
-  ];
-  for (const [name, warning] of modules) {
-    const source = fs.readFileSync(path.join(opsRoot, name, "page.tsx"), "utf8");
-    assert.match(source, warning, `${name} must state its non-operational status`);
-    assert.match(source, /\/ops\/readiness/);
+test("actions, chamber and communications expose authenticated Notion-backed initial workflows", () => {
+  for (const [name, kind] of [["actions","actions"],["chamber","chamber"],["media","media"]]) {
+    const page = fs.readFileSync(path.join(opsRoot, name, "page.tsx"), "utf8");
+    assert.match(page, /requireStaffSession/);
+    assert.match(page, /OperationalRegister/);
+    assert.ok(page.includes(`kind="${kind}"`));
   }
+  const component = fs.readFileSync(path.join(root, "components/OperationalRegister.tsx"), "utf8");
+  assert.match(component, /Save to Notion/);
+  assert.match(component, /human-authorised/);
+  assert.match(component, /Accountable owner role · required/);
+  assert.match(component, /required minLength=\{2\} maxLength=\{180\}/);
+  assert.match(component, /does not assign access or imply a named appointment/);
+
+  const api = fs.readFileSync(path.join(opsRoot, "api/registers/[kind]/route.ts"), "utf8");
+  assert.match(api, /isSameOriginRequest/);
+  assert.match(api, /requireStaffSession/);
+  assert.match(api, /readBoundedJson/);
+  assert.match(api, /createRegisterDraft/);
+  const adapter = fs.readFileSync(path.join(root, "lib/notion-registers.ts"), "utf8");
+  assert.match(adapter, /NOTION_ACTIONS_DATABASE_ID/);
+  assert.match(adapter, /NOTION_MEDIA_DATABASE_ID/);
+  assert.match(adapter, /NOTION_CHAMBER_DATABASE_ID/);
+  assert.match(adapter, /client\.databases\.query/);
+  assert.match(adapter, /client\.pages\.create/);
 });
 
+
+test("Notion operational registers expose bounded cursor pagination", () => {
+  const adapter = read("lib/notion-registers.ts");
+  const api = read("app/ops/api/registers/[kind]/route.ts");
+  const ui = read("components/OperationalRegister.tsx");
+  assert.match(adapter, /start_cursor/);
+  assert.match(adapter, /next_cursor/);
+  assert.match(adapter, /has_more/);
+  assert.match(api, /Invalid pagination cursor/);
+  assert.match(api, /nextCursor: page.nextCursor/);
+  assert.match(ui, /Load more records/);
+  assert.match(ui, /\[\.\.\.current, \.\.\.j\.records\]/);
+});
 
 test("institutional design tokens and reduced-motion accessibility are present", () => {
   const css = fs.readFileSync(path.join(root, "app/globals.css"), "utf8");
@@ -196,4 +224,163 @@ test("department applications integration check validates schema without reading
   assert.match(route, /result\.configured && result\.accessible && result\.schemaReady/);
   assert.match(route, /ok: ready/);
   assert.match(route, /status: ready \? 200 : 503/);
+});
+
+
+test("register forms send only fields accepted by their route and communications reads its saved brief", () => {
+  const component = fs.readFileSync(path.join(root, "components/OperationalRegister.tsx"), "utf8");
+  const adapter = fs.readFileSync(path.join(root, "lib/notion-registers.ts"), "utf8");
+  const route = fs.readFileSync(path.join(opsRoot, "api/registers/[kind]/route.ts"), "utf8");
+  assert.match(component, /kind === "media" \? \{ title, detail, channel \} : \{ title, detail, date \}/);
+  assert.match(component, /Array\.isArray\(j\.records\)/);
+  assert.match(component, /setRows\(\[\]\)/);
+  assert.match(adapter, /detail: "Notes"/);
+  assert.match(adapter, /readText\(props\.Notes\).*readText\(props\.Channel\)/);
+  assert.match(route, /kind === "media" \? \["title", "detail", "channel"\] : \["title", "detail", "date"\]/);
+  assert.match(route, /kind === "actions" && detail.length < 2/);
+  assert.match(route, /kind === "actions" \|\| kind === "chamber"\) && !date/);
+  assert.match(component, /Due date · required/);
+  assert.match(component, /Session date · required/);
+});
+
+test("external invitation server validation requires an accountable owner role and eligibility filters relationships", () => {
+  const route = fs.readFileSync(path.join(opsRoot, "api/external-engagement/route.ts"), "utf8");
+  const adapter = fs.readFileSync(path.join(root, "lib/external-engagement.ts"), "utf8");
+  const page = fs.readFileSync(path.join(opsRoot, "partners/page.tsx"), "utf8");
+  assert.match(route, /ownerRole\.length < 2/);
+  assert.match(adapter, /prop\.type === "date"/);
+  assert.match(adapter, /relationshipStatus: read\(p\.properties\?\.\["Relationship status"\]\)/);
+  assert.match(page, /\["Paused", "Declined", "Former collaborator"\]/);
+  assert.match(page, /loading \|\| !loaded/);
+});
+
+test("external engagement prevents duplicate records and rejects stale meeting handoff IDs", () => {
+  const adapter = fs.readFileSync(path.join(root, "lib/external-engagement.ts"), "utf8");
+  const route = fs.readFileSync(path.join(opsRoot, "api/external-engagement/route.ts"), "utf8");
+  const page = fs.readFileSync(path.join(opsRoot, "partners/page.tsx"), "utf8");
+  assert.match(adapter, /DUPLICATE_ORGANISATION/);
+  assert.match(adapter, /DUPLICATE_CONTACT/);
+  assert.match(adapter, /does not belong to the selected organisation/);
+  assert.match(route, /status: 409/);
+  assert.match(page, /result\.meetings\?\.some/);
+  assert.match(page, /candidate : result\.meetings\?\.\[0\]/);
+  assert.match(page, /activeView === "directory"/);
+  assert.match(page, /activeView === "invitations"/);
+  assert.match(page, /activeView === "agreements"/);
+});
+
+test("external organisation, contact and approved-meeting selectors paginate independently", () => {
+  const notion = read("lib/notion.ts");
+  const adapter = read("lib/external-engagement.ts");
+  const route = read("app/ops/api/external-engagement/route.ts");
+  const page = read("app/ops/partners/page.tsx");
+  assert.match(notion, /hasMore: boolean/);
+  assert.match(notion, /hasMore: res\.has_more === true/);
+  assert.match(adapter, /listExternalOptions\(cursors: \{ organisations\?: string; contacts\?: string; meetings\?: string \}/);
+  assert.match(adapter, /organisationsNextCursor: orgPages\.nextCursor/);
+  assert.match(adapter, /contactsNextCursor: contactPages\.nextCursor/);
+  assert.match(adapter, /meetingsNextCursor: meetings\.nextCursor/);
+  assert.match(route, /organisationsCursor/);
+  assert.match(route, /contactsCursor/);
+  assert.match(route, /meetingsCursor/);
+  assert.match(route, /optionsScope: "independently cursor-paginated/);
+  assert.match(page, /Load more organisations/);
+  assert.match(page, /Load more contacts/);
+  assert.match(page, /Load more approved meetings/);
+  assert.match(page, /loadMoreOptions\(kind: OptionKind\)/);
+  assert.match(page, /organisationsHasMore/);
+  assert.match(page, /contactsHasMore/);
+  assert.match(page, /meetingsHasMore/);
+  assert.match(page, /if \(!appendInvitations\)/);
+  assert.match(page, /setInviteOrg\(current => current \|\| result\.organisations\?\.find\(eligibleOrganisation\)/);
+  assert.match(page, /nextCursorKey/);
+  assert.match(page, /hasMoreKey/);
+});
+
+test("external invitation register uses validated cursor pagination and preserves loaded records", () => {
+  const adapter = read("lib/external-engagement.ts");
+  const route = read("app/ops/api/external-engagement/route.ts");
+  const page = read("app/ops/partners/page.tsx");
+  assert.match(adapter, /start_cursor/);
+  assert.match(adapter, /next_cursor/);
+  assert.match(adapter, /has_more/);
+  assert.match(adapter, /listExternalInvitations\(cursor\?: string\)/);
+  assert.match(route, /const invitationCursor = params\.get\("cursor"\)/);
+  assert.match(route, /cursorPattern = \/\^\[a-f0-9-\]\{32,36\}\$\/i/);
+  assert.match(route, /Invalid register pagination cursor/);
+  assert.match(route, /invitationsNextCursor/);
+  assert.match(route, /invitationsHasMore/);
+  assert.match(page, /Load more invitations/);
+  assert.match(page, /\[\.\.\.current\.invitations, \.\.\.result\.invitations\]/);
+  assert.match(route, /invitationsScope: "cursor-paginated"/);
+});
+
+test("external engagement is authenticated, linked and draft-only until human dispatch", () => {
+  const adapter = fs.readFileSync(path.join(root, "lib/external-engagement.ts"), "utf8");
+  const route = fs.readFileSync(path.join(opsRoot, "api/external-engagement/route.ts"), "utf8");
+  const page = fs.readFileSync(path.join(opsRoot, "partners/page.tsx"), "utf8");
+  const notion = fs.readFileSync(path.join(root, "lib/notion.ts"), "utf8");
+  assert.match(adapter, /NOTION_PARTNER_ORGANISATIONS_DATABASE_ID/);
+  assert.match(adapter, /NOTION_EXTERNAL_CONTACTS_DATABASE_ID/);
+  assert.match(adapter, /NOTION_MEETING_INVITATIONS_DATABASE_ID/);
+  assert.match(adapter, /Approved/);
+  assert.match(adapter, /Standard/);
+  assert.match(adapter, /Verification status/);
+  assert.match(adapter, /Verified/);
+  assert.match(adapter, /Contact status/);
+  assert.match(adapter, /Former collaborator/);
+  assert.match(adapter, /Relationship status/);
+  assert.match(adapter, /pages\.create/);
+  assert.match(route, /isSameOriginRequest/);
+  assert.match(route, /requireStaffSession/);
+  assert.match(route, /readBoundedJson/);
+  assert.match(route, /status: "Draft"/);
+  assert.match(route, /Not sent/);
+  assert.match(route, /subject.length < 5/);
+  assert.match(route, /draft.length < 20/);
+  assert.match(adapter, /Invitation subject/);
+  assert.match(adapter, /Invitation draft/);
+  assert.match(page, /Invitation message draft/);
+  assert.match(page, /Create invitation draft/);
+  assert.match(page, /Draft only/);
+  assert.match(page, /verified identity and recorded contact basis/);
+  const meetingReview = fs.readFileSync(path.join(opsRoot, "review/[id]/page.tsx"), "utf8");
+  assert.match(meetingReview, /Prepare external invitations/);
+  assert.match(meetingReview, /meeting.status === "Approved"/);
+  assert.match(notion, /NOTION_MEETING_INVITATIONS_DATABASE_ID/);
+  assert.ok(DOC_NAV.some((item) => item.href === "/ops/partners"));
+});
+
+
+test("external engagement list responses do not disclose private email or phone fields to shared-key sessions", () => {
+  const adapter = fs.readFileSync(path.join(root, "lib/external-engagement.ts"), "utf8");
+  const route = fs.readFileSync(path.join(opsRoot, "api/external-engagement/route.ts"), "utf8");
+  assert.match(route, /requireStaffSession/);
+  assert.match(adapter, /row\(p, "Contact", "Official role", "Contact status"\)/);
+  assert.doesNotMatch(adapter, /row\(p, "Contact", "Work email"/);
+  assert.match(adapter, /detail: read\(p\.properties\?\.\["Organisation type"\]\)/);
+  assert.doesNotMatch(adapter, /read\(p\.properties\?\.\["Official email"\]\)/);
+  assert.doesNotMatch(adapter, /read\(p\.properties\?\.\["Work email"\]\)/);
+  assert.match(adapter, /if \(input\.email\) properties\["Work email"\]/);
+  assert.match(adapter, /if \(input\.phone\) properties\["Work phone"\]/);
+});
+
+test("external engagement keeps contact channels private and invitations as unsent drafts", () => {
+  const adapter = read("lib/external-engagement.ts");
+  const route = read("app/ops/api/external-engagement/route.ts");
+  const page = read("app/ops/partners/page.tsx");
+  const start = adapter.indexOf("export async function listExternalOptions(");
+  const end = adapter.indexOf("export async function listExternalInvitations(", start);
+  assert.ok(start >= 0 && end > start);
+  const publicListing = adapter.slice(start, end);
+  assert.doesNotMatch(publicListing, /Work email|Work phone|\.email|\.phone_number/i);
+  assert.match(route, /requireStaffSession/);
+  assert.match(route, /privateJson/);
+  assert.match(route, /isSameOriginRequest/);
+  assert.match(route, /readBoundedJson/);
+  assert.match(route, /Not sent — human approval and external dispatch are still required/);
+  assert.match(page, /x\.status === "Active" && x\.verified/);
+  assert.match(page, /It has NOT been sent/);
+  assert.match(adapter, /Unverified/);
+  assert.match(adapter, /Not recorded/);
 });

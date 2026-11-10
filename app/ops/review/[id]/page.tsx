@@ -128,6 +128,8 @@ export default function ReviewPage() {
         </div>
       </dl>
 
+      {meeting.status === "Approved" && meeting.sensitivity === "Standard" ? <section className="rounded-card border border-forest-200 bg-white p-4"><p className="text-xs font-semibold uppercase tracking-widest text-gold-700">External participation</p><h2 className="mt-1 font-serif text-xl text-forest-950">Invite organisations or contributors</h2><p className="mt-1 text-sm leading-5 text-ink-600">Prepare organisation-specific invitations linked to this approved meeting. Each invitation remains a draft until separately approved and dispatched.</p><Link href={`/ops/partners?meetingId=${encodeURIComponent(meeting.id)}`} className="mt-3 inline-flex min-h-[44px] items-center rounded-control bg-forest-900 px-4 text-sm font-semibold text-white">Prepare external invitations</Link></section> : null}
+
       {error ? <p className="rounded-control border border-red-200 bg-red-50 p-3 text-sm text-red-800" role="alert">{error}</p> : null}
 
       <section className="rounded-card border border-line bg-white p-4">
