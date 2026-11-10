@@ -134,7 +134,9 @@ test("institutional design tokens and reduced-motion accessibility are present",
     assert.ok(css.includes(token), `Missing design token ${token}`);
   }
   assert.match(css, /prefers-reduced-motion/);
-  assert.match(shell, /aria-label="Primary mobile navigation"/);\n  assert.doesNotMatch(shell, /aria-label="Mobile navigation"/);\n  assert.match(shell, /fixed inset-x-0 bottom-0/);
+  assert.match(shell, /aria-label="Primary mobile navigation"/);
+  assert.doesNotMatch(shell, /aria-label="Mobile navigation"/);
+  assert.match(shell, /fixed inset-x-0 bottom-0/);
   assert.match(shell, /aria-label="Primary navigation"/);
   assert.match(shell, /min-h-\[44px\]/);
   assert.match(dashboard, /Not operational/);
