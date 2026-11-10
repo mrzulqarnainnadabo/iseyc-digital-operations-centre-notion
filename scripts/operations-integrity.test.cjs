@@ -468,6 +468,14 @@ test("external engagement keeps contact channels private and invitations as unse
 });
 
 
+test("readiness page uses the approved fourth department name and plain operational language", () => {
+  const readiness = read("app/ops/readiness/page.tsx");
+  assert.match(readiness, /Civic Affairs & Public Accountability/);
+  assert.doesNotMatch(readiness, /name: "Civic Affairs"/);
+  assert.match(readiness, /not yet implemented or connected/);
+  assert.doesNotMatch(readiness, /Placeholder/);
+});
+
 test("operations shell carries the approved ISEYC identity and institutional signature", () => {
   const layout = read("app/layout.tsx");
   const shell = read("components/DocShell.tsx");
