@@ -7,15 +7,73 @@ import { filterLegacyVisibleMeetings } from "@/lib/legacy-session-boundary";
 export const dynamic = "force-dynamic";
 
 const departments = [
-  { id: "education", name: "Education & Capacity Building" },
-  { id: "health", name: "Health & Well-being" },
-  { id: "digital-systems", name: "Digital Systems & Technology" },
-  { id: "civic-affairs", name: "Civic Affairs" },
+  {
+    id: "education",
+    number: "01",
+    name: "Education & Capacity Building",
+    short: "Learning access, skills and stronger learning environments.",
+    focus: ["Learning access", "Skills development", "Education partnerships"],
+    tone: "education",
+  },
+  {
+    id: "health",
+    number: "02",
+    name: "Health & Well-being",
+    short: "Community health, prevention and access to essential services.",
+    focus: ["Health awareness", "Primary care access", "Facility conditions"],
+    tone: "health",
+  },
+  {
+    id: "digital-systems",
+    number: "03",
+    name: "Digital Systems & Technology",
+    short: "Digital inclusion, institutional systems and responsible innovation.",
+    focus: ["Digital inclusion", "Institutional systems", "Technology capacity"],
+    tone: "digital",
+  },
+  {
+    id: "civic-affairs",
+    number: "04",
+    name: "Civic Affairs",
+    short: "Civic participation, community concerns and accountability.",
+    focus: ["Civic participation", "Community engagement", "Accountability"],
+    tone: "civic",
+  },
 ] as const;
 
+function DepartmentGlyph({ tone }: { tone: string }) {
+  if (tone === "education") return (
+    <svg viewBox="0 0 80 80" aria-hidden="true" className="h-16 w-16">
+      <path d="M10 19c12-5 22-3 30 4v40c-8-7-18-9-30-4V19Z" fill="none" stroke="currentColor" strokeWidth="2.4" />
+      <path d="M70 19c-12-5-22-3-30 4v40c8-7 18-9 30-4V19Z" fill="none" stroke="currentColor" strokeWidth="2.4" />
+      <path d="M20 29c6-1 11 0 15 3M20 38c6-1 11 0 15 3M60 29c-6-1-11 0-15 3M60 38c-6-1-11 0-15 3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+  if (tone === "health") return (
+    <svg viewBox="0 0 80 80" aria-hidden="true" className="h-16 w-16">
+      <path d="M40 12v56M12 40h56" stroke="currentColor" strokeWidth="1.5" opacity=".25" />
+      <path d="M9 42h17l7-16 11 30 8-17h19" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="40" cy="40" r="31" fill="none" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  );
+  if (tone === "digital") return (
+    <svg viewBox="0 0 80 80" aria-hidden="true" className="h-16 w-16">
+      <path d="M40 15 17 28v25l23 13 23-13V28L40 15Z" fill="none" stroke="currentColor" strokeWidth="2" />
+      <path d="m17 28 23 13 23-13M40 41v25" fill="none" stroke="currentColor" strokeWidth="2" />
+      <circle cx="40" cy="15" r="4" fill="currentColor" /><circle cx="17" cy="28" r="4" fill="currentColor" /><circle cx="63" cy="28" r="4" fill="currentColor" /><circle cx="40" cy="41" r="4" fill="currentColor" /><circle cx="17" cy="53" r="4" fill="currentColor" /><circle cx="63" cy="53" r="4" fill="currentColor" /><circle cx="40" cy="66" r="4" fill="currentColor" />
+    </svg>
+  );
+  return (
+    <svg viewBox="0 0 80 80" aria-hidden="true" className="h-16 w-16">
+      <circle cx="40" cy="40" r="29" fill="none" stroke="currentColor" strokeWidth="2" />
+      <circle cx="40" cy="40" r="17" fill="none" stroke="currentColor" strokeWidth="2" />
+      <circle cx="40" cy="11" r="4" fill="currentColor" /><circle cx="69" cy="40" r="4" fill="currentColor" /><circle cx="40" cy="69" r="4" fill="currentColor" /><circle cx="11" cy="40" r="4" fill="currentColor" />
+      <path d="M40 23v34M23 40h34" stroke="currentColor" strokeWidth="1.5" opacity=".55" />
+    </svg>
+  );
+}
+
 export default async function CommandBriefPage() {
-  // Defence in depth: verify at the page/data boundary as well as the
-  // protected layout before reading the private Notion meeting register.
   if (!(await requireStaffSession())) redirect("/login");
 
   const flags = configFlags();
@@ -26,139 +84,122 @@ export default async function CommandBriefPage() {
       const firstPage = await listMeetings({ pageSize: 25 });
       meetings = filterLegacyVisibleMeetings(firstPage.meetings);
     } catch {
-      listError = "Unable to load the meeting queue. No count is shown until the source responds.";
+      listError = "The meeting queue could not be reached. No count is shown.";
     }
   }
-
   const awaiting = meetings.filter((meeting) => ["New", "Draft", "In review"].includes(meeting.status));
-  const queueConnected = flags.token && flags.meetings && !listError;
+  const queueConnected = Boolean(flags.token && flags.meetings && !listError);
 
   return (
-    <div className="mx-auto max-w-7xl space-y-7">
-      <section className="overflow-hidden rounded-card border border-forest-900 bg-forest-950 text-white shadow-card">
-        <div className="border-b border-white/10 px-5 py-5 sm:px-7 sm:py-6">
-          <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h1 className="font-serif text-[27px] leading-tight sm:text-3xl">Command home</h1>
+    <main className="mx-auto max-w-7xl space-y-8 pb-8">
+      <section className="relative isolate overflow-hidden rounded-[22px] bg-[#10392e] text-white shadow-[0_18px_48px_rgba(12,43,34,.14)]">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-24 h-80 w-80 rounded-full border border-white/10" />
+        <div aria-hidden="true" className="pointer-events-none absolute -right-4 -top-12 h-56 w-56 rounded-full border border-[#c7a66a]/35" />
+        <div className="relative grid gap-8 px-6 py-8 sm:px-9 sm:py-10 lg:grid-cols-[1.15fr_.85fr] lg:items-center">
+          <div>
+            <div className="flex items-center gap-3">
+              <span className="h-px w-8 bg-[#c7a66a]" />
+              <p className="text-[10px] font-bold uppercase tracking-[.24em] text-[#ddc99f]">ISEYC · Institutional operations</p>
             </div>
-            <span className="inline-flex min-h-[32px] w-fit items-center rounded-full border border-white/20 px-3 text-xs font-medium text-white/80">Private</span>
+            <h1 className="mt-5 max-w-2xl font-serif text-4xl leading-[1.04] tracking-[-.035em] sm:text-5xl">Four departments.<br /><span className="text-[#d9c59b]">One institution.</span></h1>
+            <p className="mt-4 max-w-xl text-sm leading-6 text-white/75 sm:text-base">The work of ISEYC is organised through four departments, supported by shared coordination and human review.</p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link href="#departments" className="inline-flex min-h-11 items-center rounded-full bg-[#e8d8b4] px-5 text-sm font-bold text-[#173c30] transition hover:bg-white">Explore departments <span aria-hidden="true" className="ml-2">↗</span></Link>
+              <Link href="/ops/readiness" className="inline-flex min-h-11 items-center rounded-full border border-white/25 px-5 text-sm font-semibold text-white transition hover:bg-white/10">System readiness</Link>
+            </div>
+          </div>
+          <div className="relative mx-auto w-full max-w-md">
+            <div className="grid grid-cols-2 gap-3">
+              {departments.map((department) => (
+                <Link key={department.id} href={`/ops/departments/${department.id}`} className="group flex min-h-[132px] flex-col justify-between rounded-2xl border border-white/15 bg-white/[.07] p-4 backdrop-blur-sm transition hover:-translate-y-1 hover:bg-white/[.12]">
+                  <span className="text-[10px] font-semibold tracking-[.18em] text-[#d9c59b]">{department.number} / DEPARTMENT</span>
+                  <span className="flex items-end justify-between gap-2">
+                    <span className="max-w-[130px] text-sm font-semibold leading-5 text-white">{department.name.split(" & ")[0]}</span>
+                    <span className="text-xl text-[#d9c59b]" aria-hidden="true">↗</span>
+                  </span>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-3 flex items-center justify-center gap-2 text-[10px] uppercase tracking-[.2em] text-white/45"><span className="h-px w-8 bg-white/20" />Shared institutional coordination<span className="h-px w-8 bg-white/20" /></div>
           </div>
         </div>
-        <div className="grid divide-y divide-white/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-          <div className="px-5 py-4 sm:px-7">
-            <p className="text-xs text-white/60">Awaiting · first page</p>
-            <p className="mt-1 font-serif text-3xl tabular-nums">{queueConnected ? awaiting.length : "—"}</p>
-            <p className="mt-1 text-xs text-white/60">{queueConnected ? "Up to 25 loaded records · open queue for more" : "Not connected"}</p>
-          </div>
-          <div className="px-5 py-4 sm:px-7">
-            <p className="text-xs text-white/60">Meeting register</p>
-            <p className="mt-1 text-xl font-semibold">{queueConnected ? "Connected" : "Not connected"}</p>
-            <p className="mt-1 text-xs text-white/60">Notion-backed · Standard records only</p>
-          </div>
-          <div className="px-5 py-4 sm:px-7">
-            <p className="text-xs text-white/60">Decision authority</p>
-            <p className="mt-1 text-xl font-semibold">Human-led</p>
-            <p className="mt-1 text-xs text-white/60">Transitional shared-key limits apply</p>
-          </div>
-        </div>
-        {listError ? <p role="alert" className="border-t border-white/10 bg-amber-950/40 px-5 py-3 text-sm text-amber-100 sm:px-7">{listError}</p> : null}
-      </section>
-
-      <section aria-labelledby="council-heading" className="space-y-3">
-        <div className="flex flex-wrap items-end justify-between gap-2">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Governance structure</p>
-            <h2 id="council-heading" className="text-lg font-semibold text-forest-950">Presidential Council</h2>
-          </div>
-          <span className="text-xs text-ink-600">Seat occupancy not connected</span>
-        </div>
-        <div className="rounded-card border border-line bg-white p-4 shadow-card sm:flex sm:items-center sm:justify-between sm:p-5">
-          <div>
-            <p className="font-semibold text-ink-950">Council seat register</p>
-            <p className="mt-1 text-sm leading-5 text-ink-600">Role titles, appointment records and current seat-holders must come from approved governance data.</p>
-          </div>
-          <span className="mt-3 inline-flex min-h-[30px] items-center rounded-full border border-amber-200 bg-amber-50 px-3 text-xs font-semibold text-amber-900 sm:mt-0">Not connected</span>
+        <div className="relative grid grid-cols-3 divide-x divide-white/10 border-t border-white/10 bg-black/10">
+          <div className="px-5 py-4 sm:px-8"><p className="text-[10px] uppercase tracking-[.16em] text-white/50">Department structure</p><p className="mt-1 text-sm font-semibold">4 workspaces</p></div>
+          <div className="px-5 py-4 sm:px-8"><p className="text-[10px] uppercase tracking-[.16em] text-white/50">Review model</p><p className="mt-1 text-sm font-semibold">Human-led</p></div>
+          <div className="px-5 py-4 sm:px-8"><p className="text-[10px] uppercase tracking-[.16em] text-white/50">Current access</p><p className="mt-1 text-sm font-semibold">Coordination only</p></div>
         </div>
       </section>
 
-      <section id="departments" aria-labelledby="departments-heading" className="space-y-3">
-        <div className="flex flex-wrap items-end justify-between gap-2">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Institutional structure</p>
-            <h2 id="departments-heading" className="text-lg font-semibold text-forest-950">Department workspaces</h2>
-            <p className="mt-1 max-w-2xl text-sm leading-6 text-ink-600">
-              Departments are the primary organising unit of ISEYC operations. Each desk covers mandate,
-              functions, programmes, work plans, reports and shared tools. Live programme registers require
-              configured Notion env; officer appointment records remain unconnected.
-            </p>
-          </div>
-          <Link href="/ops/readiness" className="min-h-[44px] inline-flex items-center text-sm font-semibold text-forest-800 hover:underline">View readiness</Link>
+      <section id="departments" className="scroll-mt-6 space-y-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">The institutional structure</p><h2 className="mt-1 font-serif text-2xl text-[#173c30] sm:text-3xl">Department workspaces</h2></div>
+          <p className="max-w-sm text-xs leading-5 text-[#68736b]">Select a department to enter its dedicated operating desk.</p>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2">
           {departments.map((department) => (
-            <Link key={department.id} href={`/ops/departments/${department.id}`} className="flex min-h-[128px] flex-col rounded-card border border-line bg-white p-4 shadow-card hover:border-forest-800">
-              <span className="w-fit rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-900">Coordination only</span>
-              <h3 className="mt-4 text-sm font-semibold leading-5 text-ink-950">{department.name}</h3>
-              <p className="mt-2 text-xs leading-5 text-ink-600">Mandate, programmes, work plans, reports and shared registers.</p>
+            <Link key={department.id} href={`/ops/departments/${department.id}`} className={`group relative isolate flex min-h-[248px] flex-col overflow-hidden rounded-2xl border border-[#e1e5dc] bg-white p-5 shadow-[0_4px_18px_rgba(20,49,38,.045)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_16px_34px_rgba(20,49,38,.09)] sm:p-6 dept-workspace-card dept-workspace-card--${department.tone}`}>
+              <div className="flex items-start justify-between gap-3">
+                <span className="text-xs font-semibold tracking-[.16em] text-[#7b6a4b]">{department.number}</span>
+                <span className="dept-workspace-glyph"><DepartmentGlyph tone={department.tone} /></span>
+              </div>
+              <div className="mt-auto">
+                <h3 className="max-w-sm font-serif text-2xl leading-tight text-[#173c30]">{department.name}</h3>
+                <p className="mt-2 max-w-md text-sm leading-5 text-[#68736b]">{department.short}</p>
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                  {department.focus.map((item) => <span key={item} className="rounded-full border border-[#e5e8e1] bg-[#fafaf7] px-2.5 py-1 text-[10px] font-medium text-[#59665d]">{item}</span>)}
+                </div>
+                <div className="mt-5 flex items-center justify-between border-t border-[#edf0ea] pt-3 text-xs font-bold text-[#194b3b]"><span>Enter department workspace</span><span className="text-base transition group-hover:translate-x-1" aria-hidden="true">→</span></div>
+              </div>
             </Link>
           ))}
         </div>
       </section>
 
-      <section aria-labelledby="shared-heading" className="rounded-card border border-line bg-white p-4 shadow-card sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-5">
-        <div className="min-w-0">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Shared function · not a fifth department</p>
-          <h2 id="shared-heading" className="mt-1 text-base font-semibold text-forest-950">Communications coordination</h2>
-          <p className="mt-1 text-sm leading-6 text-ink-600">Draft editorial records only. Publication remains Not operational under shared-key sessions.</p>
-        </div>
-        <div className="mt-3 flex shrink-0 flex-wrap items-center gap-2 sm:mt-0">
-          <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-900">Partial</span>
-          <Link href="/ops/media" className="inline-flex min-h-[44px] items-center rounded-control border border-line px-3 text-sm font-semibold text-forest-800 hover:bg-forest-100">Open communications</Link>
-        </div>
-      </section>
-
-      <section className="grid gap-3 sm:grid-cols-2">
-        <Link href="/ops/queue" className="group rounded-card border border-forest-900 bg-forest-900 p-5 shadow-card hover:bg-forest-800">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#d7c18f]">Primary action · human review</p>
-          <h2 className="mt-1 text-base font-semibold text-white">Open queue</h2>
-          <span className="mt-4 inline-flex min-h-[44px] items-center text-sm font-semibold text-white">Open</span>
-        </Link>
-        <Link href="/ops/intake" className="group rounded-card border border-line bg-white p-5 shadow-card hover:border-forest-800">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Notion workflow</p>
-          <h2 className="mt-1 text-base font-semibold text-forest-950">Meeting intake</h2>
-          <span className="mt-4 inline-flex min-h-[44px] items-center rounded-control border border-line px-3 text-sm font-semibold text-forest-800">Start</span>
-        </Link>
-      </section>
-
-      <section aria-labelledby="environment-heading" className="rounded-card border border-line bg-white p-4">
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Configuration indicators</p>
-          <h2 id="environment-heading" className="mt-1 text-sm font-semibold text-forest-950">Environment configuration</h2>
-        </div>
-        <ul className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
-          {([
-            ["Staff key", flags.staffKey],
-            ["Notion token", flags.token],
-            ["Meetings database", flags.meetings],
-            ["Media database", flags.media],
-            ["Chamber database", flags.chamber],
-            ["Actions database", flags.actions],
-          ] as const).map(([label, configured]) => (
-            <li key={label} className="flex min-h-[40px] items-center justify-between rounded-control border border-line px-3">
-              <span className="text-ink-700">{label}</span>
-              <span className={configured ? "font-semibold text-forest-800" : "text-ink-600"}>{configured ? "Configured" : "Not configured"}</span>
-            </li>
+      <section className="rounded-2xl border border-[#e1e5dc] bg-[#f4f3ed] p-5 sm:p-7">
+        <div className="max-w-2xl"><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">How work moves</p><h2 className="mt-1 font-serif text-2xl text-[#173c30]">From departmental work to institutional review</h2></div>
+        <div className="mt-6 grid gap-3 md:grid-cols-4">
+          {[
+            ["01", "Department", "Programmes and priorities"],
+            ["02", "Work planning", "Deliverables and follow-up"],
+            ["03", "Shared registers", "Meetings, actions and coordination"],
+            ["04", "Human review", "Review before formal decisions"],
+          ].map(([number, title, detail], index) => (
+            <div key={number} className="relative rounded-xl border border-[#e0e4db] bg-white p-4">
+              <span className="text-[10px] font-bold tracking-[.15em] text-[#a7833f]">{number}</span>
+              <h3 className="mt-3 text-sm font-bold text-[#173c30]">{title}</h3>
+              <p className="mt-1 text-xs leading-5 text-[#68736b]">{detail}</p>
+              {index < 3 ? <span className="absolute -right-2.5 top-1/2 z-10 hidden h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full border border-[#dfe4dc] bg-[#f4f3ed] text-xs text-[#8a6b34] md:flex" aria-hidden="true">›</span> : null}
+            </div>
           ))}
-        </ul>
+        </div>
+        <p className="mt-4 text-[11px] leading-5 text-[#68736b]">A record being drafted or planned does not mean that work has been approved, delivered or verified.</p>
       </section>
 
-      <section className="rounded-card border border-line bg-forest-100 p-4 sm:p-5">
-        <p className="text-sm font-semibold text-forest-950">Published civic systems</p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <a href="https://2027-street-mandate.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center rounded-control border border-forest-900 bg-white px-3 text-sm font-semibold text-forest-900">Civic Mandate ↗</a>
-          <a href="https://iseyc-civic-brain.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center rounded-control border border-forest-900 bg-white px-3 text-sm font-semibold text-forest-900">Civic Brain ↗</a>
+      <section className="grid gap-4 lg:grid-cols-[1.2fr_.8fr]">
+        <div className="rounded-2xl border border-[#dce4dc] bg-white p-5 sm:p-6">
+          <p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">Shared institutional function</p>
+          <h2 className="mt-1 font-serif text-xl text-[#173c30]">Coordination across departments</h2>
+          <p className="mt-2 max-w-xl text-sm leading-5 text-[#68736b]">Common registers support meetings, actions, communications and external engagement. They do not replace departmental ownership.</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link href="/ops/actions" className="inline-flex min-h-10 items-center rounded-full border border-[#dce4dc] px-4 text-xs font-semibold text-[#194b3b] hover:bg-[#f3f6f2]">Actions</Link>
+            <Link href="/ops/intake" className="inline-flex min-h-10 items-center rounded-full border border-[#dce4dc] px-4 text-xs font-semibold text-[#194b3b] hover:bg-[#f3f6f2]">Meeting intake</Link>
+            <Link href="/ops/media" className="inline-flex min-h-10 items-center rounded-full border border-[#dce4dc] px-4 text-xs font-semibold text-[#194b3b] hover:bg-[#f3f6f2]">Communications</Link>
+            <Link href="/ops/partners" className="inline-flex min-h-10 items-center rounded-full border border-[#dce4dc] px-4 text-xs font-semibold text-[#194b3b] hover:bg-[#f3f6f2]">External engagement</Link>
+            <Link href="/ops/chamber" className="inline-flex min-h-10 items-center rounded-full border border-[#dce4dc] px-4 text-xs font-semibold text-[#194b3b] hover:bg-[#f3f6f2]">Digital Chamber</Link>
+          </div>
+        </div>
+        <div className="rounded-2xl bg-[#173f32] p-5 text-white sm:p-6">
+          <p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#d9c59b]">Review queue</p>
+          <p className="mt-3 font-serif text-4xl tabular-nums">{queueConnected ? awaiting.length : "—"}</p>
+          <p className="mt-1 text-xs text-white/65">{queueConnected ? "Awaiting review in the first 25 loaded records" : "Meeting register not connected"}</p>
+          {listError ? <p role="alert" className="mt-2 text-xs text-amber-200">{listError}</p> : null}
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Link href="/ops/queue" className="inline-flex min-h-10 items-center rounded-full bg-[#e8d8b4] px-4 text-xs font-bold text-[#173c30]">Open review queue ↗</Link>
+            <Link href="/ops/readiness" className="inline-flex min-h-10 items-center rounded-full border border-white/25 px-4 text-xs font-semibold text-white">Readiness</Link>
+          </div>
+          <p className="mt-4 text-[10px] leading-4 text-white/50">Live count is shown only when the connected register responds. No estimated activity is displayed.</p>
         </div>
       </section>
-    </div>
+    </main>
   );
 }
