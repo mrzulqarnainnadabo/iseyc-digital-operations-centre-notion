@@ -468,6 +468,17 @@ test("external engagement keeps contact channels private and invitations as unse
 });
 
 
+test("operations shell carries the approved ISEYC identity and institutional signature", () => {
+  const layout = read("app/layout.tsx");
+  const shell = read("components/DocShell.tsx");
+  assert.match(layout, /ISEYC \| Digital Operations Centre/);
+  assert.match(layout, /institutional operating environment/);
+  assert.match(shell, /Empowering Youth, Shaping Communities/);
+  assert.match(shell, /iseycglobal@gmail\.com/);
+  assert.match(shell, /@iseyc_global/);
+  assert.match(shell, /iseyc-seal\.svg/);
+});
+
 test("officer access page uses the approved full Civic Affairs department name", () => {
   const access = read("app/ops/access/page.tsx");
   assert.match(access, /Civic Affairs & Public Accountability/);
