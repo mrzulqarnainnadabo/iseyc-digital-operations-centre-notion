@@ -109,6 +109,19 @@ test("actions, chamber and communications expose authenticated Notion-backed ini
 });
 
 
+test("Notion operational registers expose bounded cursor pagination", () => {
+  const adapter = read("lib/notion-registers.ts");
+  const api = read("app/ops/api/registers/[kind]/route.ts");
+  const ui = read("components/OperationalRegister.tsx");
+  assert.match(adapter, /start_cursor/);
+  assert.match(adapter, /next_cursor/);
+  assert.match(adapter, /has_more/);
+  assert.match(api, /Invalid pagination cursor/);
+  assert.match(api, /nextCursor: page.nextCursor/);
+  assert.match(ui, /Load more records/);
+  assert.match(ui, /\[\.\.\.current, \.\.\.j\.records\]/);
+});
+
 test("institutional design tokens and reduced-motion accessibility are present", () => {
   const css = fs.readFileSync(path.join(root, "app/globals.css"), "utf8");
   const shell = fs.readFileSync(path.join(root, "components/DocShell.tsx"), "utf8");
