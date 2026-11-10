@@ -142,8 +142,8 @@ test("department adapters preserve canonical UI labels while writing exact live 
     const source = read(file);
     assert.match(source, /"digital-systems": "Software & Technology"/);
     assert.match(source, /"civic-affairs": "Civic Department"/);
-    assert.match(source, /Department: \\{ select: \\{ name: DEPARTMENT_SELECT\\[input\\.departmentId\\] \\} \\}/);
+    assert.match(source, /Department: \{ select: \{ name: DEPARTMENT_SELECT\[input\.departmentId\] \} \}/);
   }
-  assert.match(model, /case "software & technology":\\s*return "digital-systems"/);
-  assert.match(model, /case "civic department":\\s*return "civic-affairs"/);
+  assert.match(model, /case "software & technology":\s*return "digital-systems"/);
+  assert.match(model, /case "civic department":\s*return "civic-affairs"/);
 });
