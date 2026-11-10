@@ -36,6 +36,23 @@ test("department programme work-plan and report Notion adapters bind internal da
   assert.match(notion, /NOTION_DEPARTMENT_REPORTS_DATABASE_ID/);
 });
 
+test("unknown Notion department values remain Unspecified across all registers", () => {
+  const model = read("lib/department-operations.ts");
+  assert.match(model, /export type DepartmentRecordId = OpsDepartmentId \| "Unspecified"/);
+  assert.match(model, /default:\s*return "Unspecified"/);
+  for (const file of [
+    "lib/notion-department-programmes.ts",
+    "lib/notion-department-workplans.ts",
+    "lib/notion-department-reports.ts",
+  ]) {
+    const adapter = read(file);
+    assert.match(adapter, /departmentIdFromNotionSelect\(deptRaw\)/);
+    assert.doesNotMatch(adapter, /let departmentId: OpsDepartmentId = "education"/);
+  }
+  assert.match(model, /case "software & technology":\s*return "digital-systems"/);
+  assert.match(model, /case "civic department":\s*return "civic-affairs"/);
+});
+
 test("department desks mount programme work-plan and report panels with tools", () => {
   assert.match(read("components/DepartmentProgrammePanel.tsx"), /Save programme draft/);
   assert.match(read("components/DepartmentWorkPlanPanel.tsx"), /Save work-plan item/);
