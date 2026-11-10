@@ -246,6 +246,39 @@ export async function createMeeting(input: {
   return { id: page.id };
 }
 
+export async function updateMeetingDraft(
+  id: string,
+  input: { attendanceNotes?: string; draftMinutes?: string; outcomeSummary?: string }
+): Promise<void> {
+  const client = notion();
+  const database_id = dbId("NOTION_MEETINGS_DATABASE_ID");
+  if (!client || !database_id) throw new Error("Notion meetings database not configured");
+  assertInternalDb(database_id, "NOTION_MEETINGS_DATABASE_ID");
+
+  const page: any = await client.pages.retrieve({ page_id: id });
+  if (
+    typeof page.parent?.database_id !== "string" ||
+    canonicalNotionId(page.parent.database_id) !== database_id
+  ) {
+    throw new Error("Refusing to update a page outside the configured internal Meetings database.");
+  }
+  const sensitivity = textProp(page.properties?.Sensitivity);
+  if (sensitivity !== "Standard") throw new Error("Draft collaboration is limited to Standard meeting records.");
+
+  const properties: Record<string, unknown> = {};
+  if (input.attendanceNotes !== undefined) {
+    properties["Attendance & apologies"] = { rich_text: [{ text: { content: input.attendanceNotes.slice(0, 1000) } }] };
+  }
+  if (input.draftMinutes !== undefined) {
+    properties["Draft minutes"] = { rich_text: [{ text: { content: input.draftMinutes.slice(0, 1900) } }] };
+  }
+  if (input.outcomeSummary !== undefined) {
+    properties["Meeting outcome"] = { rich_text: [{ text: { content: input.outcomeSummary.slice(0, 1000) } }] };
+  }
+  if (!Object.keys(properties).length) throw new Error("No draft fields supplied.");
+  await client.pages.update({ page_id: id, properties: properties as any });
+}
+
 export async function setMeetingStatus(
   id: string,
   status: "In review" | "Approved" | "Archived" | "Draft"
