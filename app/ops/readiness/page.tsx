@@ -123,7 +123,7 @@ export default function ReadinessPage() {
             { id: "education", name: "Education & Capacity Building" },
             { id: "health", name: "Health & Well-being" },
             { id: "digital-systems", name: "Digital Systems & Technology" },
-            { id: "civic-affairs", name: "Civic Affairs" },
+            { id: "civic-affairs", name: "Civic Affairs & Public Accountability" },
           ].map((dept) => (
             <Link
               key={dept.id}
