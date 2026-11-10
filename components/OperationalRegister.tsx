@@ -59,7 +59,7 @@ function ActionProgressForm({ row, onSaved }: { row: RecordRow; onSaved: () => v
     <details className="mt-4 border-t border-line pt-3">
       <summary className="min-h-10 cursor-pointer list-none text-xs font-bold text-forest-800">Update working progress <span aria-hidden="true">＋</span></summary>
       <form onSubmit={submit} className="mt-3 space-y-3">
-        <p className="text-[10px] leading-4 text-ink-600">Self-reported working status only. This cannot mark an action Done or close it.</p>
+        <p className="text-[10px] leading-4 text-ink-600">Self-reported working status only. This update does not mark an action Done or close it.</p>
         <label className="block text-xs font-semibold text-ink-800">Working status
           <select value={status} onChange={(event) => setStatus(event.target.value as "In progress" | "Blocked")} className={field}>
             <option>In progress</option><option>Blocked</option>
