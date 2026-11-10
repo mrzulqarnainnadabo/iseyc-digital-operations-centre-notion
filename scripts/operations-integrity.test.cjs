@@ -468,6 +468,25 @@ test("external engagement keeps contact channels private and invitations as unse
 });
 
 
+test("department work plans cannot link programmes across departments or unrelated databases", () => {
+  const adapter = read("lib/notion-department-workplans.ts");
+  const route = read("app/ops/api/department-workplans/route.ts");
+  assert.match(adapter, /NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID/);
+  assert.match(adapter, /client\.pages\.retrieve/);
+  assert.match(adapter, /relatedProgramme\.parent\?\.database_id/);
+  assert.match(adapter, /relatedDepartment !== DEPARTMENT_SELECT\[input\.departmentId\]/);
+  assert.match(adapter, /same department/);
+  assert.match(route, /Programme relation must be a valid Notion page id/);
+});
+
+test("department programme dates reject an end date before the start date", () => {
+  const route = read("app/ops/api/department-programmes/route.ts");
+  assert.match(route, /endDate < startDate/);
+  assert.match(route, /End date cannot be earlier than the start date/);
+  assert.match(route, /validDate\(startDate\)/);
+  assert.match(route, /validDate\(endDate\)/);
+});
+
 test("council role guide defines bounded templates without inventing appointments", () => {
   const page = read("app/ops/council/page.tsx");
   const framework = read("docs/COUNCIL-ROLE-AND-DEVELOPMENT-FRAMEWORK.md");
