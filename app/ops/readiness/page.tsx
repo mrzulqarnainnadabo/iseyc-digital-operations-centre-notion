@@ -52,6 +52,13 @@ const modules = [
     dependency: "Verified organisations and contacts, approved meeting eligibility, individual dispatch authority and durable audit.",
   },
   {
+    name: "Department programmes & work plans",
+    route: "/ops/departments/education",
+    state: "Not operational",
+    detail: "Operating architecture and workspace structure exist for all four departments. Programme, work-plan and report Notion registers are not configured. No programme instances are invented.",
+    dependency: "Create and share DCC Department Programmes, Work Plans and Reports databases; set NOTION_DEPARTMENT_*_DATABASE_ID; department-scoped access with verified appointments.",
+  },
+  {
     name: "Audit & security operations",
     route: "/ops/access",
     state: "Not operational",
