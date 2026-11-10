@@ -468,6 +468,15 @@ test("external engagement keeps contact channels private and invitations as unse
 });
 
 
+test("meeting review queue does not imply it handles every institutional approval", () => {
+  const page = read("app/ops/queue/page.tsx");
+  const nav = read("lib/nav.ts");
+  assert.match(page, /Meeting review queue/);
+  assert.match(page, /This queue covers meeting briefs only/);
+  assert.match(page, /Department programme, finance and other institutional approvals are not managed here/);
+  assert.match(nav, /label: "Meeting review queue"/);
+});
+
 test("department draft forms are collapsed until requested and clearly explain their status", () => {
   const programme = read("components/DepartmentProgrammePanel.tsx");
   const workplan = read("components/DepartmentWorkPlanPanel.tsx");
