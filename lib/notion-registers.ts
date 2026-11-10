@@ -1,7 +1,7 @@
 import { dbId, notion, assertInternalDb, getMeeting } from "@/lib/notion";
 
 export type RegisterKind = "actions" | "media" | "chamber";
-type Row = { id: string; title: string; status: string; detail: string; date: string; url: string; department: string; priority: string; expectedEvidence: string; blocker: string; sourceMeetingId: string; purpose: string; chairRole: string; secretaryRole: string; agenda: string; attendanceBasis: string; decisionItems: string; draftMinutes: string; decisionOutcome: string };
+type Row = { id: string; title: string; status: string; detail: string; date: string; url: string; department: string; priority: string; expectedEvidence: string; blocker: string; sourceMeetingId: string; notes: string; purpose: string; chairRole: string; secretaryRole: string; agenda: string; attendanceBasis: string; decisionItems: string; draftMinutes: string; decisionOutcome: string };
 const CONFIG = {
   actions: { env: "NOTION_ACTIONS_DATABASE_ID", title: "Name", status: "Status", detail: "Owner", date: "Due date" },
   media: { env: "NOTION_MEDIA_DATABASE_ID", title: "Name", status: "Status", detail: "Notes", date: "" },
@@ -45,6 +45,7 @@ export async function listRegister(kind: RegisterKind, cursor?: string): Promise
       expectedEvidence: readText(props["Expected evidence"]),
       blocker: readText(props["Blocker / support required"]),
       sourceMeetingId: Array.isArray(props["Source meeting"]?.relation) && typeof props["Source meeting"].relation[0]?.id === "string" ? props["Source meeting"].relation[0].id : "",
+      notes: readText(props.Notes),
       purpose: readText(props["Session purpose"]),
       chairRole: readText(props["Chair role"]),
       secretaryRole: readText(props["Secretary role"]),
