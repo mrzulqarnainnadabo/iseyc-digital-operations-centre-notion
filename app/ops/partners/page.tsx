@@ -5,7 +5,14 @@ import { useSearchParams } from "next/navigation";
 
 type Option = { id: string; title: string; detail: string; status: string; url: string; organisationId?: string; verified?: boolean; relationshipStatus?: string };
 type Invitation = { id: string; title: string; organisation: string; contact: string; meeting: string; status: string; participation: string; purpose: string; subject: string; draft: string; sentOn: string; url: string };
-type Data = { organisations: Option[]; contacts: Option[]; meetings: Option[]; invitations: Invitation[]; invitationsNextCursor: string | null; invitationsHasMore: boolean };
+type Data = {
+  organisations: Option[]; contacts: Option[]; meetings: Option[]; invitations: Invitation[];
+  organisationsNextCursor: string | null; organisationsHasMore: boolean;
+  contactsNextCursor: string | null; contactsHasMore: boolean;
+  meetingsNextCursor: string | null; meetingsHasMore: boolean;
+  invitationsNextCursor: string | null; invitationsHasMore: boolean;
+};
+type OptionKind = "organisations" | "contacts" | "meetings";
 
 const organisationTypes = ["Government institution", "Civil society organisation", "University or research institution", "Private sector", "Development partner", "Professional association", "Community organisation", "Media organisation", "Other"];
 const participationTypes = ["Observer", "Presenter", "Technical contributor", "Panelist", "Resource person", "Institutional representative", "Prospective partner", "Host", "Other"];
@@ -16,7 +23,7 @@ const eligibleOrganisation = (x: Option) => x.status === "Verified" && !["Paused
 export default function ExternalEngagementPage() {
   const searchParams = useSearchParams();
   const requestedMeetingId = searchParams.get("meetingId") || "";
-  const [data, setData] = useState<Data>({ organisations: [], contacts: [], meetings: [], invitations: [], invitationsNextCursor: null, invitationsHasMore: false });
+  const [data, setData] = useState<Data>({ organisations: [], contacts: [], meetings: [], invitations: [], organisationsNextCursor: null, organisationsHasMore: false, contactsNextCursor: null, contactsHasMore: false, meetingsNextCursor: null, meetingsHasMore: false, invitationsNextCursor: null, invitationsHasMore: false });
   const [loading, setLoading] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const [activeView, setActiveView] = useState<"directory" | "invitations" | "agreements">("invitations");
@@ -57,7 +64,7 @@ export default function ExternalEngagementPage() {
       if (!response.ok) throw new Error(result.error || "External engagement registers could not be loaded.");
       if (!Array.isArray(result.invitations) || (result.invitationsNextCursor !== null && typeof result.invitationsNextCursor !== "string") || typeof result.invitationsHasMore !== "boolean") throw new Error("The invitation register returned an invalid pagination response.");
       setData(current => appendInvitations
-        ? { ...result, invitations: [...current.invitations, ...result.invitations] }
+        ? { ...current, invitations: [...current.invitations, ...result.invitations], invitationsNextCursor: result.invitationsNextCursor, invitationsHasMore: result.invitationsHasMore }
         : result as Data);
       setLoaded(true);
       setContactOrg(current => current || result.organisations?.[0]?.id || "");
@@ -66,11 +73,29 @@ export default function ExternalEngagementPage() {
     } catch (cause) {
       if (!appendInvitations) {
         setLoaded(false);
-        setData({ organisations: [], contacts: [], meetings: [], invitations: [], invitationsNextCursor: null, invitationsHasMore: false });
+        setData({ organisations: [], contacts: [], meetings: [], invitations: [], organisationsNextCursor: null, organisationsHasMore: false, contactsNextCursor: null, contactsHasMore: false, meetingsNextCursor: null, meetingsHasMore: false, invitationsNextCursor: null, invitationsHasMore: false });
       }
       setError(cause instanceof Error ? cause.message : "The service could not be reached.");
     } finally { setLoading(false); }
   }
+  async function loadMoreOptions(kind: OptionKind) {
+    const cursor = kind === "organisations" ? data.organisationsNextCursor : kind === "contacts" ? data.contactsNextCursor : data.meetingsNextCursor;
+    if (!cursor || loading || busy) return;
+    setLoading(true); setError("");
+    try {
+      const response = await fetch(`/ops/api/external-engagement?${kind}Cursor=${encodeURIComponent(cursor)}`, { cache: "no-store" });
+      const result = await response.json();
+      if (!response.ok || !Array.isArray(result[kind])) throw new Error(result.error || `Could not load more ${kind}.`);
+      setData(current => {
+        if (kind === "organisations") return { ...current, organisations: [...current.organisations, ...result.organisations], organisationsNextCursor: result.organisationsNextCursor, organisationsHasMore: result.organisationsHasMore === true };
+        if (kind === "contacts") return { ...current, contacts: [...current.contacts, ...result.contacts], contactsNextCursor: result.contactsNextCursor, contactsHasMore: result.contactsHasMore === true };
+        return { ...current, meetings: [...current.meetings, ...result.meetings], meetingsNextCursor: result.meetingsNextCursor, meetingsHasMore: result.meetingsHasMore === true };
+      });
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : `Could not load more ${kind}.`);
+    } finally { setLoading(false); }
+  }
+
   useEffect(() => { void refresh(); }, []);
 
   const eligibleOrganisations = useMemo(() => data.organisations.filter(eligibleOrganisation), [data.organisations]);
@@ -156,12 +181,14 @@ export default function ExternalEngagementPage() {
         <ul className="mt-3 divide-y divide-line">
           {data.organisations.length ? data.organisations.slice(0, 12).map(x=><li key={x.id} className="py-3"><div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm font-semibold text-forest-950">{x.title}</p><span className="rounded-full border border-line bg-cream-50 px-2 py-1 text-xs">{x.status || "Unverified"}{x.relationshipStatus ? ` · ${x.relationshipStatus}` : ""}</span></div><p className="mt-1 text-xs text-ink-600">{x.detail || "Organisation type not recorded"}</p>{x.url ? <a href={x.url} target="_blank" rel="noreferrer" className="mt-1 inline-flex min-h-8 items-center text-xs font-semibold text-forest-800 underline">Open organisation record ↗</a> : null}</li>) : <li className="py-3 text-sm text-ink-600">{loading ? "Loading organisations…" : !loaded ? "Register unavailable. Check the source connection above." : "No organisation records are currently loaded."}</li>}
         </ul>
+        {data.organisationsHasMore ? <button type="button" onClick={() => void loadMoreOptions("organisations")} disabled={loading || busy} className="mt-2 min-h-9 text-xs font-semibold text-forest-800 underline">Load more organisations</button> : null}
       </div>
       <div className="rounded-card border border-line bg-white p-4 shadow-card">
         <div className="flex items-center justify-between gap-2"><h2 className="font-serif text-xl text-forest-950">External contacts</h2><span className="text-xs text-ink-600">{data.contacts.length} loaded</span></div>
         <ul className="mt-3 divide-y divide-line">
           {data.contacts.length ? data.contacts.slice(0, 12).map(x=><li key={x.id} className="py-3"><div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm font-semibold text-forest-950">{x.title}</p><span className="rounded-full border border-line bg-cream-50 px-2 py-1 text-xs">{x.status || "Unverified"}</span></div><p className="mt-1 text-xs text-ink-600">{data.organisations.find(o=>o.id===x.organisationId)?.title || "Organisation not in loaded page"} · {x.detail || "Role not recorded"} · {x.verified ? "Identity verified" : "Identity not verified"}</p></li>) : <li className="py-3 text-sm text-ink-600">{loading ? "Loading contacts…" : !loaded ? "Register unavailable. Check the source connection above." : "No contact records are currently loaded."}</li>}
         </ul>
+        {data.contactsHasMore ? <button type="button" onClick={() => void loadMoreOptions("contacts")} disabled={loading || busy} className="mt-2 min-h-9 text-xs font-semibold text-forest-800 underline">Load more contacts</button> : null}
       </div>
     </section>
 
@@ -176,10 +203,13 @@ export default function ExternalEngagementPage() {
       {loaded && eligibleOrganisations.length === 0 ? <div className="rounded-control border border-amber-200 bg-amber-50 p-3 text-xs text-amber-950">No eligible organisations yet. Add a prospect in the directory, then verify its official identity and relationship status.</div> : null}
       <div className="grid gap-3 sm:grid-cols-2">
         <label className={label}>Approved meeting<select required value={meetingId} onChange={e=>setMeetingId(e.target.value)} className={field}><option value="">Select meeting</option>{data.meetings.map(x=><option key={x.id} value={x.id}>{x.title}{x.detail ? ` · ${x.detail}` : ""}</option>)}</select></label>
+        {data.meetingsHasMore ? <button type="button" onClick={() => void loadMoreOptions("meetings")} disabled={loading || busy} className="min-h-9 text-xs font-semibold text-forest-800 underline">Load more approved meetings</button> : null}
         <label className={label}>Verified organisation<select required value={inviteOrg} onChange={e=>{setInviteOrg(e.target.value);setInviteContact("");}} className={field}><option value="">Select organisation</option>{eligibleOrganisations.map(x=><option key={x.id} value={x.id}>{x.title}</option>)}</select></label>
+        {data.organisationsHasMore ? <button type="button" onClick={() => void loadMoreOptions("organisations")} disabled={loading || busy} className="min-h-9 text-xs font-semibold text-forest-800 underline">Load more organisations</button> : null}
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <label className={label}>Verified contact (optional)<select value={inviteContact} onChange={e=>setInviteContact(e.target.value)} className={field}><option value="">Institutional office / no named contact</option>{eligibleContacts.map(x=><option key={x.id} value={x.id}>{x.title}{x.detail ? ` · ${x.detail}` : ""}</option>)}</select></label>
+        {data.contactsHasMore ? <button type="button" onClick={() => void loadMoreOptions("contacts")} disabled={loading || busy} className="min-h-9 text-xs font-semibold text-forest-800 underline">Load more contacts</button> : null}
         <label className={label}>Participation type<select value={inviteType} onChange={e=>setInviteType(e.target.value)} className={field}>{participationTypes.map(x=><option key={x}>{x}</option>)}</select></label>
       </div>
       <label className={label}>Invitation purpose<textarea required minLength={5} maxLength={1000} rows={3} value={invitePurpose} onChange={e=>setInvitePurpose(e.target.value)} placeholder="Why is this organisation being invited, and what contribution is expected?" className="mt-1 w-full rounded-control border border-line p-3 text-sm"/></label>
