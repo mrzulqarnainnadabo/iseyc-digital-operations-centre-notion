@@ -69,6 +69,50 @@ test("module readiness is reachable from the persistent navigation", () => {
   assert.ok(DOC_NAV.some((item) => item.href === "/ops/readiness"));
 });
 
+test("executive desk is an authenticated source-backed coordination workspace", () => {
+  const page = read("app/ops/executive/page.tsx");
+  const nav = read("lib/nav.ts");
+  assert.match(page, /requireStaffSession/);
+  assert.match(page, /listMeetings/);
+  assert.match(page, /listRegister/);
+  assert.match(page, /Upcoming meetings/);
+  assert.match(page, /Action register/);
+  assert.match(page, /Digital Chamber/);
+  assert.match(page, /first loaded page/);
+  assert.match(page, /does not confer executive appointment/);
+  assert.match(nav, /Executive desk/);
+  assert.match(nav, /Meetings calendar/);
+  assert.match(nav, /Council sessions/);
+});
+
+test("meeting intake stores structured preparation in the canonical Meetings database", () => {
+  const form = read("app/ops/intake/page.tsx");
+  const api = read("app/api/meetings/route.ts");
+  const adapter = read("lib/notion.ts");
+  const detail = read("app/ops/review/[id]/page.tsx");
+  for (const field of ["meetingType", "purpose", "meetingTime", "venue", "meetingOwnerRole", "agenda", "requiredParticipants", "preReading", "decisionsSought", "minutesOwnerRole"]) {
+    assert.ok(form.includes(field), `Meeting form missing ${field}`);
+    assert.ok(api.includes(field), `Meeting API missing ${field}`);
+    assert.ok(adapter.includes(field), `Notion adapter missing ${field}`);
+  }
+  assert.match(adapter, /Linked actions/);
+  assert.match(detail, /Meeting brief/);
+  assert.match(detail, /Draft minutes/);
+  assert.match(form, /Standard-sensitivity intake only/);
+});
+
+test("actions can be linked to an existing Standard meeting without granting decision authority", () => {
+  const adapter = read("lib/notion-registers.ts");
+  const api = read("app/ops/api/registers/[kind]/route.ts");
+  const component = read("components/OperationalRegister.tsx");
+  assert.match(adapter, /getMeeting\(input\.sourceMeetingId\)/);
+  assert.match(adapter, /meeting\.sensitivity !== "Standard"/);
+  assert.match(adapter, /properties\["Source meeting"\]/);
+  assert.match(api, /sourceMeetingId/);
+  assert.match(component, /Related meeting · optional/);
+  assert.match(component, /does not certify a decision/);
+});
+
 test("operations errors recover without exposing exception details", () => {
   const errorBoundary = fs.readFileSync(path.join(opsRoot, "error.tsx"), "utf8");
   assert.match(errorBoundary, /^"use client";/);
