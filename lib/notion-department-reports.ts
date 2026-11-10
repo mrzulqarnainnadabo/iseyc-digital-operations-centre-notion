@@ -9,8 +9,8 @@ const ENV = "NOTION_DEPARTMENT_REPORTS_DATABASE_ID" as const;
 const DEPARTMENT_SELECT: Record<OpsDepartmentId, string> = {
   education: "Education & Capacity Building",
   health: "Health & Well-being",
-  "digital-systems": "Software & Technology",
-  "civic-affairs": "Civic Department",
+  "digital-systems": "Digital Systems & Technology",
+  "civic-affairs": "Civic Affairs & Public Accountability",
 };
 
 function database() {
