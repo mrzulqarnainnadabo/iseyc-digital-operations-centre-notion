@@ -3,6 +3,8 @@
 ## Delivered in this change
 - Adds authenticated, server-side Notion read and create adapters for the existing Actions, Media and Chamber databases.
 - Adds a shared mobile-first register interface with refresh, live records, Notion deep links and record creation.
+- Adds bounded cursor pagination to Actions, Media and Chamber operational registers, with a load-more interaction and response validation.
+- Adds cursor pagination to the external invitation register; organisation/contact directory selectors and the approved-meeting option list remain limited to their first 50 records and must not be treated as exhaustive.
 - Restricts creation to initial states: Actions=Open, Media=Draft, Chamber=Scheduled.
 - Keeps approval, publication, closure and formal decisions disabled because the current shared-key session does not establish individual identity or appointment authority.
 - Fails closed when a register is not configured, returns a malformed response or Notion cannot be reached. It never substitutes demo rows or inferred counts.
@@ -32,7 +34,7 @@ The Notion integration must be explicitly shared with each database. A populated
 6. Integrate the Partnership Agreements & Commitments register into the application only after individual permissions and approval authority are available.
 5. Add Chamber attendance, agenda, minutes and decision handoff with verified chair/secretary authority.
 6. Connect department programme and report registers using approved IDs and department-scoped access.
-7. Add pagination, distributed rate limits, monitoring, backup/restore and recovery tests.
+7. Extend pagination to organisation/contact directory selectors and approved-meeting options; add distributed rate limits, monitoring, backup/restore and recovery tests.
 8. Run CI, preview deployment, and mobile/tablet/desktop QA before release.
 
 This change is not production authorization and does not make the entire DOC release-ready.
