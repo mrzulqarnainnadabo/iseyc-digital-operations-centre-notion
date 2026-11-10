@@ -239,8 +239,8 @@ button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
 .ops-department-mark {
   position: relative;
   display: grid;
-  width: 13rem;
-  height: 13rem;
+  width: 9rem;
+  height: 9rem;
   place-items: center;
   border: 1px solid rgb(217 197 155 / 34%);
   border-radius: 50%;
@@ -272,3 +272,14 @@ button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
 .ops-department--health .ops-department-mark { box-shadow: 0 0 0 8px rgb(217 180 122 / 5%); }
 .ops-department--digital .ops-department-mark { box-shadow: 0 0 0 8px rgb(141 185 197 / 5%); }
 .ops-department--civic .ops-department-mark { box-shadow: 0 0 0 8px rgb(212 192 140 / 5%); }
+
+.ops-department-mark svg { width: 7rem; height: 7rem; }
+@media (min-width: 1024px) {
+  .ops-department-mark { width: 13rem; height: 13rem; }
+  .ops-department-mark svg { width: 10rem; height: 10rem; }
+}
+@media (max-width: 640px) {
+  .ops-department-mark { width: 8rem; height: 8rem; }
+  .ops-department-mark svg { width: 6rem; height: 6rem; }
+  .ops-department-mark span { bottom: .75rem; font-size: .38rem; }
+}
