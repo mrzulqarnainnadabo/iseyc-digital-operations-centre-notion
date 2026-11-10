@@ -32,7 +32,7 @@ const departments = [
   "Education & Capacity Building",
   "Health & Well-being",
   "Digital Systems & Technology",
-  "Civic Affairs",
+  "Civic Affairs & Public Accountability",
 ];
 
 export default function Page() {
