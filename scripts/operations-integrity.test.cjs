@@ -233,12 +233,15 @@ test("register forms send only fields accepted by their route and communications
   const component = fs.readFileSync(path.join(root, "components/OperationalRegister.tsx"), "utf8");
   const adapter = fs.readFileSync(path.join(root, "lib/notion-registers.ts"), "utf8");
   const route = fs.readFileSync(path.join(opsRoot, "api/registers/[kind]/route.ts"), "utf8");
-  assert.match(component, /kind === "media" \? \{ title, detail, channel \} : \{ title, detail, date \}/);
-  assert.match(component, /Array\.isArray\(j\.records\)/);
+  assert.match(component, /kind === "media"/);
+  assert.match(component, /sourceMeetingId/);
+  assert.match(component, /expectedEvidence/);
+  assert.match(component, /Array\.isArray\(data\.records\)/);
   assert.match(component, /setRows\(\[\]\)/);
   assert.match(adapter, /detail: "Notes"/);
   assert.match(adapter, /readText\(props\.Notes\).*readText\(props\.Channel\)/);
-  assert.match(route, /kind === "media" \? \["title", "detail", "channel"\] : \["title", "detail", "date"\]/);
+  assert.match(route, /kind === "media" \? \["title", "detail", "channel"\]/);
+  assert.match(route, /sourceMeetingId/);
   assert.match(route, /kind === "actions" && detail.length < 2/);
   assert.match(route, /kind === "actions" \|\| kind === "chamber"\) && !date/);
   assert.match(component, /Due date · required/);
