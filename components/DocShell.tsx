@@ -102,7 +102,9 @@ export function DocShell({ children }: { children: React.ReactNode }) {
         {MOBILE_NAV.map((item) => {
           const active = item.href === "/ops"
             ? pathname === "/ops"
-            : pathname === item.href || pathname.startsWith(item.href + "/");
+            : item.href === "/ops#departments"
+              ? pathname === "/ops"
+              : pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={`flex min-h-[54px] flex-col items-center justify-center gap-1 rounded-lg px-1 text-[10px] font-semibold transition-colors ${active ? "bg-forest-50 text-forest-950" : "text-ink-600 hover:bg-cream-50 hover:text-forest-950"}`}>
               <span aria-hidden="true" className={`h-1 w-5 rounded-full ${active ? "bg-gold-600" : "bg-transparent"}`} />
