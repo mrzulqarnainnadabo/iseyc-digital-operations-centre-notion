@@ -146,7 +146,7 @@ export default function DepartmentReportPanel({ departmentId, departmentName }: 
             <input required minLength={3} maxLength={180} value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
           </label>
           <label className="block text-sm font-semibold text-ink-800">
-            Report type
+            Reporting cycle
             <select value={reportType} onChange={(e) => setReportType(e.target.value as ReportType)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal">
               {REPORT_TYPES.map((t) => (<option key={t} value={t}>{t}</option>))}
             </select>
