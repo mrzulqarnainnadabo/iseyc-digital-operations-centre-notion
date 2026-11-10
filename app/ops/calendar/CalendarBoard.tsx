@@ -10,6 +10,8 @@ type Meeting = {
   conveningBody: string;
   meetingDate: string;
   summary: string;
+  meetingType: string;
+  meetingTime: string;
 };
 
 function dateKey(date: Date) {
@@ -84,7 +86,7 @@ export default function CalendarBoard({ meetings, error }: { meetings: Meeting[]
             <p className="text-xs font-semibold uppercase tracking-[.14em] text-gold-700">Selected date</p>
             <h2 className="mt-2 font-serif text-xl text-forest-950">{parseDate(selected)?.toLocaleDateString("en-NG",{weekday:"long",day:"numeric",month:"long",year:"numeric"}) || selected}</h2>
             <p className="mt-1 text-xs text-ink-600">{selectedMeetings.length} scheduled {selectedMeetings.length === 1 ? "meeting" : "meetings"}</p>
-            {selectedMeetings.length ? <ul className="mt-4 space-y-3">{selectedMeetings.map((meeting) => <li key={meeting.id} className="border-t border-line pt-3"><Link href={`/ops/review/${encodeURIComponent(meeting.id)}`} className="font-semibold text-forest-900 hover:underline">{meeting.title}</Link><p className="mt-1 text-xs text-ink-600">{meeting.conveningBody} · {meeting.status}</p></li>)}</ul> : <p className="mt-4 rounded-control bg-cream-50 p-3 text-sm text-ink-600">No meeting is recorded for this date.</p>}
+            {selectedMeetings.length ? <ul className="mt-4 space-y-3">{selectedMeetings.map((meeting) => <li key={meeting.id} className="border-t border-line pt-3"><Link href={`/ops/review/${encodeURIComponent(meeting.id)}`} className="font-semibold text-forest-900 hover:underline">{meeting.title}</Link><p className="mt-1 text-xs text-ink-600">{meeting.meetingTime ? `${meeting.meetingTime} WAT · ` : ""}{meeting.meetingType ? `${meeting.meetingType} · ` : ""}{meeting.conveningBody} · {meeting.status}</p></li>)}</ul> : <p className="mt-4 rounded-control bg-cream-50 p-3 text-sm text-ink-600">No meeting is recorded for this date.</p>}
           </section>
           <section className="rounded-card border border-line bg-forest-950 p-4 text-white">
             <p className="text-xs font-semibold uppercase tracking-[.14em] text-[#d7c18f]">This month · loaded page</p>
@@ -95,7 +97,7 @@ export default function CalendarBoard({ meetings, error }: { meetings: Meeting[]
       </div>
       <section className="rounded-card border border-line bg-white p-4 shadow-card sm:p-5">
         <div className="flex flex-wrap items-end justify-between gap-2"><div><p className="text-xs font-semibold uppercase tracking-[.14em] text-gold-700">Agenda view</p><h2 className="mt-1 font-serif text-xl text-forest-950">{monthLabel}</h2></div><span className="text-xs text-ink-600">Loaded page · Notion Meetings</span></div>
-        {monthMeetings.length ? <ul className="mt-4 divide-y divide-line">{monthMeetings.map((meeting) => <li key={meeting.id} className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-semibold text-forest-950">{meeting.title}</p><p className="mt-1 text-xs text-ink-600">{meeting.meetingDate} · {meeting.conveningBody || "Convening body not supplied"}</p></div><Link href={`/ops/review/${encodeURIComponent(meeting.id)}`} className="inline-flex min-h-[40px] items-center text-sm font-semibold text-forest-800 hover:underline">Open record →</Link></li>)}</ul> : <p className="mt-4 rounded-control bg-cream-50 p-4 text-sm text-ink-600">No dated meetings are available for this month in the loaded page. Older records may not be included. Use Schedule meeting to add a record.</p>}
+        {monthMeetings.length ? <ul className="mt-4 divide-y divide-line">{monthMeetings.map((meeting) => <li key={meeting.id} className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-semibold text-forest-950">{meeting.title}</p><p className="mt-1 text-xs text-ink-600">{meeting.meetingDate}{meeting.meetingTime ? ` · ${meeting.meetingTime} WAT` : ""} · {meeting.meetingType || "Meeting"} · {meeting.conveningBody || "Convening body not supplied"}</p></div><Link href={`/ops/review/${encodeURIComponent(meeting.id)}`} className="inline-flex min-h-[40px] items-center text-sm font-semibold text-forest-800 hover:underline">Open record →</Link></li>)}</ul> : <p className="mt-4 rounded-control bg-cream-50 p-4 text-sm text-ink-600">No dated meetings are available for this month in the loaded page. Older records may not be included. Use Schedule meeting to add a record.</p>}
       </section>
       <p className="text-xs leading-5 text-ink-600">This calendar reflects only the first loaded page (up to 50 records) from the connected Meetings database. Older records may not appear. It does not create attendance, invitations, minutes or action assignments. Those remain separate operational capabilities and must not be inferred from a scheduled meeting.</p>
     </div>
