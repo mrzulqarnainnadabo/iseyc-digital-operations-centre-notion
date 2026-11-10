@@ -278,7 +278,7 @@ test("external invitation register uses validated cursor pagination and preserve
   assert.match(route, /invitationsHasMore/);
   assert.match(page, /Load more invitations/);
   assert.match(page, /\[\.\.\.current\.invitations, \.\.\.result\.invitations\]/);
-  assert.match(page, /invitationsScope: "cursor-paginated"/);
+  assert.match(route, /invitationsScope: "cursor-paginated"/);
 });
 
 test("external engagement is authenticated, linked and draft-only until human dispatch", () => {
