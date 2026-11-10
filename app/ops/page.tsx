@@ -200,6 +200,32 @@ export default async function CommandBriefPage() {
           <p className="mt-4 text-[10px] leading-4 text-white/50">Live count is shown only when the connected register responds. No estimated activity is displayed.</p>
         </div>
       </section>
+
+      <section className="grid gap-3 sm:grid-cols-2">
+        <div className="rounded-xl border border-[#e1e5dc] bg-white p-4">
+          <p className="text-[9px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Shared function · not a fifth department</p>
+          <h2 className="mt-1 text-sm font-bold text-[#173c30]">Communications coordination</h2>
+          <div className="mt-2 flex items-center justify-between gap-3">
+            <p className="text-[11px] text-[#68736b]">Editorial drafts only · publication remains disabled.</p>
+            <span className="shrink-0 rounded-full border border-[#e7d9b8] bg-[#fbf8ef] px-2 py-1 text-[9px] font-bold text-[#6e5425]">Not operational</span>
+          </div>
+          <Link href="/ops/media" className="mt-3 inline-flex min-h-9 items-center text-xs font-bold text-[#194b3b]">Open communications →</Link>
+        </div>
+        <div className="rounded-xl border border-[#e1e5dc] bg-white p-4">
+          <p className="text-[9px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Governance records</p>
+          <h2 className="mt-1 text-sm font-bold text-[#173c30]">Presidential Council</h2>
+          <p className="mt-2 text-[11px] text-[#68736b]">Seat occupancy not connected. Role and appointment records require approved governance data.</p>
+          <Link href="/ops/readiness" className="mt-3 inline-flex min-h-9 items-center text-xs font-bold text-[#194b3b]">View readiness →</Link>
+        </div>
+      </section>
+
+      <section className="rounded-xl border border-[#dce4dc] bg-[#edf2ec] p-4 sm:flex sm:items-center sm:justify-between sm:gap-4">
+        <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Published civic systems</p><p className="mt-1 text-xs text-[#68736b]">Separate public platforms connected to ISEYC’s civic work.</p></div>
+        <div className="mt-3 flex flex-wrap gap-2 sm:mt-0">
+          <a href="https://2027-street-mandate.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center rounded-full border border-[#cdd8ce] bg-white px-3 text-[11px] font-bold text-[#194b3b]">Civic Mandate ↗</a>
+          <a href="https://iseyc-civic-brain.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center rounded-full border border-[#cdd8ce] bg-white px-3 text-[11px] font-bold text-[#194b3b]">Civic Brain ↗</a>
+        </div>
+      </section>
     </main>
   );
 }
