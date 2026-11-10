@@ -28,8 +28,8 @@ export function departmentIdFromNotionSelect(value: string): DepartmentRecordId 
       return "health";
     case "digital systems":
     case "digital systems & technology":
-    case "software & technology":
     case "software and technology":
+    case "software & technology":
       return "digital-systems";
     case "civic affairs":
     case "civic affairs & public accountability":
