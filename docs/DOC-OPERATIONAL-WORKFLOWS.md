@@ -4,6 +4,7 @@
 - Adds authenticated, server-side Notion read and create adapters for the existing Actions, Media and Chamber databases.
 - Adds a shared mobile-first register interface with refresh, live records, Notion deep links and record creation.
 - Adds bounded cursor pagination to Actions, Media and Chamber operational registers, with a load-more interaction and response validation.
+- Requires an accountable owner role when creating an action; the form explicitly states that this is not an access grant or proof of appointment.
 - Adds cursor pagination to the external invitation register; organisation/contact directory selectors and the approved-meeting option list remain limited to their first 50 records and must not be treated as exhaustive.
 - Restricts creation to initial states: Actions=Open, Media=Draft, Chamber=Scheduled.
 - Keeps approval, publication, closure and formal decisions disabled because the current shared-key session does not establish individual identity or appointment authority.
@@ -33,8 +34,8 @@ The Notion integration must be explicitly shared with each database. A populated
 5. Complete invitation approval, dispatch evidence, RSVP updates, attendance confirmation and follow-up. Do not automate dispatch until individual officer authority is implemented.
 6. Integrate the Partnership Agreements & Commitments register into the application only after individual permissions and approval authority are available.
 5. Add Chamber attendance, agenda, minutes and decision handoff with verified chair/secretary authority.
-6. Connect department programme and report registers using approved IDs and department-scoped access.
-7. Extend pagination to organisation/contact directory selectors and approved-meeting options; add distributed rate limits, monitoring, backup/restore and recovery tests.
-8. Run CI, preview deployment, and mobile/tablet/desktop QA before release.
+7. Connect department programme and report registers using approved IDs and department-scoped access.
+8. Extend pagination to organisation/contact directory selectors and approved-meeting options; add distributed rate limits, monitoring, backup/restore and recovery tests.
+9. Run CI, preview deployment, and mobile/tablet/desktop QA before release.
 
 This change is not production authorization and does not make the entire DOC release-ready.
