@@ -50,14 +50,21 @@ function row(page: any, titleProp: string, detailProp: string, statusProp: strin
 export function externalRegistersConfigured() {
   return Boolean(process.env.NOTION_TOKEN?.trim() && dbId(ENV.organisations) && dbId(ENV.contacts) && dbId(ENV.invitations) && dbId("NOTION_MEETINGS_DATABASE_ID"));
 }
-export async function listExternalOptions() {
+export async function listExternalOptions(cursors: { organisations?: string; contacts?: string; meetings?: string } = {}) {
   const [orgPages, contactPages, meetings] = await Promise.all([
-    query("organisations"), query("contacts"), listMeetings({ pageSize: 50 }),
+    query("organisations", cursors.organisations),
+    query("contacts", cursors.contacts),
+    listMeetings({ pageSize: 50, cursor: cursors.meetings }),
   ]);
   const organisations = orgPages.pages.map((p: any) => ({ ...row(p, "Organisation", "Organisation type", "Verification status"), relationshipStatus: read(p.properties?.["Relationship status"]), detail: read(p.properties?.["Organisation type"]) }));
   const contacts = contactPages.pages.map((p: any) => ({ ...row(p, "Contact", "Official role", "Contact status"), organisationId: read(p.properties?.Organisation).split(",")[0] || "", verified: p.properties?.Verified?.checkbox === true }));
   const meetingOptions = meetings.meetings.filter((m: MeetingRecord) => m.status === "Approved" && m.sensitivity === "Standard").map((m: MeetingRecord) => ({ id: m.id, title: m.title, detail: m.meetingDate, status: m.status, url: "" }));
-  return { organisations, contacts, meetings: meetingOptions };
+  return {
+    organisations, contacts, meetings: meetingOptions,
+    organisationsNextCursor: orgPages.nextCursor, organisationsHasMore: orgPages.hasMore,
+    contactsNextCursor: contactPages.nextCursor, contactsHasMore: contactPages.hasMore,
+    meetingsNextCursor: meetings.nextCursor, meetingsHasMore: meetings.hasMore,
+  };
 }
 export async function listExternalInvitations(cursor?: string) {
   const result = await query("invitations", cursor);
