@@ -42,8 +42,8 @@ export const departments: Department[] = [
   },
   {
     slug: "technology",
-    name: "Software & Technology",
-    shortName: "Software & Technology",
+    name: "Digital Systems & Technology",
+    shortName: "Digital Systems",
     number: "03",
     summary: "Digital inclusion, skills, software innovation and responsible public-interest technology.",
     introduction: "Technology supports community development when people can access it, understand it and trust how it is used. This department considers digital capability alongside the infrastructure and safeguards that make technology useful.",
@@ -57,7 +57,7 @@ export const departments: Department[] = [
   },
   {
     slug: "civic",
-    name: "Civic Department",
+    name: "Civic Affairs & Public Accountability",
     shortName: "Civic Affairs & Public Accountability",
     number: "04",
     summary: "Civic learning, institutional responsibilities, public-service conditions and evidence-based participation.",
