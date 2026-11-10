@@ -87,8 +87,9 @@ export default async function CommandBriefPage() {
             <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Institutional structure</p>
             <h2 id="departments-heading" className="text-lg font-semibold text-forest-950">Department workspaces</h2>
             <p className="mt-1 max-w-2xl text-sm leading-6 text-ink-600">
-              Departments are the primary organising unit of ISEYC operations. Each desk states mandate,
-              operational path and authority limits. Programme and officer-assignment registers remain unconnected.
+              Departments are the primary organising unit of ISEYC operations. Each desk covers mandate,
+              functions, programmes, work plans, reports and shared tools. Live programme registers require
+              configured Notion env; officer appointment records remain unconnected.
             </p>
           </div>
           <Link href="/ops/readiness" className="min-h-[44px] inline-flex items-center text-sm font-semibold text-forest-800 hover:underline">View readiness</Link>
@@ -98,7 +99,7 @@ export default async function CommandBriefPage() {
             <Link key={department.id} href={`/ops/departments/${department.id}`} className="flex min-h-[128px] flex-col rounded-card border border-line bg-white p-4 shadow-card hover:border-forest-800">
               <span className="w-fit rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-900">Coordination only</span>
               <h3 className="mt-4 text-sm font-semibold leading-5 text-ink-950">{department.name}</h3>
-              <p className="mt-2 text-xs leading-5 text-ink-600">Open workspace for mandate, meetings and authorised tools.</p>
+              <p className="mt-2 text-xs leading-5 text-ink-600">Mandate, programmes, work plans, reports and shared registers.</p>
             </Link>
           ))}
         </div>
