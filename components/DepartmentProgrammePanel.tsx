@@ -185,8 +185,7 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
         </form>
           </div>
         </details>
-      ) : (
-        {connectionState === "checking" ? (
+      ) : connectionState === "checking" ? (
           <p role="status" className="rounded-control border border-line bg-white p-3 text-sm text-ink-600">Checking the Notion register…</p>
         ) : connectionState === "not-configured" ? (
           <p className="rounded-control border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">Configure <code className="text-xs">NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID</code> and share the database with the DOC Notion integration. No programme records are invented while the register is disconnected.</p>
@@ -195,7 +194,6 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
             <p>The register connection could not be verified. Draft creation is disabled until the connection is restored.</p>
             <button type="button" onClick={() => void refresh()} disabled={busy} className="mt-2 min-h-10 rounded-control border border-amber-300 px-3 font-semibold disabled:opacity-50">Retry connection</button>
           </div>
-        )}
       )}
 
       {error ? (
