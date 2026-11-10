@@ -13,6 +13,30 @@ export type OpsDepartmentId =
   | "digital-systems"
   | "civic-affairs";
 
+export type DepartmentRecordId = OpsDepartmentId | "Unspecified";
+
+/** Map known Notion select values without silently assigning unknown records to Education. */
+export function departmentIdFromNotionSelect(value: string): DepartmentRecordId {
+  switch (value.trim().toLowerCase()) {
+    case "education":
+    case "education & capacity building":
+      return "education";
+    case "health":
+    case "health & well-being":
+      return "health";
+    case "digital systems":
+    case "digital systems & technology":
+    case "software & technology":
+      return "digital-systems";
+    case "civic affairs":
+    case "civic affairs & public accountability":
+    case "civic department":
+      return "civic-affairs";
+    default:
+      return "Unspecified";
+  }
+}
+
 export type DepartmentFunction = {
   id: string;
   title: string;
@@ -53,7 +77,7 @@ export type ProgrammeRecord = {
   title: string;
   description: string;
   objectives: string;
-  departmentId: OpsDepartmentId;
+  departmentId: DepartmentRecordId;
   targetCommunity: string;
   geography: string;
   activities: string;
@@ -71,7 +95,7 @@ export type WorkPlanRecord = {
   id: string;
   title: string;
   objective: string;
-  departmentId: OpsDepartmentId;
+  departmentId: DepartmentRecordId;
   programmeId: string;
   deliverable: string;
   dueDate: string;
@@ -88,7 +112,7 @@ export type DepartmentReportRecord = {
   id: string;
   title: string;
   reportType: ReportType;
-  departmentId: OpsDepartmentId;
+  departmentId: DepartmentRecordId;
   period: string;
   summary: string;
   challenges: string;
