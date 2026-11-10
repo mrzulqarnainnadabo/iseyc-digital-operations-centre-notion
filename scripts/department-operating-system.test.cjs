@@ -121,3 +121,20 @@ test("department readiness and environment example document the two actual share
   assert.match(env, /NOTION_DEPARTMENT_REPORTS_DATABASE_ID=/);
   assert.doesNotMatch(env, /NOTION_DEPARTMENT_WORKPLANS_DATABASE_ID=/);
 });
+
+
+test("department register forms are gated on a confirmed connection and expose retry after connection failure", () => {
+  for (const file of [
+    "components/DepartmentProgrammePanel.tsx",
+    "components/DepartmentWorkPlanPanel.tsx",
+    "components/DepartmentReportPanel.tsx",
+  ]) {
+    const source = read(file);
+    assert.match(source, /connectionState === "connected"/);
+    assert.match(source, /connectionState === "checking"/);
+    assert.match(source, /connectionState === "not-configured"/);
+    assert.match(source, /Connection error/);
+    assert.match(source, /Retry connection/);
+    assert.doesNotMatch(source, /configured !== false/);
+  }
+});
