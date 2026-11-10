@@ -125,7 +125,7 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
         </div>
         <section className="rounded-xl border border-amber-200 bg-amber-50 p-4">
           <p className="text-sm font-semibold text-amber-950">Authority and record boundary</p>
-          <p className="mt-1 text-xs leading-5 text-amber-900">A role label is not an appointment. The accountable role field does not assign access or imply a named appointment. A meeting reference is context, not proof of a decision. Records created here remain initial states; approval, official dispatch, publication and formal closure require verified individual authority and audit.</p>
+          <p className="mt-1 text-xs leading-5 text-amber-900">A role label is not an appointment. The accountable role field does not assign access or imply a named appointment. A meeting reference is context, not proof of a decision. Records created here remain initial states. Approval, publication, closure and formal decisions remain human-authorised and require verified individual authority and audit.</p>
         </section>
       </header>
 
