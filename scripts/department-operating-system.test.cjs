@@ -15,7 +15,9 @@ test("department programme work-plan and report APIs are authenticated draft-onl
     assert.match(route, /isOpsDepartmentId/);
     assert.match(route, /Invalid pagination cursor/);
   }
-  assert.match(read("app/ops/api/department-programmes/route.ts"), /Only a Proposed programme record/);
+  const programmeRoute = read("app/ops/api/department-programmes/route.ts");
+  assert.match(programmeRoute, /createDepartmentProgrammeDraft/);
+  assert.doesNotMatch(programmeRoute, /input\.status|statusRaw/);
   assert.match(read("app/ops/api/department-workplans/route.ts"), /Proposed/);
   assert.match(read("app/ops/api/department-reports/route.ts"), /not institutional approval/);
 });
