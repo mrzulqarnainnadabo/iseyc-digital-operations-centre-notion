@@ -15,8 +15,8 @@ test("department programme work-plan and report APIs are authenticated draft-onl
     assert.match(route, /isOpsDepartmentId/);
     assert.match(route, /Invalid pagination cursor/);
   }
-  assert.match(read("app/ops/api/department-programmes/route.ts"), /Only Planning or Draft/);
-  assert.match(read("app/ops/api/department-workplans/route.ts"), /Planned/);
+  assert.match(read("app/ops/api/department-programmes/route.ts"), /Only a Proposed programme record/);
+  assert.match(read("app/ops/api/department-workplans/route.ts"), /Proposed/);
   assert.match(read("app/ops/api/department-reports/route.ts"), /not institutional approval/);
 });
 
@@ -32,8 +32,28 @@ test("department programme work-plan and report Notion adapters bind internal da
   }
   const notion = read("lib/notion.ts");
   assert.match(notion, /NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID/);
-  assert.match(notion, /NOTION_DEPARTMENT_WORKPLANS_DATABASE_ID/);
+  assert.match(read("lib/notion-department-workplans.ts"), /NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID/);
   assert.match(notion, /NOTION_DEPARTMENT_REPORTS_DATABASE_ID/);
+});
+
+test("Notion adapters use the actual live register titles, property types and select options", () => {
+  const programmes = read("lib/notion-department-programmes.ts");
+  const workplans = read("lib/notion-department-workplans.ts");
+  const reports = read("lib/notion-department-reports.ts");
+  for (const source of [programmes, workplans]) {
+    assert.match(source, /"Programme \/ Work Item"/);
+    assert.match(source, /"Education & Capacity Building"/);
+    assert.match(source, /"Software & Technology"/);
+    assert.match(source, /Status: \{ status: \{ name: "Proposed" \} \}/);
+  }
+  assert.match(programmes, /"Work Type": \{ select: \{ name: "Programme" \} \}/);
+  assert.match(workplans, /"Work Type": \{ select: \{ name: "Operations" \} \}/);
+  assert.match(reports, /NOTION_DEPARTMENT_REPORTS_DATABASE_ID/);
+  for (const field of ["Report \/ Period", "Reporting Cycle", "Reporting Period Start", "Reporting Period End", "Completed Work", "Risks & Blockers", "Decisions Required", "Outcomes \/ Evidence"]) {
+    assert.ok(reports.includes(field), `Reports adapter is missing live schema field: ${field}`);
+  }
+  assert.match(reports, /Status: \{ status: \{ name: "Draft" \} \}/);
+  assert.doesNotMatch(reports, /props\.Name|props\["Report type"\]|Status: \{ select:/);
 });
 
 test("unknown Notion department values remain Unspecified across all registers", () => {
