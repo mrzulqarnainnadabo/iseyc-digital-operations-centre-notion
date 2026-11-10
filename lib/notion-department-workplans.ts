@@ -2,66 +2,69 @@ import { dbId, notion, assertInternalDb, textProp } from "@/lib/notion";
 import {
   isOpsDepartmentId,
   type OpsDepartmentId,
-  type WorkPlanRecord,
-  type WorkPlanStatus,
   departmentIdFromNotionSelect,
 } from "@/lib/department-operations";
 
-const ENV = "NOTION_DEPARTMENT_WORKPLANS_DATABASE_ID" as const;
-
+const ENV = "NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID" as const;
 const DEPARTMENT_SELECT: Record<OpsDepartmentId, string> = {
-  education: "Education",
-  health: "Health",
-  "digital-systems": "Digital Systems",
-  "civic-affairs": "Civic Affairs",
+  education: "Education & Capacity Building",
+  health: "Health & Well-being",
+  "digital-systems": "Software & Technology",
+  "civic-affairs": "Civic Department",
 };
 
 function database() {
   const client = notion();
   const databaseId = dbId(ENV);
-  if (!client || !databaseId) throw new Error("Department work plans register is not configured.");
+  if (!client || !databaseId) throw new Error("Department programmes and work register is not configured.");
   assertInternalDb(databaseId, ENV);
   return { client, databaseId };
 }
 
-export function departmentWorkPlansConfigured(): boolean {
+export function departmentProgrammesConfigured(): boolean {
   return Boolean(process.env.NOTION_TOKEN?.trim() && dbId(ENV));
 }
 
+export function departmentWorkPlansConfigured(): boolean {
+  return departmentProgrammesConfigured();
+}
+
+function urlProp(prop: unknown): string {
+  if (!prop || typeof prop !== "object") return "";
+  const value = prop as Record<string, unknown>;
+  return value.type === "url" && typeof value.url === "string" ? value.url : "";
+}
+
+function departmentFilter(departmentId?: OpsDepartmentId) {
+  return departmentId && isOpsDepartmentId(departmentId)
+    ? { property: "Department", select: { equals: DEPARTMENT_SELECT[departmentId] } }
+    : undefined;
+}
+
+import type { WorkPlanRecord, WorkPlanStatus } from "@/lib/department-operations";
+
+const WORK_TYPE_FILTER = { property: "Work Type", select: { equals: "Operations" } };
+
 function mapStatus(raw: string): WorkPlanStatus {
   const allowed: WorkPlanStatus[] = [
-    "Planned",
-    "In progress",
-    "Blocked",
-    "Completed",
-    "Deferred",
-    "Unspecified",
+    "Proposed", "Approved", "In Progress", "Under Review",
+    "Completed", "Paused", "Cancelled", "Unspecified",
   ];
   return (allowed.includes(raw as WorkPlanStatus) ? raw : "Unspecified") as WorkPlanStatus;
 }
 
 function mapRow(page: any): WorkPlanRecord {
   const props = page.properties || {};
-  const deptRaw = textProp(props.Department);
-  const departmentId = departmentIdFromNotionSelect(deptRaw);
-  const programmeRelation = props.Programme?.relation;
-  const programmeId =
-    Array.isArray(programmeRelation) && programmeRelation[0]?.id
-      ? String(programmeRelation[0].id)
-      : "";
   return {
     id: page.id,
-    title: textProp(props.Name) || "Untitled work-plan item",
-    objective: textProp(props.Objective) || "",
-    departmentId,
-    programmeId,
-    deliverable: textProp(props.Deliverable) || "",
-    dueDate: textProp(props["Due date"]) || "",
-    dependencies: textProp(props.Dependencies) || "",
-    accountableRole: textProp(props["Accountable role"]) || "",
+    title: textProp(props["Programme / Work Item"]) || "Untitled work item",
+    objective: textProp(props["Intended Outcome"]),
+    departmentId: departmentIdFromNotionSelect(textProp(props.Department)),
+    deliverable: textProp(props["Acceptance Criteria"]),
+    dueDate: textProp(props["Due Date"]),
+    accountableRole: textProp(props["Accountable Role"]),
     status: mapStatus(textProp(props.Status)),
-    progressNote: textProp(props["Progress note"]) || "",
-    evidenceNote: textProp(props["Evidence notes"]) || "",
+    evidenceNote: urlProp(props["Evidence / Deliverable"]),
     url: typeof page.url === "string" ? page.url : "",
   };
 }
@@ -71,112 +74,45 @@ export async function listDepartmentWorkPlans(options: {
   cursor?: string;
 }): Promise<{ rows: WorkPlanRecord[]; nextCursor: string | null; hasMore: boolean }> {
   const { client, databaseId } = database();
-  const filter =
-    options.departmentId && isOpsDepartmentId(options.departmentId)
-      ? {
-          property: "Department",
-          select: { equals: DEPARTMENT_SELECT[options.departmentId] },
-        }
-      : undefined;
+  const department = departmentFilter(options.departmentId);
   const response = await client.databases.query({
     database_id: databaseId,
     page_size: 50,
+    filter: department ? { and: [WORK_TYPE_FILTER, department] } : WORK_TYPE_FILTER,
     ...(options.cursor ? { start_cursor: options.cursor } : {}),
-    ...(filter ? { filter } : {}),
   });
   const rows = response.results
-    .filter((p: any) => p.object === "page")
-    .map((p: any) => mapRow(p));
-  return {
-    rows,
-    nextCursor: response.next_cursor || null,
-    hasMore: response.has_more === true,
-  };
+    .filter((page: any) => page.object === "page")
+    .map((page: any) => mapRow(page));
+  return { rows, nextCursor: response.next_cursor || null, hasMore: response.has_more === true };
 }
 
 export async function createDepartmentWorkPlanDraft(input: {
   title: string;
   departmentId: OpsDepartmentId;
-  programmeId?: string;
   objective?: string;
   deliverable?: string;
   dueDate?: string;
-  dependencies?: string;
   accountableRole?: string;
-  progressNote?: string;
-  evidenceNote?: string;
 }): Promise<{ id: string; url: string; status: string }> {
   const { client, databaseId } = database();
   if (!isOpsDepartmentId(input.departmentId)) throw new Error("Invalid department.");
   const properties: Record<string, unknown> = {
-    Name: { title: [{ text: { content: input.title.trim().slice(0, 180) } }] },
+    "Programme / Work Item": { title: [{ text: { content: input.title.trim().slice(0, 180) } }] },
     Department: { select: { name: DEPARTMENT_SELECT[input.departmentId] } },
-    Status: { select: { name: "Planned" } },
+    "Work Type": { select: { name: "Operations" } },
+    Status: { status: { name: "Proposed" } },
   };
-  if (input.programmeId) {
-    if (!/^[a-f0-9-]{32,36}$/i.test(input.programmeId)) {
-      throw new Error("Programme reference is invalid.");
-    }
-    const programmeDatabaseId = dbId("NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID");
-    if (!programmeDatabaseId) {
-      throw new Error("The department programmes register is not configured.");
-    }
-    assertInternalDb(
-      programmeDatabaseId,
-      "NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID"
-    );
-    const relatedProgramme: any = await client.pages.retrieve({
-      page_id: input.programmeId,
-    });
-    const relatedDatabaseId = relatedProgramme.parent?.database_id;
-    if (
-      relatedProgramme.object !== "page" ||
-      typeof relatedDatabaseId !== "string" ||
-      relatedDatabaseId.replace(/-/g, "").toLowerCase() !== programmeDatabaseId
-    ) {
-      throw new Error("Programme reference does not belong to the configured programmes register.");
-    }
-    const relatedDepartment = textProp(relatedProgramme.properties?.Department);
-    if (relatedDepartment !== DEPARTMENT_SELECT[input.departmentId]) {
-      throw new Error("A work-plan item can only be linked to a programme in the same department.");
-    }
-    properties.Programme = { relation: [{ id: input.programmeId }] };
-  }
   if (input.objective) {
-    properties.Objective = {
-      rich_text: [{ text: { content: input.objective.slice(0, 1800) } }],
-    };
+    properties["Intended Outcome"] = { rich_text: [{ text: { content: input.objective.slice(0, 1800) } }] };
   }
   if (input.deliverable) {
-    properties.Deliverable = {
-      rich_text: [{ text: { content: input.deliverable.slice(0, 1800) } }],
-    };
-  }
-  if (input.dependencies) {
-    properties.Dependencies = {
-      rich_text: [{ text: { content: input.dependencies.slice(0, 500) } }],
-    };
+    properties["Acceptance Criteria"] = { rich_text: [{ text: { content: input.deliverable.slice(0, 1800) } }] };
   }
   if (input.accountableRole) {
-    properties["Accountable role"] = {
-      rich_text: [{ text: { content: input.accountableRole.slice(0, 180) } }],
-    };
+    properties["Accountable Role"] = { rich_text: [{ text: { content: input.accountableRole.slice(0, 180) } }] };
   }
-  if (input.progressNote) {
-    properties["Progress note"] = {
-      rich_text: [{ text: { content: input.progressNote.slice(0, 1800) } }],
-    };
-  }
-  if (input.evidenceNote) {
-    properties["Evidence notes"] = {
-      rich_text: [{ text: { content: input.evidenceNote.slice(0, 1800) } }],
-    };
-  }
-  if (input.dueDate) properties["Due date"] = { date: { start: input.dueDate } };
-
-  const page = await client.pages.create({
-    parent: { database_id: databaseId },
-    properties: properties as any,
-  });
-  return { id: page.id, url: (page as any).url || "", status: "Planned" };
+  if (input.dueDate) properties["Due Date"] = { date: { start: input.dueDate } };
+  const page = await client.pages.create({ parent: { database_id: databaseId }, properties: properties as any });
+  return { id: page.id, url: (page as any).url || "", status: "Proposed" };
 }
