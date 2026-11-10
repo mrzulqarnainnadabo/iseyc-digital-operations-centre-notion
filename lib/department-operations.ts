@@ -504,7 +504,7 @@ export function getDepartmentOperatingProfile(
 }
 
 export const PROGRAMME_REGISTER_ENV = "NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID";
-export const WORKPLAN_REGISTER_ENV = "NOTION_DEPARTMENT_WORKPLANS_DATABASE_ID";
+export const WORKPLAN_REGISTER_ENV = PROGRAMME_REGISTER_ENV;
 export const REPORT_REGISTER_ENV = "NOTION_DEPARTMENT_REPORTS_DATABASE_ID";
 
 export function departmentProgrammeRegisterConfigured(): boolean {
