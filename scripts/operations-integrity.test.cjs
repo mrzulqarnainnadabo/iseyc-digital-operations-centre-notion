@@ -291,6 +291,10 @@ test("external organisation, contact and approved-meeting selectors paginate ind
   assert.match(page, /organisationsHasMore/);
   assert.match(page, /contactsHasMore/);
   assert.match(page, /meetingsHasMore/);
+  assert.match(page, /if \(!appendInvitations\)/);
+  assert.match(page, /setInviteOrg\(current => current \|\| result\.organisations\?\.find\(eligibleOrganisation\)/);
+  assert.match(page, /nextCursorKey/);
+  assert.match(page, /hasMoreKey/);
 });
 
 test("external invitation register uses validated cursor pagination and preserves loaded records", () => {
