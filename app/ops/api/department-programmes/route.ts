@@ -147,6 +147,12 @@ export async function POST(request: NextRequest) {
   if (endDate && !validDate(endDate)) {
     return privateJson({ ok: false, error: "End date must be YYYY-MM-DD." }, { status: 400 });
   }
+  if (startDate && endDate && endDate < startDate) {
+    return privateJson(
+      { ok: false, error: "End date cannot be earlier than the start date." },
+      { status: 400 }
+    );
+  }
   const accountableRole = str("accountableRole", 180);
   try {
     const created = await createDepartmentProgrammeDraft({
