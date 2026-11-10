@@ -101,6 +101,21 @@ test("meeting intake stores structured preparation in the canonical Meetings dat
   assert.match(form, /Standard-sensitivity intake only/);
 });
 
+test("action progress can be self-reported without enabling completion or closure", () => {
+  const api = read("app/ops/api/actions/[id]/route.ts");
+  const adapter = read("lib/notion-registers.ts");
+  const ui = read("components/OperationalRegister.tsx");
+  assert.match(api, /isSameOriginRequest/);
+  assert.match(api, /requireStaffSession/);
+  assert.match(api, /input\.status !== "In progress" && input\.status !== "Blocked"/);
+  assert.match(api, /Done and closure require a separate authorised review/);
+  assert.match(adapter, /updateActionProgress/);
+  assert.match(adapter, /\["Open", "In progress", "Blocked"\]/);
+  assert.match(ui, /Update working progress/);
+  assert.match(ui, /Self-reported working status only/);
+  assert.match(ui, /does not mark an action Done or close it/);
+});
+
 test("meeting collaboration is limited to draft notes on Standard records", () => {
   const api = read("app/api/meetings/[id]/route.ts");
   const adapter = read("lib/notion.ts");
