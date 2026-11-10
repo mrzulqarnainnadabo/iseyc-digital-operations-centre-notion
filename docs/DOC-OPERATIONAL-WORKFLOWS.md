@@ -5,7 +5,7 @@
 - Adds a shared mobile-first register interface with refresh, live records, Notion deep links and record creation.
 - Adds bounded cursor pagination to Actions, Media and Chamber operational registers, with a load-more interaction and response validation.
 - Requires an accountable owner role when creating an action; the form explicitly states that this is not an access grant or proof of appointment.
-- Adds cursor pagination to the external invitation register; organisation/contact directory selectors and the approved-meeting option list remain limited to their first 50 records and must not be treated as exhaustive.
+- Adds independent, bounded cursor pagination to the external invitation, organisation, contact and approved-meeting registers/selectors. Directory views display every record in each loaded page and provide explicit load-more controls.
 - Restricts creation to initial states: Actions=Open, Media=Draft, Chamber=Scheduled.
 - Keeps approval, publication, closure and formal decisions disabled because the current shared-key session does not establish individual identity or appointment authority.
 - Fails closed when a register is not configured, returns a malformed response or Notion cannot be reached. It never substitutes demo rows or inferred counts.
@@ -33,9 +33,9 @@ The Notion integration must be explicitly shared with each database. A populated
 4. Add media review/approval and publication evidence; publishing remains human-controlled.
 5. Complete invitation approval, dispatch evidence, RSVP updates, attendance confirmation and follow-up. Do not automate dispatch until individual officer authority is implemented.
 6. Integrate the Partnership Agreements & Commitments register into the application only after individual permissions and approval authority are available.
-5. Add Chamber attendance, agenda, minutes and decision handoff with verified chair/secretary authority.
-7. Connect department programme and report registers using approved IDs and department-scoped access.
-8. Extend pagination to organisation/contact directory selectors and approved-meeting options; add distributed rate limits, monitoring, backup/restore and recovery tests.
-9. Run CI, preview deployment, and mobile/tablet/desktop QA before release.
+7. Add Chamber attendance, agenda, minutes and decision handoff with verified chair/secretary authority.
+8. Connect department programme and report registers using approved IDs and department-scoped access.
+9. Extend pagination to the calendar and department activity views; add distributed rate limits, monitoring, backup/restore and recovery tests.
+10. Run CI, preview deployment, and mobile/tablet/desktop QA before release.
 
 This change is not production authorization and does not make the entire DOC release-ready.
