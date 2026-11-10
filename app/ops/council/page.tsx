@@ -26,7 +26,7 @@ export default function CouncilRolesPage() {
         <div className="relative flex flex-wrap items-end justify-between gap-3">
           <div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">Institutional architecture · 01</p><h2 id="council-map-title" className="mt-1 font-serif text-2xl text-[#173c30] sm:text-3xl">The leadership system</h2><p className="mt-2 max-w-xl text-xs leading-5 text-[#68736b]">A functional map of the proposed council roles. Grouping shows each office's institutional function; it does not create a reporting line or grant authority.</p></div>
           <span className="rounded-full border border-[#d7ddcf] bg-white/80 px-3 py-1.5 text-[10px] font-semibold text-[#526457]">14 role templates · no appointments</span>
-          <Link href="/docs/PRESIDENTIAL-COUNCIL-OPERATING-COMPACT.md" className="inline-flex min-h-9 items-center rounded-full border border-[#d7ddcf] bg-white px-3 text-[10px] font-bold text-[#315b45] hover:bg-[#f7f8f3]">Read operating compact ↗</Link>
+          <Link href="https://github.com/mrzulqarnainnadabo/iseyc-digital-operations-centre-notion/blob/feat/department-workspaces-quality/docs/PRESIDENTIAL-COUNCIL-OPERATING-COMPACT.md" className="inline-flex min-h-9 items-center rounded-full border border-[#d7ddcf] bg-white px-3 text-[10px] font-bold text-[#315b45] hover:bg-[#f7f8f3]">Read operating compact ↗</Link>
         </div>
         <div className="relative mt-7 flex flex-col items-center">
           <div className="relative z-10 flex w-full max-w-sm items-center gap-4 rounded-2xl border border-[#c5b184] bg-[#173f32] px-5 py-4 text-white shadow-[0_12px_28px_rgba(18,59,47,.14)]">
