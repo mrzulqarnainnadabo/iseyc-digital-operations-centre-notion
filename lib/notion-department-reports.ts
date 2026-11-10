@@ -5,7 +5,7 @@ import {
   departmentIdFromNotionSelect,
 } from "@/lib/department-operations";
 
-const ENV = "NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID" as const;
+const ENV = "NOTION_DEPARTMENT_REPORTS_DATABASE_ID" as const;
 const DEPARTMENT_SELECT: Record<OpsDepartmentId, string> = {
   education: "Education & Capacity Building",
   health: "Health & Well-being",
@@ -16,23 +16,13 @@ const DEPARTMENT_SELECT: Record<OpsDepartmentId, string> = {
 function database() {
   const client = notion();
   const databaseId = dbId(ENV);
-  if (!client || !databaseId) throw new Error("Department programmes and work register is not configured.");
+  if (!client || !databaseId) throw new Error("Department reports and scorecards register is not configured.");
   assertInternalDb(databaseId, ENV);
   return { client, databaseId };
 }
 
-export function departmentProgrammesConfigured(): boolean {
+export function departmentReportsConfigured(): boolean {
   return Boolean(process.env.NOTION_TOKEN?.trim() && dbId(ENV));
-}
-
-export function departmentWorkPlansConfigured(): boolean {
-  return departmentProgrammesConfigured();
-}
-
-function urlProp(prop: unknown): string {
-  if (!prop || typeof prop !== "object") return "";
-  const value = prop as Record<string, unknown>;
-  return value.type === "url" && typeof value.url === "string" ? value.url : "";
 }
 
 function departmentFilter(departmentId?: OpsDepartmentId) {
