@@ -363,7 +363,7 @@ test("external engagement keeps contact channels private and invitations as unse
   const adapter = read("lib/external-engagement.ts");
   const route = read("app/ops/api/external-engagement/route.ts");
   const page = read("app/ops/partners/page.tsx");
-  const start = adapter.indexOf("export async function listExternalOptions()");
+  const start = adapter.indexOf("export async function listExternalOptions(");
   const end = adapter.indexOf("export async function listExternalInvitations(", start);
   assert.ok(start >= 0 && end > start);
   const publicListing = adapter.slice(start, end);
