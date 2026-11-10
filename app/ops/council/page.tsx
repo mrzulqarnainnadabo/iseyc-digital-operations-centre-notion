@@ -26,6 +26,17 @@ export default function CouncilRolesPage() {
         <article className="rounded-xl border border-[#e1e5dc] bg-white p-4"><p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#8a6b34]">Governance principle</p><h2 className="mt-2 font-serif text-xl text-[#173c30]">Authority is explicit</h2><p className="mt-1 text-xs leading-5 text-[#68736b]">A role description is not an appointment, identity check or system permission.</p></article>
       </section>
 
+      <section className="rounded-2xl border border-[#dfe6df] bg-white p-5 sm:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="max-w-2xl">
+            <p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">How the council works</p>
+            <h2 className="mt-1 font-serif text-xl text-[#173c30]">A clear operating rhythm, not another layer of meetings</h2>
+            <p className="mt-2 text-xs leading-5 text-[#68736b]">See the proposed weekly coordination, monthly council review, decision gates, financial controls and department approval pathway. This is a governance proposal for review, not a substitute for ISEYC's constitution or approved delegations.</p>
+          </div>
+          <Link href="/docs/PRESIDENTIAL-COUNCIL-OPERATING-COMPACT.md" className="inline-flex min-h-10 items-center rounded-lg border border-[#d9dfd7] px-3 py-2 text-xs font-semibold text-[#194b3b] hover:bg-[#f4f6f2]">Read operating compact <span aria-hidden="true" className="ml-2">→</span></Link>
+        </div>
+      </section>
+
       <section className="rounded-2xl border border-[#e1e5dc] bg-[#f4f3ed] p-5 sm:p-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Proposed lean structure</p><h2 className="mt-1 font-serif text-2xl text-[#173c30]">One council · clear operating lanes</h2></div>
