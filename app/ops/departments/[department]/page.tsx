@@ -104,7 +104,7 @@ export default async function DepartmentDeskPage({
         const haystack = `${meeting.conveningBody} ${meeting.title}`.toLowerCase();
         return profile.meetingTerms.some((term) => haystack.includes(term));
       });
-      sourceMessage = "Filtered from the connected Meetings register · Standard-sensitivity records.";
+      sourceMessage = "Filtered from the first loaded page (up to 50 records) of the connected Meetings register · Standard-sensitivity records only.";
     } catch {
       sourceMessage = "The Meetings register could not be reached. No cached records are displayed.";
     }
