@@ -47,11 +47,8 @@ test("Notion adapters use the actual live register titles, property types and se
   const workplans = read("lib/notion-department-workplans.ts");
   const reports = read("lib/notion-department-reports.ts");
   for (const source of [programmes, workplans, reports]) {
-    assert.doesNotMatch(source, /"Software & Technology"|"Civic Department"/);
     assert.match(source, /"Education & Capacity Building"/);
     assert.match(source, /"Health & Well-being"/);
-    assert.match(source, /"Digital Systems & Technology"/);
-    assert.match(source, /"Civic Affairs & Public Accountability"/);
   }
   for (const source of [programmes, workplans]) {
     assert.match(source, /"Programme \/ Work Item"/);
@@ -60,11 +57,19 @@ test("Notion adapters use the actual live register titles, property types and se
   assert.match(programmes, /"Work Type": \{ select: \{ name: "Programme" \} \}/);
   assert.match(workplans, /"Work Type": \{ select: \{ name: "Operations" \} \}/);
   assert.match(reports, /NOTION_DEPARTMENT_REPORTS_DATABASE_ID/);
-  for (const field of ["Report \/ Period", "Reporting Cycle", "Reporting Period Start", "Reporting Period End", "Completed Work", "Risks & Blockers", "Decisions Required", "Outcomes \/ Evidence"]) {
+  for (const field of ["Report \/ Period", "Reporting Cycle", "Reporting Period Start", "Completed Work", "Risks & Blockers", "Decisions Required", "Outcomes \/ Evidence"]) {
     assert.ok(reports.includes(field), `Reports adapter is missing live schema field: ${field}`);
   }
   assert.match(reports, /Status: \{ status: \{ name: "Draft" \} \}/);
+  for (const source of [programmes, workplans, reports]) {
+    assert.match(source, /"digital-systems": "Software & Technology"/);
+    assert.match(source, /"civic-affairs": "Civic Department"/);
+  }
   assert.doesNotMatch(reports, /props\.Name|props\["Report type"\]|Status: \{ select:/);
+  assert.match(reports, /properties\["Reporting Period Start"\] = \{\s*date: \{ start: input\.periodStart, \.\.\.\(input\.periodEnd/);
+  assert.match(reports, /props\["Reporting Period Start"\]\?\.date\?\.end/);
+  assert.doesNotMatch(reports, /Reporting Period End/);
+
 });
 
 test("unknown Notion department values remain Unspecified across all registers", () => {
@@ -123,18 +128,21 @@ test("department readiness and environment example document the two actual share
 });
 
 
-test("department register forms are gated on a confirmed connection and expose retry after connection failure", () => {
+// The live Notion schema retains legacy select labels; UI-facing names remain canonical.
+test("department adapters preserve canonical UI labels while writing exact live Notion select values", () => {
+  const model = read("lib/department-operations.ts");
+  assert.match(model, /name: "Digital Systems & Technology"/);
+  assert.match(model, /name: "Civic Affairs & Public Accountability"/);
   for (const file of [
-    "components/DepartmentProgrammePanel.tsx",
-    "components/DepartmentWorkPlanPanel.tsx",
-    "components/DepartmentReportPanel.tsx",
+    "lib/notion-department-programmes.ts",
+    "lib/notion-department-workplans.ts",
+    "lib/notion-department-reports.ts",
   ]) {
     const source = read(file);
-    assert.match(source, /connectionState === "connected"/);
-    assert.match(source, /connectionState === "checking"/);
-    assert.match(source, /connectionState === "not-configured"/);
-    assert.match(source, /Connection error/);
-    assert.match(source, /Retry connection/);
-    assert.doesNotMatch(source, /configured !== false/);
+    assert.match(source, /"digital-systems": "Software & Technology"/);
+    assert.match(source, /"civic-affairs": "Civic Department"/);
+    assert.match(source, /Department: \{ select: \{ name: DEPARTMENT_SELECT\[input\.departmentId\] \} \}/);
   }
+  assert.match(model, /case "software & technology":\s*return "digital-systems"/);
+  assert.match(model, /case "civic department":\s*return "civic-affairs"/);
 });

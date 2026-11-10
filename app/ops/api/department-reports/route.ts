@@ -132,6 +132,9 @@ export async function POST(request: NextRequest) {
   if ((periodStart && !validDate(periodStart)) || (periodEnd && !validDate(periodEnd))) {
     return privateJson({ ok: false, error: "Reporting period dates must be valid YYYY-MM-DD dates." }, { status: 400 });
   }
+  if (periodEnd && !periodStart) {
+    return privateJson({ ok: false, error: "Provide a period start when a period end is supplied." }, { status: 400 });
+  }
   if (periodStart && periodEnd && periodEnd < periodStart) {
     return privateJson({ ok: false, error: "Reporting period end cannot be earlier than its start." }, { status: 400 });
   }
