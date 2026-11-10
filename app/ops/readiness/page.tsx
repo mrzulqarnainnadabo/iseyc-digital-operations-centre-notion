@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { StatusBadge } from "@/components/StatusBadge";
+import DepartmentArchitectureDiagram from "@/components/DepartmentArchitectureDiagram";
 
 const modules = [
   {
@@ -55,7 +56,7 @@ const modules = [
     name: "Department programmes & work plans",
     route: "/ops/departments/education",
     state: "Not operational",
-    detail: "Operating architecture and workspace structure exist for all four departments. Programme, work-plan and report Notion registers are not configured. No programme instances are invented.",
+    detail: "Programme, work-plan and report APIs and department UI panels are implemented. Live Notion persistence requires NOTION_DEPARTMENT_*_DATABASE_ID and integration share. No programme instances are invented when disconnected.",
     dependency: "Create and share DCC Department Programmes, Work Plans and Reports databases; set NOTION_DEPARTMENT_*_DATABASE_ID; department-scoped access with verified appointments.",
   },
   {
@@ -105,6 +106,8 @@ export default function ReadinessPage() {
         ))}
       </div>
 
+      <DepartmentArchitectureDiagram />
+
       <section className="space-y-3">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-700">Departments</p>
@@ -112,7 +115,7 @@ export default function ReadinessPage() {
           <p className="mt-1 max-w-2xl text-sm leading-6 text-ink-700">
             Each department workspace states its institutional responsibilities, links to shared operational
             registers and keeps authority boundaries explicit. Programme registers and appointed ownership
-            remain unconnected.
+            remain unconnected until Notion env is configured.
           </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
