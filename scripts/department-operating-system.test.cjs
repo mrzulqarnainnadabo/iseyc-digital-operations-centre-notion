@@ -131,8 +131,8 @@ test("department readiness and environment example document the two actual share
 // The live Notion schema retains legacy select labels; UI-facing names remain canonical.
 test("department adapters preserve canonical UI labels while writing exact live Notion select values", () => {
   const model = read("lib/department-operations.ts");
-  assert.match(model, /name: "Digital Systems & Technology"/);
-  assert.match(model, /name: "Civic Affairs & Public Accountability"/);
+  assert.match(model, /name: "Software and Technology"/);
+  assert.match(model, /name: "Civic Department"/);
   for (const file of [
     "lib/notion-department-programmes.ts",
     "lib/notion-department-workplans.ts",
