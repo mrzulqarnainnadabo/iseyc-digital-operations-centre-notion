@@ -8,12 +8,19 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 type Context = { params: Promise<{ kind: string }> };
 
-export async function GET(_request: NextRequest, context: Context) {
+export async function GET(request: NextRequest, context: Context) {
   if (!(await requireStaffSession())) return privateJson({ ok: false, error: "Unauthorized" }, { status: 401 });
   const { kind } = await context.params;
   if (!isRegisterKind(kind)) return privateJson({ ok: false, error: "Unknown register." }, { status: 404 });
   if (!registerConfigured(kind)) return privateJson({ ok: false, error: "Register is not configured. No records are shown." }, { status: 503 });
-  try { return privateJson({ ok: true, records: await listRegister(kind), source: "notion", pageSize: 50, scope: "first page only" }); }
+  const cursor = new URL(request.url).searchParams.get("cursor") || undefined;
+  if (cursor && (!/^[a-f0-9-]{32,36}$/i.test(cursor))) {
+    return privateJson({ ok: false, error: "Invalid pagination cursor." }, { status: 400 });
+  }
+  try {
+    const page = await listRegister(kind, cursor);
+    return privateJson({ ok: true, records: page.rows, nextCursor: page.nextCursor, hasMore: page.hasMore, pageSize: 50, source: "notion" });
+  }
   catch { return privateJson({ ok: false, error: "The Notion register could not be reached. No cached or estimated records are shown." }, { status: 502 }); }
 }
 export async function POST(request: NextRequest, context: Context) {
