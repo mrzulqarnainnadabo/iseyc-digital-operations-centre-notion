@@ -8,6 +8,7 @@ export type NavItem = {
 export const DOC_NAV: NavItem[] = [
   { label: "Command home", href: "/ops", group: "Command" },
   { label: "Executive desk", href: "/ops/executive", group: "Command" },
+  { label: "Council & role guide", href: "/ops/council", group: "Council & people" },
   { label: "Review queue", href: "/ops/queue", group: "Command" },
   { label: "Departments", href: "/ops#departments", group: "Departments" },
   { label: "Meetings calendar", href: "/ops/calendar", group: "Meetings & governance" },
@@ -35,6 +36,7 @@ export const MOBILE_NAV: NavItem[] = [
 export const GROUPS = [
   "Command",
   "Departments",
+  "Council & people",
   "Meetings & governance",
   "Delivery & coordination",
   "Governance",
