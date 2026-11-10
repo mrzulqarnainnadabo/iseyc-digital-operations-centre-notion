@@ -9,7 +9,7 @@ export const DOC_NAV: NavItem[] = [
   { label: "Command home", href: "/ops", group: "Command" },
   { label: "Executive desk", href: "/ops/executive", group: "Command" },
   { label: "Council & role guide", href: "/ops/council", group: "Council & people" },
-  { label: "Review queue", href: "/ops/queue", group: "Command" },
+  { label: "Meeting review queue", href: "/ops/queue", group: "Command" },
   { label: "Departments", href: "/ops#departments", group: "Departments" },
   { label: "Meetings calendar", href: "/ops/calendar", group: "Meetings & governance" },
   { label: "New meeting brief", href: "/ops/intake", group: "Meetings & governance" },
