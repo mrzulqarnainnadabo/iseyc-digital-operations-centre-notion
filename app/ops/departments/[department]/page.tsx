@@ -162,6 +162,7 @@ export default async function DepartmentDeskPage({
 
       <section className="grid scroll-mt-5 gap-4 lg:grid-cols-2">
         <article id="work-plans" className="rounded-2xl border border-[#e1e5dc] bg-white p-4 shadow-[0_4px_18px_rgba(20,49,38,.04)] sm:p-5">
+          <p className="mb-3 text-[10px] leading-4 text-[#7a837c]">A department task register is Not connected until its Notion register is configured. No task records are simulated.</p>
           <div className="mb-3 flex items-center gap-3"><span className="h-8 w-1 rounded-full bg-[#315b45]" /><div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">02 · Execution</p><h2 className="font-serif text-xl text-[#173c30]">Work plans</h2></div></div>
           <DepartmentWorkPlanPanel departmentId={department} departmentName={profile.name} />
         </article>
@@ -183,10 +184,10 @@ export default async function DepartmentDeskPage({
             <p className="mt-1 text-[10px] text-[#7a837c]">{meeting.meetingDate || "Date not supplied"} · {meeting.conveningBody}</p>
             <Link href={`/ops/review/${encodeURIComponent(meeting.id)}`} className="mt-2 inline-flex min-h-8 items-center text-[11px] font-bold text-[#194b3b]">Open meeting record →</Link>
           </li>
-        ))}</ul> : <p className="mt-4 rounded-xl border border-dashed border-[#d7ddd4] bg-white/70 p-4 text-xs leading-5 text-[#6c786f]">No matching meeting records on the loaded page. This does not establish that no department activity exists.</p>}
+        ))}</ul> : <p className="mt-4 rounded-xl border border-dashed border-[#d7ddd4] bg-white/70 p-4 text-xs leading-5 text-[#6c786f]">No matching department meetings were found on the loaded page. This does not establish that no department activity exists.</p>}
       </section>
 
-      <section id="shared-tools" className="scroll-mt-5 rounded-2xl border border-[#dce4dc] bg-white p-5 sm:p-6">
+      <section id="tools" className="scroll-mt-5 rounded-2xl border border-[#dce4dc] bg-white p-5 sm:p-6">
         <div className="flex flex-wrap items-end justify-between gap-2"><div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">Institution-wide support</p><h2 className="mt-1 font-serif text-2xl text-[#173c30]">Shared registers</h2></div><span className="text-[10px] text-[#7a837c]">Common tools · not additional departments</span></div>
         <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {[
@@ -202,7 +203,7 @@ export default async function DepartmentDeskPage({
 
       <details className="rounded-xl border border-[#e7d9b8] bg-[#fbf8ef] p-4">
         <summary className="min-h-9 cursor-pointer list-none text-xs font-bold text-[#6e5425]">Governance and authority limits <span aria-hidden="true" className="ml-1">＋</span></summary>
-        <p className="mt-2 max-w-4xl text-xs leading-5 text-[#6f654e]">This workspace supports coordination and record-keeping. A staff login does not prove individual identity, appointment or decision authority. Formal approval, publication, official dispatch, decision authorisation and action closure remain disabled until verified appointments and scoped permissions are in place. {profile.boundaries.join(" ")}</p>
+        <p className="mt-2 max-w-4xl text-xs leading-5 text-[#6f654e]">This workspace supports coordination and record-keeping. Reports and ownership are not inferred from login identity. A staff login does not prove individual identity, appointment or decision authority. Formal approval, publication, official dispatch, decision authorisation and action closure remain disabled until verified appointments and scoped permissions are in place. {profile.boundaries.join(" ")}</p>
       </details>
 
       <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e1e5dc] pt-4">
