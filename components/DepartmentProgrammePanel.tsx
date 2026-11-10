@@ -119,7 +119,7 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
       {configured !== false ? (
         <details className="rounded-xl border border-[#dfe6df] bg-[#fafbf8] p-3">
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-[#194b3b]">
-            <span>Prepare a programme draft<span className="mt-1 block text-xs font-normal text-[#68736b]">Saved as Proposed in the live register. This does not approve or start a programme.</span></span>
+            <span>Prepare a programme proposal<span className="mt-1 block text-xs font-normal text-[#68736b]">Saved as Proposed in the live register. This does not approve or start a programme.</span></span>
             <span aria-hidden="true" className="text-lg text-[#a7833f]">＋</span>
           </summary>
           <div className="mt-3">
@@ -138,7 +138,7 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
               />
             </label>
             <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
-              Objectives
+              Intended outcome
               <textarea
                 maxLength={1800}
                 rows={3}
