@@ -25,16 +25,6 @@ export function departmentProgrammesConfigured(): boolean {
   return Boolean(process.env.NOTION_TOKEN?.trim() && dbId(ENV));
 }
 
-export function departmentWorkPlansConfigured(): boolean {
-  return departmentProgrammesConfigured();
-}
-
-function urlProp(prop: unknown): string {
-  if (!prop || typeof prop !== "object") return "";
-  const value = prop as Record<string, unknown>;
-  return value.type === "url" && typeof value.url === "string" ? value.url : "";
-}
-
 function departmentFilter(departmentId?: OpsDepartmentId) {
   return departmentId && isOpsDepartmentId(departmentId)
     ? { property: "Department", select: { equals: DEPARTMENT_SELECT[departmentId] } }
