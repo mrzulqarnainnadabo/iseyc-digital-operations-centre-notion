@@ -76,7 +76,7 @@ export default function ReadinessPage() {
         <h2 className="font-serif text-3xl text-forest-950">Module readiness</h2>
         <p className="max-w-2xl text-sm leading-6 text-ink-700">
           A factual view of what the Digital Operations Centre can do today, what remains a policy foundation,
-          and what is still a Placeholder. Modules marked Partial have live list/create paths but blocked authority steps. A configured database or visible page does not mean a workflow is operational.
+          and what is not yet implemented or connected. Modules marked Partial have live list/create paths but blocked authority steps. A configured database or visible page does not mean a workflow is operational.
         </p>
       </header>
 
@@ -123,7 +123,7 @@ export default function ReadinessPage() {
             { id: "education", name: "Education & Capacity Building" },
             { id: "health", name: "Health & Well-being" },
             { id: "digital-systems", name: "Digital Systems & Technology" },
-            { id: "civic-affairs", name: "Civic Affairs" },
+            { id: "civic-affairs", name: "Civic Affairs & Public Accountability" },
           ].map((dept) => (
             <Link
               key={dept.id}

@@ -118,7 +118,13 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
       </div>
 
       {configured !== false ? (
-        <form onSubmit={submit} className="rounded-card border border-line bg-white p-4 shadow-card sm:p-5">
+        <details className="rounded-xl border border-[#dfe6df] bg-[#fafbf8] p-3">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-[#194b3b]">
+            <span>Prepare a programme draft<span className="mt-1 block text-xs font-normal text-[#68736b]">Saved as Draft or Planning only. This does not approve or start a programme.</span></span>
+            <span aria-hidden="true" className="text-lg text-[#a7833f]">＋</span>
+          </summary>
+          <div className="mt-3">
+          <form onSubmit={submit} className="rounded-card border border-line bg-white p-4 shadow-card sm:p-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Create draft</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
@@ -200,6 +206,8 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
             </button>
           </div>
         </form>
+          </div>
+        </details>
       ) : (
         <p className="rounded-card border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
           Configure <code className="text-xs">NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID</code> and share

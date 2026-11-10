@@ -58,7 +58,7 @@ export const departments: Department[] = [
   {
     slug: "civic",
     name: "Civic Department",
-    shortName: "Civic Affairs",
+    shortName: "Civic Affairs & Public Accountability",
     number: "04",
     summary: "Civic learning, institutional responsibilities, public-service conditions and evidence-based participation.",
     introduction: "Civic participation is strongest when people can understand public responsibilities and assess information in context. This department supports non-partisan learning and transparent engagement without endorsing parties, candidates or campaigns.",

@@ -118,7 +118,13 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
       </div>
 
       {configured !== false ? (
-        <form onSubmit={submit} className="grid gap-3 rounded-control border border-line bg-cream-50 p-3 sm:grid-cols-2">
+        <details className="rounded-xl border border-[#dfe6df] bg-[#fafbf8] p-3">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-[#194b3b]">
+            <span>Add a work-plan item<span className="mt-1 block text-xs font-normal text-[#68736b]">New items are saved as Planned. They are not proof that work has started.</span></span>
+            <span aria-hidden="true" className="text-lg text-[#a7833f]">＋</span>
+          </summary>
+          <div className="mt-3">
+          <form onSubmit={submit} className="grid gap-3 rounded-control border border-line bg-cream-50 p-3 sm:grid-cols-2">
           <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
             Title · required
             <input required minLength={3} maxLength={180} value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
@@ -148,6 +154,8 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
             <button type="button" onClick={() => void refresh()} disabled={busy} className="min-h-11 rounded-control border border-line px-4 text-sm font-semibold disabled:opacity-50">Refresh</button>
           </div>
         </form>
+          </div>
+        </details>
       ) : (
         <p className="rounded-control border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
           Configure <code className="text-xs">NOTION_DEPARTMENT_WORKPLANS_DATABASE_ID</code>. No work-plan records are invented while disconnected.

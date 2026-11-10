@@ -98,8 +98,8 @@ export default function QueuePage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <header className="space-y-3">
         <div>
-          <h1 className="mt-1 font-serif text-2xl text-forest-950 sm:text-3xl">Approval queue</h1>
-          <p className="mt-1 text-sm text-ink-600">Records are loaded in pages from the internal Meetings register.</p>
+          <h1 className="mt-1 font-serif text-2xl text-forest-950 sm:text-3xl">Meeting review queue</h1>
+          <p className="mt-1 text-sm text-ink-600">This queue covers meeting briefs only. Department programme, finance and other institutional approvals are not managed here.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={() => setReloadKey((value) => value + 1)} disabled={loading || loadingMore} className="inline-flex min-h-[44px] items-center rounded-control border border-line bg-white px-4 text-sm font-semibold text-ink-700 disabled:opacity-50">{loading ? "Refreshing…" : "Refresh"}</button>
@@ -113,7 +113,7 @@ export default function QueuePage() {
           <p className="mt-1 font-serif text-2xl tabular-nums">{loading || error ? "—" : meetings.length}</p>
         </div>
         <div className="rounded-card border border-line bg-white p-4">
-          <p className="text-xs text-ink-600">Awaiting · loaded</p>
+          <p className="text-xs text-ink-600">Awaiting meeting review · loaded</p>
           <p className="mt-1 font-serif text-2xl tabular-nums">{loading || error ? "—" : reviewCount}</p>
         </div>
         <div className="col-span-2 rounded-card border border-line bg-white p-4 sm:col-span-1">

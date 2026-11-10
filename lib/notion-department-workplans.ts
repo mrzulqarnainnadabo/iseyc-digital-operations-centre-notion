@@ -118,7 +118,33 @@ export async function createDepartmentWorkPlanDraft(input: {
     Department: { select: { name: DEPARTMENT_SELECT[input.departmentId] } },
     Status: { select: { name: "Planned" } },
   };
-  if (input.programmeId && /^[a-f0-9-]{32,36}$/i.test(input.programmeId)) {
+  if (input.programmeId) {
+    if (!/^[a-f0-9-]{32,36}$/i.test(input.programmeId)) {
+      throw new Error("Programme reference is invalid.");
+    }
+    const programmeDatabaseId = dbId("NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID");
+    if (!programmeDatabaseId) {
+      throw new Error("The department programmes register is not configured.");
+    }
+    assertInternalDb(
+      programmeDatabaseId,
+      "NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID"
+    );
+    const relatedProgramme: any = await client.pages.retrieve({
+      page_id: input.programmeId,
+    });
+    const relatedDatabaseId = relatedProgramme.parent?.database_id;
+    if (
+      relatedProgramme.object !== "page" ||
+      typeof relatedDatabaseId !== "string" ||
+      relatedDatabaseId.replace(/-/g, "").toLowerCase() !== programmeDatabaseId
+    ) {
+      throw new Error("Programme reference does not belong to the configured programmes register.");
+    }
+    const relatedDepartment = textProp(relatedProgramme.properties?.Department);
+    if (relatedDepartment !== DEPARTMENT_SELECT[input.departmentId]) {
+      throw new Error("A work-plan item can only be linked to a programme in the same department.");
+    }
     properties.Programme = { relation: [{ id: input.programmeId }] };
   }
   if (input.objective) {

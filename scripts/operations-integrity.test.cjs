@@ -13,6 +13,7 @@ require.extensions[".ts"] = (mod, filename) => {
 };
 
 const { DOC_NAV } = require("../lib/nav.ts");
+const { COUNCIL_ROLES, ROLE_GROUPS } = require("../lib/council-roles.ts");
 const root = path.join(__dirname, "..");
 const opsRoot = path.join(root, "app/ops");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
@@ -464,4 +465,107 @@ test("external engagement keeps contact channels private and invitations as unse
   assert.match(page, /It has NOT been sent/);
   assert.match(adapter, /Unverified/);
   assert.match(adapter, /Not recorded/);
+});
+
+
+test("readiness page uses the approved fourth department name and plain operational language", () => {
+  const readiness = read("app/ops/readiness/page.tsx");
+  assert.match(readiness, /Civic Affairs & Public Accountability/);
+  assert.doesNotMatch(readiness, /name: "Civic Affairs"/);
+  assert.match(readiness, /not yet implemented or connected/);
+  assert.doesNotMatch(readiness, /Placeholder/);
+});
+
+test("operations shell carries the approved ISEYC identity and institutional signature", () => {
+  const layout = read("app/layout.tsx");
+  const shell = read("components/DocShell.tsx");
+  assert.match(layout, /ISEYC \| Digital Operations Centre/);
+  assert.match(layout, /institutional operating environment/);
+  assert.match(shell, /Empowering Youth, Shaping Communities/);
+  assert.match(shell, /iseycglobal@gmail\.com/);
+  assert.match(shell, /@iseyc_global/);
+  assert.match(shell, /iseyc-seal\.svg/);
+});
+
+test("officer access page uses the approved full Civic Affairs department name", () => {
+  const access = read("app/ops/access/page.tsx");
+  assert.match(access, /Civic Affairs & Public Accountability/);
+});
+
+test("meeting review queue does not imply it handles every institutional approval", () => {
+  const page = read("app/ops/queue/page.tsx");
+  const nav = read("lib/nav.ts");
+  assert.match(page, /Meeting review queue/);
+  assert.match(page, /This queue covers meeting briefs only/);
+  assert.match(page, /Department programme, finance and other institutional approvals are not managed here/);
+  assert.match(nav, /label: "Meeting review queue"/);
+});
+
+test("department draft forms are collapsed until requested and clearly explain their status", () => {
+  const programme = read("components/DepartmentProgrammePanel.tsx");
+  const workplan = read("components/DepartmentWorkPlanPanel.tsx");
+  const report = read("components/DepartmentReportPanel.tsx");
+  for (const [name, source] of [["programme", programme], ["work plan", workplan], ["report", report]]) {
+    assert.match(source, /<details className=/, `${name} form should be collapsible`);
+    assert.match(source, /<summary/, `${name} form needs a visible disclosure label`);
+  }
+  assert.match(programme, /Save programme draft/);
+  assert.match(workplan, /Save work-plan item/);
+  assert.match(report, /Save report draft/);
+  assert.match(programme, /Creation is limited to Planning/);
+  assert.match(report, /Draft only/);
+});
+
+test("department work plans cannot link programmes across departments or unrelated databases", () => {
+  const adapter = read("lib/notion-department-workplans.ts");
+  const route = read("app/ops/api/department-workplans/route.ts");
+  assert.match(adapter, /NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID/);
+  assert.match(adapter, /client\.pages\.retrieve/);
+  assert.match(adapter, /relatedProgramme\.parent\?\.database_id/);
+  assert.match(adapter, /relatedDepartment !== DEPARTMENT_SELECT\[input\.departmentId\]/);
+  assert.match(adapter, /same department/);
+  assert.match(route, /Programme relation must be a valid Notion page id/);
+});
+
+test("department programme dates reject an end date before the start date", () => {
+  const route = read("app/ops/api/department-programmes/route.ts");
+  assert.match(route, /endDate < startDate/);
+  assert.match(route, /End date cannot be earlier than the start date/);
+  assert.match(route, /validDate\(startDate\)/);
+  assert.match(route, /validDate\(endDate\)/);
+});
+
+test("council role guide defines bounded templates without inventing appointments", () => {
+  const page = read("app/ops/council/page.tsx");
+  const framework = read("docs/COUNCIL-ROLE-AND-DEVELOPMENT-FRAMEWORK.md");
+  assert.ok(COUNCIL_ROLES.length >= 10);
+  assert.equal(new Set(COUNCIL_ROLES.map((role) => role.id)).size, COUNCIL_ROLES.length);
+  assert.deepEqual(ROLE_GROUPS.filter((group) => COUNCIL_ROLES.some((role) => role.group === group)).length, ROLE_GROUPS.length);
+  for (const role of COUNCIL_ROLES) {
+    assert.ok(role.purpose && role.reportsTo && role.authorityBoundary, `Incomplete role template: ${role.id}`);
+    assert.ok(role.responsibilities.length && role.weeklyPractice.length && role.development.length, `Missing operating guide: ${role.id}`);
+  }
+  assert.match(page, /No appointments or permissions created/);
+  assert.match(page, /Personal development and authority limits/);
+  assert.ok(framework.includes("existing **IDCC — Appointment & Role Register**"));
+  assert.match(framework, /Automation should handle reminders/);
+  assert.ok(DOC_NAV.some((item) => item.href === "/ops/council"));
+});
+
+test("Presidential Council guide links to a bounded operating compact", () => {
+  const page = read("app/ops/council/page.tsx");
+  const compact = read("docs/PRESIDENTIAL-COUNCIL-OPERATING-COMPACT.md");
+  assert.match(page, /Council roles & leadership guide/);
+  assert.match(page, /\/docs\/PRESIDENTIAL-COUNCIL-OPERATING-COMPACT\.md/);
+  for (const heading of [
+    "Council operating rhythm",
+    "Decision and approval gates",
+    "Department approval cycle",
+    "Meeting record standard",
+    "Lean council test",
+    "Review and adoption"
+  ]) assert.ok(compact.includes(heading), `Operating compact missing section: ${heading}`);
+  assert.match(compact, /Authority not configured/);
+  assert.match(compact, /shared staff key cannot prove who attended/);
+  assert.match(compact, /Automation must not approve/);
 });

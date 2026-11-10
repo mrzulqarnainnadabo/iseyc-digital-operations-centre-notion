@@ -34,7 +34,7 @@ const departments = [
   {
     id: "civic-affairs",
     number: "04",
-    name: "Civic Affairs",
+    name: "Civic Affairs & Public Accountability",
     short: "Civic participation, community concerns and accountability.",
     focus: ["Civic participation", "Community engagement", "Accountability"],
     tone: "civic",

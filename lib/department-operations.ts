@@ -381,7 +381,7 @@ export const DEPARTMENT_OPERATING_PROFILES: Record<
   },
   "civic-affairs": {
     id: "civic-affairs",
-    name: "Civic Affairs",
+    name: "Civic Affairs & Public Accountability",
     publicSlug: "civic",
     missionLink:
       "Supports non-partisan civic learning, community representation pathways and transparent institutional engagement.",
