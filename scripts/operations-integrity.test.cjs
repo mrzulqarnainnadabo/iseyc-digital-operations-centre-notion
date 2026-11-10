@@ -468,6 +468,11 @@ test("external engagement keeps contact channels private and invitations as unse
 });
 
 
+test("officer access page uses the approved full Civic Affairs department name", () => {
+  const access = read("app/ops/access/page.tsx");
+  assert.match(access, /Civic Affairs & Public Accountability/);
+});
+
 test("meeting review queue does not imply it handles every institutional approval", () => {
   const page = read("app/ops/queue/page.tsx");
   const nav = read("lib/nav.ts");
