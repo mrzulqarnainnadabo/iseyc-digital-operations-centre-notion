@@ -166,8 +166,8 @@ test("Notion operational registers expose bounded cursor pagination", () => {
   assert.match(adapter, /has_more/);
   assert.match(api, /Invalid pagination cursor/);
   assert.match(api, /nextCursor: page.nextCursor/);
-  assert.match(ui, /Load more records/);
-  assert.match(ui, /\[\.\.\.current, \.\.\.j\.records\]/);
+  assert.match(ui, /\[\.\.\.current, \.\.\.data\.records\]/);
+  assert.match(ui, /\[\.\.\.current, \.\.\.data\.records\]/);
 });
 
 test("institutional design tokens and reduced-motion accessibility are present", () => {
