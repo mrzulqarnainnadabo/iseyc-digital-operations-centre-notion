@@ -305,7 +305,9 @@ test("external invitation register uses validated cursor pagination and preserve
   assert.match(adapter, /next_cursor/);
   assert.match(adapter, /has_more/);
   assert.match(adapter, /listExternalInvitations\(cursor\?: string\)/);
-  assert.match(route, /Invalid invitation pagination cursor/);
+  assert.match(route, /const invitationCursor = params\.get\("cursor"\)/);
+  assert.match(route, /cursorPattern = \/\^\[a-f0-9-\]\{32,36\}\$\/i/);
+  assert.match(route, /Invalid register pagination cursor/);
   assert.match(route, /invitationsNextCursor/);
   assert.match(route, /invitationsHasMore/);
   assert.match(page, /Load more invitations/);
