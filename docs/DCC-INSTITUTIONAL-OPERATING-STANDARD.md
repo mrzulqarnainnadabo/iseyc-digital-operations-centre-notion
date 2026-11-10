@@ -349,3 +349,9 @@ The application can create a **Scheduled** session with draft preparation fields
 - The current shared-key session is not individual identity or executive appointment verification.
 - Individual sign-in, current appointment records, scoped permissions, durable audit, verified chair authority, meeting approval, dispatch/RSVP, attendance verification, accepted minutes, formal decision certification and action acceptance/closure remain gated.
 - No live record creation/reload test is claimed until performed against the authorised Vercel/Notion environment.
+
+
+### Transitional working updates
+
+- Standard meeting records support shared-key editing of attendance notes, draft minutes and draft outcome summaries. These are explicitly working drafts, do not verify attendance or quorum, and do not certify a decision. The editor is not individually identified by the shared key.
+- Open actions support self-reported **In progress** and **Blocked** updates with a progress note and blocker explanation. The interface does not offer Done or formal closure. Completion evidence review and acceptance require individual identity, scoped authority and durable audit.
