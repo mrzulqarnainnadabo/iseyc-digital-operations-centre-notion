@@ -20,6 +20,10 @@ test("department programme work-plan and report APIs are authenticated draft-onl
   assert.doesNotMatch(programmeRoute, /input\.status|statusRaw/);
   assert.match(read("app/ops/api/department-workplans/route.ts"), /Proposed/);
   assert.match(read("app/ops/api/department-reports/route.ts"), /not institutional approval/);
+  const reportRoute = read("app/ops/api/department-reports/route.ts");
+  assert.match(reportRoute, /REPORT_TYPES: ReportType\[\] = \["Weekly", "Monthly", "Quarterly", "Annual"\]/);
+  assert.match(reportRoute, /periodEnd < periodStart/);
+  assert.match(reportRoute, /validDate\(periodStart\)/);
 });
 
 test("department programme work-plan and report Notion adapters bind internal databases", () => {
