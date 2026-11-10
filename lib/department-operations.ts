@@ -13,7 +13,7 @@ export type OpsDepartmentId =
   | "digital-systems"
   | "civic-affairs";
 
-export type DepartmentRecordId = OpsDepartmentId | "Unspecified";
+export type DepartmentRecordId = OpsDepartmentId | "Cross-departmental" | "Unspecified";
 
 /** Map known Notion select values without silently assigning unknown records to Education. */
 export function departmentIdFromNotionSelect(value: string): DepartmentRecordId {
@@ -32,6 +32,8 @@ export function departmentIdFromNotionSelect(value: string): DepartmentRecordId 
     case "civic affairs & public accountability":
     case "civic department":
       return "civic-affairs";
+    case "cross-departmental":
+      return "Cross-departmental";
     default:
       return "Unspecified";
   }
@@ -48,28 +50,26 @@ export type DepartmentFunction = {
 };
 
 export type ProgrammeStatus =
-  | "Planning"
-  | "Draft"
-  | "Active"
-  | "On hold"
+  | "Proposed"
+  | "Approved"
+  | "In Progress"
+  | "Under Review"
   | "Completed"
-  | "Closed"
+  | "Paused"
+  | "Cancelled"
   | "Unspecified";
 
 export type WorkPlanStatus =
-  | "Planned"
-  | "In progress"
-  | "Blocked"
+  | "Proposed"
+  | "Approved"
+  | "In Progress"
+  | "Under Review"
   | "Completed"
-  | "Deferred"
+  | "Paused"
+  | "Cancelled"
   | "Unspecified";
 
-export type ReportType =
-  | "Activity"
-  | "Programme"
-  | "Monthly department"
-  | "Coordination"
-  | "Other";
+export type ReportType = "Weekly" | "Monthly" | "Quarterly" | "Annual" | "Unspecified";
 
 /** Canonical programme fields for a future Notion-backed register. */
 export type ProgrammeRecord = {
@@ -96,13 +96,10 @@ export type WorkPlanRecord = {
   title: string;
   objective: string;
   departmentId: DepartmentRecordId;
-  programmeId: string;
   deliverable: string;
   dueDate: string;
-  dependencies: string;
   accountableRole: string;
   status: WorkPlanStatus;
-  progressNote: string;
   evidenceNote: string;
   url: string;
 };
@@ -113,12 +110,13 @@ export type DepartmentReportRecord = {
   title: string;
   reportType: ReportType;
   departmentId: DepartmentRecordId;
-  period: string;
+  periodStart: string;
+  periodEnd: string;
   summary: string;
   challenges: string;
   outstandingActions: string;
   recommendations: string;
-  status: "Draft" | "Submitted for review" | "Archived" | "Unspecified";
+  status: "Draft" | "Submitted" | "Under Review" | "Accepted" | "Revision Required" | "Archived" | "Unspecified";
   url: string;
 };
 
