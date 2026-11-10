@@ -233,3 +233,53 @@ button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
 @media (prefers-reduced-motion: reduce) {
   .dept-workspace-card, .ops-department-nav a { transition: none; }
 }
+
+
+/* Department signature marks — distinct disciplines within one ISEYC identity */
+.ops-department-mark {
+  position: relative;
+  display: grid;
+  width: 9rem;
+  height: 9rem;
+  place-items: center;
+  border: 1px solid rgb(217 197 155 / 34%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 255 255 / 7%), transparent 68%);
+}
+.ops-department-mark::before,
+.ops-department-mark::after {
+  position: absolute;
+  inset: .65rem;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 50%;
+  content: "";
+}
+.ops-department-mark::after { inset: 1.35rem; border-color: rgb(217 197 155 / 18%); }
+.ops-department-mark span {
+  position: absolute;
+  bottom: 1.15rem;
+  color: #e4d3aa;
+  font-size: .48rem;
+  font-weight: 750;
+  letter-spacing: .2em;
+}
+.ops-department--education { --department-accent: #8bb99a; }
+.ops-department--health { --department-accent: #d9b47a; }
+.ops-department--digital { --department-accent: #8db9c5; }
+.ops-department--civic { --department-accent: #d4c08c; }
+.ops-department .ops-department-nav a:hover { border-color: var(--department-accent); }
+.ops-department--education .ops-department-mark { box-shadow: 0 0 0 8px rgb(139 185 154 / 5%); }
+.ops-department--health .ops-department-mark { box-shadow: 0 0 0 8px rgb(217 180 122 / 5%); }
+.ops-department--digital .ops-department-mark { box-shadow: 0 0 0 8px rgb(141 185 197 / 5%); }
+.ops-department--civic .ops-department-mark { box-shadow: 0 0 0 8px rgb(212 192 140 / 5%); }
+
+.ops-department-mark svg { width: 7rem; height: 7rem; }
+@media (min-width: 1024px) {
+  .ops-department-mark { width: 13rem; height: 13rem; }
+  .ops-department-mark svg { width: 10rem; height: 10rem; }
+}
+@media (max-width: 640px) {
+  .ops-department-mark { width: 8rem; height: 8rem; }
+  .ops-department-mark svg { width: 6rem; height: 6rem; }
+  .ops-department-mark span { bottom: .75rem; font-size: .38rem; }
+}

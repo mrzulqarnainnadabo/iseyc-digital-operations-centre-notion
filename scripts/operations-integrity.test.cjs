@@ -501,6 +501,29 @@ test("meeting review queue does not imply it handles every institutional approva
   assert.match(nav, /label: "Meeting review queue"/);
 });
 
+test("department workspaces use distinct identity marks and every in-page navigation target resolves", () => {
+  const page = read("app/ops/departments/[department]/page.tsx");
+  const styles = read("app/globals.css");
+  const definitions = read("lib/departments.ts");
+  assert.match(page, /function DepartmentMark/);
+  for (const discipline of ["education", "health", "digital-systems", "civic-affairs"]) {
+    assert.ok(page.includes(`department === "${discipline}"`) || discipline === "civic-affairs", `Missing visual identity for ${discipline}`);
+  }
+  assert.match(page, /id="shared-tools"/);
+  assert.match(page, /\["#shared-tools", "Shared tools"\]/);
+  assert.doesNotMatch(page, /id="tools"/);
+  assert.match(page, /ops-department-mark--education/);
+  assert.match(page, /ops-department-mark--health/);
+  assert.match(page, /ops-department-mark--digital/);
+  assert.match(page, /ops-department-mark--civic/);
+  assert.match(styles, /ops-department--education \.ops-department-mark/);
+  assert.match(styles, /ops-department--health \.ops-department-mark/);
+  assert.match(styles, /ops-department--digital \.ops-department-mark/);
+  assert.match(styles, /ops-department--civic \.ops-department-mark/);
+  assert.match(definitions, /name: "Digital Systems & Technology"/);
+  assert.match(definitions, /name: "Civic Affairs & Public Accountability"/);
+});
+
 test("department draft forms are collapsed until requested and clearly explain their status", () => {
   const programme = read("components/DepartmentProgrammePanel.tsx");
   const workplan = read("components/DepartmentWorkPlanPanel.tsx");
