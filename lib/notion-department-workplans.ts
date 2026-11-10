@@ -22,7 +22,7 @@ function database() {
 }
 
 export function departmentWorkPlansConfigured(): boolean {
-  return departmentProgrammesConfigured();
+  return Boolean(process.env.NOTION_TOKEN?.trim() && dbId(ENV));
 }
 
 function urlProp(prop: unknown): string {
