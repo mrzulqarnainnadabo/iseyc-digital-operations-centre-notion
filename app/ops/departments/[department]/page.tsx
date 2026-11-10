@@ -4,13 +4,13 @@ import { configFlags, listMeetings } from "@/lib/notion";
 import { filterLegacyVisibleMeetings } from "@/lib/legacy-session-boundary";
 import { getDepartment } from "@/lib/departments";
 import {
-  departmentReportRegisterConfigured,
-  departmentWorkPlanRegisterConfigured,
   getDepartmentOperatingProfile,
   isOpsDepartmentId,
   type OpsDepartmentId,
 } from "@/lib/department-operations";
 import DepartmentProgrammePanel from "@/components/DepartmentProgrammePanel";
+import DepartmentWorkPlanPanel from "@/components/DepartmentWorkPlanPanel";
+import DepartmentReportPanel from "@/components/DepartmentReportPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -34,8 +34,6 @@ export default async function DepartmentDeskPage({
 
   const publicDef = getDepartment(profile.publicSlug);
   const flags = configFlags();
-  const workPlansConfigured = departmentWorkPlanRegisterConfigured();
-  const reportsConfigured = departmentReportRegisterConfigured();
 
   let meetings: Awaited<ReturnType<typeof listMeetings>>["meetings"] = [];
   let sourceMessage =
@@ -67,27 +65,18 @@ export default async function DepartmentDeskPage({
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <header className="overflow-hidden rounded-card border border-forest-900 bg-forest-950 p-5 text-white shadow-card sm:p-7">
-        <Link
-          href="/ops/readiness"
-          className="inline-flex min-h-[36px] items-center text-sm text-white/75 hover:text-white"
-        >
+        <Link href="/ops/readiness" className="inline-flex min-h-[36px] items-center text-sm text-white/75 hover:text-white">
           ← Department overview
         </Link>
         <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold-400">
-              Department operating workspace
-            </p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold-400">Department operating workspace</p>
             <h1 className="mt-1 font-serif text-2xl leading-tight sm:text-3xl">{profile.name}</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/80">{profile.mandate}</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <span className="inline-flex min-h-[32px] items-center rounded-full border border-white/20 px-3 text-xs font-medium text-white/85">
-              Institutional
-            </span>
-            <span className="inline-flex min-h-[32px] items-center rounded-full border border-amber-300/40 bg-amber-950/30 px-3 text-xs font-medium text-amber-100">
-              Shared-key limits apply
-            </span>
+            <span className="inline-flex min-h-[32px] items-center rounded-full border border-white/20 px-3 text-xs font-medium text-white/85">Institutional</span>
+            <span className="inline-flex min-h-[32px] items-center rounded-full border border-amber-300/40 bg-amber-950/30 px-3 text-xs font-medium text-amber-100">Shared-key limits apply</span>
           </div>
         </div>
         <p className="mt-4 max-w-3xl text-xs leading-5 text-white/65">{profile.missionLink}</p>
@@ -101,7 +90,6 @@ export default async function DepartmentDeskPage({
           ["#work-plans", "Work plans"],
           ["#reports", "Reports"],
           ["#meetings", "Meetings"],
-          ["#tools", "Tools"],
           ["#coordination", "Coordination"],
         ].map(([href, label]) => (
           <a key={href} href={href} className="inline-flex min-h-[40px] shrink-0 items-center rounded-full border border-line bg-white px-3 text-forest-900 hover:border-forest-800">{label}</a>
@@ -111,7 +99,7 @@ export default async function DepartmentDeskPage({
       <section className="rounded-card border border-amber-200 bg-amber-50 p-4 sm:p-5">
         <p className="text-sm font-semibold text-amber-950">Authority boundary</p>
         <p className="mt-1 text-sm leading-6 text-amber-900">
-          This workspace supports coordination and record-keeping. A staff login does not prove individual
+          This workspace supports coordination and record-keeping. Reports and ownership are not inferred from login identity. A staff login does not prove individual
           identity, appointment or decision authority. Formal approval, publication, official dispatch,
           decision authorisation and action closure remain disabled until verified appointments and
           scoped permissions are in place.
@@ -161,25 +149,14 @@ export default async function DepartmentDeskPage({
       </section>
 
       <section className="grid gap-4 lg:grid-cols-2">
-        <article id="work-plans" className="rounded-card border border-line bg-white p-5 shadow-card">
-          <div className="flex flex-wrap items-start justify-between gap-2">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Work planning</p>
-              <h2 className="mt-1 font-serif text-xl text-forest-950">Work plans & deliverables</h2>
-            </div>
-            <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-900">{workPlansConfigured ? "Configured · not live-verified" : "Not connected"}</span>
-          </div>
-          <p className="mt-2 text-sm leading-6 text-ink-600">A department task register is not yet connected. Assignments, deadlines and completion status are intentionally withheld rather than simulated. Use GET/POST /ops/api/department-workplans when NOTION_DEPARTMENT_WORKPLANS_DATABASE_ID is configured.</p>
+        <article id="work-plans" className="rounded-card border border-line bg-white p-4 shadow-card sm:p-5">
+          <p className="mb-3 text-xs leading-5 text-ink-600">
+            A department task register is Not connected until the work-plan Notion register is configured; records are not simulated.
+          </p>
+          <DepartmentWorkPlanPanel departmentId={department} departmentName={profile.name} />
         </article>
-        <article id="reports" className="rounded-card border border-line bg-white p-5 shadow-card">
-          <div className="flex flex-wrap items-start justify-between gap-2">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Accountability</p>
-              <h2 className="mt-1 font-serif text-xl text-forest-950">Reports & documentation</h2>
-            </div>
-            <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-900">{reportsConfigured ? "Configured · not live-verified" : "Not connected"}</span>
-          </div>
-          <p className="mt-2 text-sm leading-6 text-ink-600">Activity reports and evidence-backed progress require approved registers and verified staff roles. They are not inferred from login identity. Draft API: /ops/api/department-reports.</p>
+        <article id="reports" className="rounded-card border border-line bg-white p-4 shadow-card sm:p-5">
+          <DepartmentReportPanel departmentId={department} departmentName={profile.name} />
         </article>
       </section>
 
