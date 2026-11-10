@@ -13,6 +13,7 @@ require.extensions[".ts"] = (mod, filename) => {
 };
 
 const { DOC_NAV } = require("../lib/nav.ts");
+const { COUNCIL_ROLES, ROLE_GROUPS } = require("../lib/council-roles.ts");
 const root = path.join(__dirname, "..");
 const opsRoot = path.join(root, "app/ops");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
@@ -464,4 +465,22 @@ test("external engagement keeps contact channels private and invitations as unse
   assert.match(page, /It has NOT been sent/);
   assert.match(adapter, /Unverified/);
   assert.match(adapter, /Not recorded/);
+});
+
+
+test("council role guide defines bounded templates without inventing appointments", () => {
+  const page = read("app/ops/council/page.tsx");
+  const framework = read("docs/COUNCIL-ROLE-AND-DEVELOPMENT-FRAMEWORK.md");
+  assert.ok(COUNCIL_ROLES.length >= 10);
+  assert.equal(new Set(COUNCIL_ROLES.map((role) => role.id)).size, COUNCIL_ROLES.length);
+  assert.deepEqual(ROLE_GROUPS.filter((group) => COUNCIL_ROLES.some((role) => role.group === group)).length, ROLE_GROUPS.length);
+  for (const role of COUNCIL_ROLES) {
+    assert.ok(role.purpose && role.reportsTo && role.authorityBoundary, `Incomplete role template: ${role.id}`);
+    assert.ok(role.responsibilities.length && role.weeklyPractice.length && role.development.length, `Missing operating guide: ${role.id}`);
+  }
+  assert.match(page, /No appointments or permissions created/);
+  assert.match(page, /Personal development and authority limits/);
+  assert.match(framework, /existing **IDCC — Appointment & Role Register**/);
+  assert.match(framework, /Automation should handle reminders/);
+  assert.ok(DOC_NAV.some((item) => item.href === "/ops/council"));
 });
