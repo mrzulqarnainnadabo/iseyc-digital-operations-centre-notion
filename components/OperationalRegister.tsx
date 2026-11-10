@@ -13,11 +13,23 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  async function refresh() {
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  async function refresh(append = false) {
     setBusy(true); setError("");
-    try { const r = await fetch(`/ops/api/registers/${kind}`, { cache: "no-store" }); const j = await r.json(); if (!r.ok) throw new Error(j.error || "Could not load register."); if (!Array.isArray(j.records)) throw new Error("The register returned an invalid response. No records are shown."); setRows(j.records); setLoaded(true); }
-    catch (e) { setRows([]); setError(e instanceof Error ? e.message : "Could not load register."); setLoaded(false); }
-    finally { setBusy(false); }
+    const cursor = append ? nextCursor : null;
+    try {
+      const suffix = cursor ? `?cursor=${encodeURIComponent(cursor)}` : "";
+      const r = await fetch(`/ops/api/registers/${kind}${suffix}`, { cache: "no-store" });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || "Could not load register.");
+      if (!Array.isArray(j.records) || (j.nextCursor !== null && typeof j.nextCursor !== "string") || typeof j.hasMore !== "boolean") throw new Error("The register returned an invalid response. No records are shown.");
+      setRows(current => append ? [...current, ...j.records] : j.records);
+      setNextCursor(j.hasMore ? j.nextCursor : null);
+      setLoaded(true);
+    } catch (e) {
+      if (!append) { setRows([]); setLoaded(false); setNextCursor(null); }
+      setError(e instanceof Error ? e.message : "Could not load register.");
+    } finally { setBusy(false); }
   }
   useEffect(() => { void refresh(); }, [kind]);
   async function submit(e: React.FormEvent) {
@@ -41,6 +53,7 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
     {!loaded && !error ? <p className="text-sm text-ink-600">Loading records…</p> : null}
     {loaded && rows.length === 0 ? <p className="rounded-card border border-line bg-white p-4 text-sm text-ink-600">The connected register contains no records on the returned page.</p> : null}
     {rows.map(row=><article key={row.id} className="rounded-card border border-line bg-white p-4"><div className="flex flex-wrap items-start justify-between gap-2"><h3 className="font-semibold text-forest-950">{row.title}</h3><span className="rounded-full border border-line bg-cream-50 px-2.5 py-1 text-xs">{row.status}</span></div>{row.detail ? <p className="mt-2 text-sm text-ink-700">{row.detail}</p> : null}{row.date ? <p className="mt-1 text-xs text-ink-600">{row.date}</p> : null}{row.url ? <a href={row.url} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-9 items-center text-sm font-semibold text-forest-800 underline">Open Notion record ↗</a> : null}</article>)}
+    {nextCursor ? <button type="button" onClick={()=>void refresh(true)} disabled={busy} className="min-h-11 rounded-control border border-line bg-white px-4 text-sm font-semibold disabled:opacity-50">{busy ? "Loading…" : "Load more records"}</button> : null}
     </section>
   </div>;
 }
