@@ -101,6 +101,23 @@ test("meeting intake stores structured preparation in the canonical Meetings dat
   assert.match(form, /Standard-sensitivity intake only/);
 });
 
+test("meeting collaboration is limited to draft notes on Standard records", () => {
+  const api = read("app/api/meetings/[id]/route.ts");
+  const adapter = read("lib/notion.ts");
+  const detail = read("app/ops/review/[id]/page.tsx");
+  assert.match(api, /isSameOriginRequest/);
+  assert.match(api, /requireStaffSession/);
+  assert.match(api, /draftKeys = \["attendanceNotes", "draftMinutes", "outcomeSummary"\]/);
+  assert.match(api, /updateMeetingDraft\(id, draftInput\)/);
+  assert.match(adapter, /parent\.database_id/);
+  assert.match(adapter, /sensitivity !== "Standard"/);
+  assert.match(adapter, /Attendance & apologies/);
+  assert.match(adapter, /Draft minutes/);
+  assert.match(detail, /Save draft notes/);
+  assert.match(detail, /shared staff key does not identify the editor/);
+  assert.match(detail, /do not verify attendance, establish quorum, approve minutes or certify a decision/);
+});
+
 test("actions can be linked to an existing Standard meeting without granting decision authority", () => {
   const adapter = read("lib/notion-registers.ts");
   const api = read("app/ops/api/registers/[kind]/route.ts");
