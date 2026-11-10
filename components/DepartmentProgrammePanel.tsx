@@ -112,7 +112,7 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
           </p>
         </div>
         <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-900">
-          {configured === false ? "Not connected" : configured ? "Connected · draft only" : "Checking…"}
+          {configured === false ? "Not connected" : configured ? "Connected · Proposed only" : "Checking…"}
         </span>
       </div>
 
