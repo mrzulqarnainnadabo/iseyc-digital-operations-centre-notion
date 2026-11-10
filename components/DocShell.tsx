@@ -103,7 +103,7 @@ export function DocShell({ children }: { children: React.ReactNode }) {
           const active = item.href === "/ops"
             ? pathname === "/ops"
             : item.href === "/ops#departments"
-              ? pathname === "/ops"
+              ? pathname.startsWith("/ops/departments/")
               : pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={`flex min-h-[54px] flex-col items-center justify-center gap-1 rounded-lg px-1 text-[10px] font-semibold transition-colors ${active ? "bg-forest-50 text-forest-950" : "text-ink-600 hover:bg-cream-50 hover:text-forest-950"}`}>
