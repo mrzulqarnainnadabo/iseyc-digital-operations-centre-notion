@@ -64,8 +64,10 @@ export default function ExternalEngagementPage() {
       setInviteOrg(current => current && result.organisations?.some((x: Option) => x.id === current && eligibleOrganisation(x)) ? current : result.organisations?.find(eligibleOrganisation)?.id || "");
       setMeetingId(current => { const candidate = requestedMeetingId || current; return result.meetings?.some((x: Option) => x.id === candidate) ? candidate : result.meetings?.[0]?.id || ""; });
     } catch (cause) {
-      setLoaded(false);
-      if (!appendInvitations) setData({ organisations: [], contacts: [], meetings: [], invitations: [], invitationsNextCursor: null, invitationsHasMore: false });
+      if (!appendInvitations) {
+        setLoaded(false);
+        setData({ organisations: [], contacts: [], meetings: [], invitations: [], invitationsNextCursor: null, invitationsHasMore: false });
+      }
       setError(cause instanceof Error ? cause.message : "The service could not be reached.");
     } finally { setLoading(false); }
   }
