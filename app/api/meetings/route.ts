@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     return privateJson({ ok: false, error: "Invalid request body" }, { status: 400 });
   }
   const input = body as Record<string, unknown>;
-  const allowedFields = ["title", "conveningBody", "meetingDate", "summary", "sensitivity"];
+  const allowedFields = ["title", "conveningBody", "meetingDate", "summary", "sensitivity", "meetingType", "purpose", "meetingTime", "venue", "meetingOwnerRole", "agenda", "requiredParticipants", "preReading", "decisionsSought", "minutesOwnerRole"];
   if (Object.keys(input).some((key) => !allowedFields.includes(key))) {
     return privateJson({ ok: false, error: "Unexpected meeting fields." }, { status: 400 });
   }
@@ -75,11 +75,32 @@ export async function POST(req: NextRequest) {
   const conveningBody = asText(input.conveningBody);
   const meetingDate = asText(input.meetingDate);
   const summary = asText(input.summary);
+  const meetingType = asText(input.meetingType);
+  const purpose = asText(input.purpose);
+  const meetingTime = asText(input.meetingTime);
+  const venue = asText(input.venue);
+  const meetingOwnerRole = asText(input.meetingOwnerRole);
+  const agenda = asText(input.agenda);
+  const requiredParticipants = asText(input.requiredParticipants);
+  const preReading = asText(input.preReading);
+  const decisionsSought = asText(input.decisionsSought);
+  const minutesOwnerRole = asText(input.minutesOwnerRole);
   if (title.length < 5 || title.length > 200) {
     return privateJson({ ok: false, error: "Meeting title must be between 5 and 200 characters." }, { status: 400 });
   }
-  if (conveningBody.length > 200 || summary.length > 1900) {
-    return privateJson({ ok: false, error: "Meeting details exceed the allowed length." }, { status: 400 });
+  const lengths: [string, string, number][] = [
+    ["Convening body", conveningBody, 200], ["Summary", summary, 1900], ["Meeting type", meetingType, 60],
+    ["Purpose", purpose, 450], ["Meeting time", meetingTime, 30], ["Venue", venue, 240],
+    ["Meeting owner role", meetingOwnerRole, 120], ["Agenda", agenda, 550],
+    ["Required participants", requiredParticipants, 300], ["Pre-reading", preReading, 300],
+    ["Decisions sought", decisionsSought, 300], ["Minutes owner role", minutesOwnerRole, 120],
+  ];
+  if (lengths.some(([, value, max]) => value.length > max)) {
+    return privateJson({ ok: false, error: "One or more meeting brief fields exceed the allowed length." }, { status: 400 });
+  }
+  const meetingTypes = ["Executive", "Department coordination", "Council / Chamber", "Working group", "External engagement"];
+  if (meetingType && !meetingTypes.includes(meetingType)) {
+    return privateJson({ ok: false, error: "Choose a valid meeting type." }, { status: 400 });
   }
   if (meetingDate && (!/^\d{4}-\d{2}-\d{2}$/.test(meetingDate) ||
       Number.isNaN(Date.parse(`${meetingDate}T00:00:00.000Z`)) ||
@@ -110,6 +131,16 @@ export async function POST(req: NextRequest) {
       meetingDate,
       summary,
       sensitivity,
+      meetingType,
+      purpose,
+      meetingTime,
+      venue,
+      meetingOwnerRole,
+      agenda,
+      requiredParticipants,
+      preReading,
+      decisionsSought,
+      minutesOwnerRole,
     });
     return privateJson({ ok: true, id: created.id });
   } catch {

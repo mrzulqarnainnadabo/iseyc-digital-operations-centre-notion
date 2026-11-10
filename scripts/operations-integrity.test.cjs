@@ -30,7 +30,7 @@ test("every internal operations navigation link resolves to a real page", () => 
   const internal = DOC_NAV.filter((item) => !item.external);
   assert.ok(internal.length > 0, "operations navigation should not be empty");
   for (const item of internal) {
-    assert.ok(pages.has(item.href), `Navigation item "${item.label}" points to missing route ${item.href}`);
+    assert.ok(pages.has(item.href.split("#")[0]), `Navigation item "${item.label}" points to missing route ${item.href}`);
   }
 });
 
@@ -44,9 +44,9 @@ test("every operations page is covered by the authenticated operations layout", 
   assert.ok(pages.length >= 6, "route inventory should include the current operations modules");
 });
 
-test("external navigation is restricted to the two published civic products", () => {
+test("external navigation points only to published ISEYC civic intelligence products", () => {
   const external = DOC_NAV.filter((item) => item.external);
-  assert.deepEqual(external.map((item) => item.label).sort(), ["Civic Brain", "Civic Mandate"]);
+  assert.deepEqual(external.map((item) => item.label).sort(), ["Civic Brain", "Civic Mandate", "Civic Observatory"]);
   assert.ok(external.every((item) => item.href.startsWith("https://")));
   assert.ok(external.every((item) => !/operators|admin|submission|member/i.test(item.href)));
 });
@@ -67,6 +67,82 @@ test("command home defines exactly four departments and keeps Communications as 
 
 test("module readiness is reachable from the persistent navigation", () => {
   assert.ok(DOC_NAV.some((item) => item.href === "/ops/readiness"));
+});
+
+test("executive desk is an authenticated source-backed coordination workspace", () => {
+  const page = read("app/ops/executive/page.tsx");
+  const nav = read("lib/nav.ts");
+  assert.match(page, /requireStaffSession/);
+  assert.match(page, /listMeetings/);
+  assert.match(page, /listRegister/);
+  assert.match(page, /Upcoming meetings/);
+  assert.match(page, /Action register/);
+  assert.match(page, /Digital Chamber/);
+  assert.match(page, /first loaded page/);
+  assert.match(page, /does not confer executive appointment/);
+  assert.match(nav, /Executive desk/);
+  assert.match(nav, /Meetings calendar/);
+  assert.match(nav, /Council sessions/);
+});
+
+test("meeting intake stores structured preparation in the canonical Meetings database", () => {
+  const form = read("app/ops/intake/page.tsx");
+  const api = read("app/api/meetings/route.ts");
+  const adapter = read("lib/notion.ts");
+  const detail = read("app/ops/review/[id]/page.tsx");
+  for (const field of ["meetingType", "purpose", "meetingTime", "venue", "meetingOwnerRole", "agenda", "requiredParticipants", "preReading", "decisionsSought", "minutesOwnerRole"]) {
+    assert.ok(form.includes(field), `Meeting form missing ${field}`);
+    assert.ok(api.includes(field), `Meeting API missing ${field}`);
+    assert.ok(adapter.includes(field), `Notion adapter missing ${field}`);
+  }
+  assert.match(adapter, /Linked actions/);
+  assert.match(detail, /Meeting brief/);
+  assert.match(detail, /Draft minutes/);
+  assert.match(form, /Standard-sensitivity intake only/);
+});
+
+test("action progress can be self-reported without enabling completion or closure", () => {
+  const api = read("app/ops/api/actions/[id]/route.ts");
+  const adapter = read("lib/notion-registers.ts");
+  const ui = read("components/OperationalRegister.tsx");
+  assert.match(api, /isSameOriginRequest/);
+  assert.match(api, /requireStaffSession/);
+  assert.match(api, /input\.status !== "In progress" && input\.status !== "Blocked"/);
+  assert.match(api, /Done and closure require a separate authorised review/);
+  assert.match(adapter, /updateActionProgress/);
+  assert.match(adapter, /\["Open", "In progress", "Blocked"\]/);
+  assert.match(ui, /Update working progress/);
+  assert.match(ui, /Self-reported working status only/);
+  assert.match(ui, /does not mark an action Done or close it/);
+});
+
+test("meeting collaboration is limited to draft notes on Standard records", () => {
+  const api = read("app/api/meetings/[id]/route.ts");
+  const adapter = read("lib/notion.ts");
+  const detail = read("app/ops/review/[id]/page.tsx");
+  assert.match(api, /isSameOriginRequest/);
+  assert.match(api, /requireStaffSession/);
+  assert.match(api, /draftKeys = \["attendanceNotes", "draftMinutes", "outcomeSummary"\]/);
+  assert.match(api, /updateMeetingDraft\(id, draftInput\)/);
+  assert.match(adapter, /parent\.database_id/);
+  assert.match(adapter, /sensitivity !== "Standard"/);
+  assert.match(adapter, /Attendance & apologies/);
+  assert.match(adapter, /Draft minutes/);
+  assert.match(detail, /Save draft notes/);
+  assert.match(detail, /shared staff key does not identify the editor/);
+  assert.match(detail, /do not verify attendance, establish quorum, approve minutes or certify a decision/);
+});
+
+test("actions can be linked to an existing Standard meeting without granting decision authority", () => {
+  const adapter = read("lib/notion-registers.ts");
+  const api = read("app/ops/api/registers/[kind]/route.ts");
+  const component = read("components/OperationalRegister.tsx");
+  assert.match(adapter, /getMeeting\(input\.sourceMeetingId\)/);
+  assert.match(adapter, /meeting\.sensitivity !== "Standard"/);
+  assert.match(adapter, /properties\["Source meeting"\]/);
+  assert.match(api, /sourceMeetingId/);
+  assert.match(component, /Related meeting · optional/);
+  assert.match(component, /does not certify a decision/);
 });
 
 test("operations errors recover without exposing exception details", () => {
@@ -122,8 +198,8 @@ test("Notion operational registers expose bounded cursor pagination", () => {
   assert.match(adapter, /has_more/);
   assert.match(api, /Invalid pagination cursor/);
   assert.match(api, /nextCursor: page.nextCursor/);
-  assert.match(ui, /Load more records/);
-  assert.match(ui, /\[\.\.\.current, \.\.\.j\.records\]/);
+  assert.match(ui, /\[\.\.\.current, \.\.\.data\.records\]/);
+  assert.match(ui, /\[\.\.\.current, \.\.\.data\.records\]/);
 });
 
 test("institutional design tokens and reduced-motion accessibility are present", () => {
@@ -134,7 +210,9 @@ test("institutional design tokens and reduced-motion accessibility are present",
     assert.ok(css.includes(token), `Missing design token ${token}`);
   }
   assert.match(css, /prefers-reduced-motion/);
-  assert.match(shell, /aria-label="Mobile navigation"/);
+  assert.match(shell, /aria-label="Primary mobile navigation"/);
+  assert.doesNotMatch(shell, /aria-label="Mobile navigation"/);
+  assert.match(shell, /fixed inset-x-0 bottom-0/);
   assert.match(shell, /aria-label="Primary navigation"/);
   assert.match(shell, /min-h-\[44px\]/);
   assert.match(dashboard, /Not operational/);
@@ -231,12 +309,15 @@ test("register forms send only fields accepted by their route and communications
   const component = fs.readFileSync(path.join(root, "components/OperationalRegister.tsx"), "utf8");
   const adapter = fs.readFileSync(path.join(root, "lib/notion-registers.ts"), "utf8");
   const route = fs.readFileSync(path.join(opsRoot, "api/registers/[kind]/route.ts"), "utf8");
-  assert.match(component, /kind === "media" \? \{ title, detail, channel \} : \{ title, detail, date \}/);
-  assert.match(component, /Array\.isArray\(j\.records\)/);
+  assert.match(component, /kind === "media"/);
+  assert.match(component, /sourceMeetingId/);
+  assert.match(component, /expectedEvidence/);
+  assert.match(component, /Array\.isArray\(data\.records\)/);
   assert.match(component, /setRows\(\[\]\)/);
   assert.match(adapter, /detail: "Notes"/);
   assert.match(adapter, /readText\(props\.Notes\).*readText\(props\.Channel\)/);
-  assert.match(route, /kind === "media" \? \["title", "detail", "channel"\] : \["title", "detail", "date"\]/);
+  assert.match(route, /kind === "media" \? \["title", "detail", "channel"\]/);
+  assert.match(route, /sourceMeetingId/);
   assert.match(route, /kind === "actions" && detail.length < 2/);
   assert.match(route, /kind === "actions" \|\| kind === "chamber"\) && !date/);
   assert.match(component, /Due date · required/);

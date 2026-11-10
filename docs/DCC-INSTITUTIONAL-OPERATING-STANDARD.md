@@ -312,3 +312,46 @@ Until the dedicated registers and access controls are available, the DCC may pre
 The Notion workspace now includes a dedicated **DCC — Partnership Agreements & Commitments** register, related to Partner Organisations, originating Meetings and Meeting Invitations. Use it for MoUs, partnership agreements, sponsorships, research collaborations, data-sharing arrangements and service agreements. The register records competent authority, approval reference, signatory roles, execution/effective/expiry dates, signed instrument, obligations, deliverables, reporting cadence, financial commitments and safeguarding/privacy conditions.
 
 A record may be created as a lead or draft, but the status must not be set to Approved, Executed or Active without the relevant authority and documentary evidence. The register's existence does not mean the application currently supports its full workflow; the app integration remains a separate implementation and release gate.
+
+
+## 11. Executive coordination implementation update — 10 November 2026
+
+The existing canonical Notion registers have been extended in place; no duplicate meeting, action or Chamber databases were created.
+
+### Meetings register
+The existing ISEYC DOC Meetings data source now has dedicated fields for:
+- Meeting type, purpose, time, venue/meeting link and convening body.
+- Meeting owner role and minutes owner role.
+- Agenda, required participants by role, pre-reading and decisions sought.
+- Attendance notes (draft), draft minutes and outcome summary.
+- A two-way relation to the existing Actions register (meeting-side: Linked actions; action-side: Source meeting).
+
+The application creates a Standard-sensitivity meeting as **New**. It captures the meeting brief in dedicated properties and presents the record for human review. The existing status options remain unchanged; the application does not claim that a scheduled or approved brief means a meeting was held.
+
+### Actions register
+The existing ISEYC DOC Actions data source now includes department, priority, expected evidence, blocker/support required, progress update and completion evidence link. Its Source meeting relation connects an action to an existing meeting record.
+
+The application can create an **Open** action with a responsible role, due date, department, priority, expected evidence and optional Standard meeting context. A linked meeting is context/provenance; it does not certify that a decision was taken. Owner role is not an appointment or a named assignment. Completion evidence, acceptance and formal closure remain separate controls.
+
+### Digital Chamber
+The existing ISEYC DOC Chamber data source now includes session purpose, chair role, secretary role, agenda, attendance/quorum basis, decision items, draft minutes and decision outcome notes.
+
+The application can create a **Scheduled** session with draft preparation fields. It does not verify attendance, calculate quorum, authenticate a chair, certify a motion, approve a decision or close a formal session.
+
+### Interface and navigation
+- Executive desk consolidates the first loaded page of meetings, actions, Chamber sessions and communications with source connection states.
+- Mobile navigation is placed in a bottom dock rather than a crowded top strip.
+- The desktop institutional sidebar remains available.
+- Departments remain the institution's four primary operating workspaces.
+
+### Outstanding release gates
+- The Vercel application integration must be confirmed to have access to the existing Notion databases after schema changes.
+- The current shared-key session is not individual identity or executive appointment verification.
+- Individual sign-in, current appointment records, scoped permissions, durable audit, verified chair authority, meeting approval, dispatch/RSVP, attendance verification, accepted minutes, formal decision certification and action acceptance/closure remain gated.
+- No live record creation/reload test is claimed until performed against the authorised Vercel/Notion environment.
+
+
+### Transitional working updates
+
+- Standard meeting records support shared-key editing of attendance notes, draft minutes and draft outcome summaries. These are explicitly working drafts, do not verify attendance or quorum, and do not certify a decision. The editor is not individually identified by the shared key.
+- Open actions support self-reported **In progress** and **Blocked** updates with a progress note and blocker explanation. The interface does not offer Done or formal closure. Completion evidence review and acceptance require individual identity, scoped authority and durable audit.

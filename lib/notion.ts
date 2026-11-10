@@ -57,6 +57,20 @@ export type MeetingRecord = {
   meetingDate: string;
   summary: string;
   sensitivity: string;
+  meetingType: string;
+  purpose: string;
+  meetingTime: string;
+  venue: string;
+  meetingOwnerRole: string;
+  agenda: string;
+  requiredParticipants: string;
+  preReading: string;
+  decisionsSought: string;
+  minutesOwnerRole: string;
+  attendanceNotes: string;
+  draftMinutes: string;
+  outcomeSummary: string;
+  linkedActionIds: string[];
 };
 
 export type MeetingPage = {
@@ -103,6 +117,20 @@ export async function listMeetings(options: {
       meetingDate: textProp(props["Meeting date"]) || textProp(props.Date) || "",
       summary: textProp(props.Summary) || textProp(props.Notes) || "",
       sensitivity: textProp(props.Sensitivity) || "Unclassified",
+      meetingType: textProp(props["Meeting type"]),
+      purpose: textProp(props.Purpose),
+      meetingTime: textProp(props["Meeting time"]),
+      venue: textProp(props["Venue / meeting link"]),
+      meetingOwnerRole: textProp(props["Meeting owner role"]),
+      agenda: textProp(props.Agenda),
+      requiredParticipants: textProp(props["Required participants"]),
+      preReading: textProp(props["Pre-reading"]),
+      decisionsSought: textProp(props["Decisions sought"]),
+      minutesOwnerRole: textProp(props["Minutes owner role"]),
+      attendanceNotes: textProp(props["Attendance & apologies"]),
+      draftMinutes: textProp(props["Draft minutes"]),
+      outcomeSummary: textProp(props["Meeting outcome"]),
+      linkedActionIds: Array.isArray(props["Linked actions"]?.relation) ? props["Linked actions"].relation.map((item: any) => item.id).filter((id: unknown): id is string => typeof id === "string") : [],
     };
   });
 
@@ -135,6 +163,20 @@ export async function getMeeting(id: string): Promise<MeetingRecord | null> {
       meetingDate: textProp(props["Meeting date"]) || textProp(props.Date) || "",
       summary: textProp(props.Summary) || textProp(props.Notes) || "",
       sensitivity: textProp(props.Sensitivity) || "Unclassified",
+      meetingType: textProp(props["Meeting type"]),
+      purpose: textProp(props.Purpose),
+      meetingTime: textProp(props["Meeting time"]),
+      venue: textProp(props["Venue / meeting link"]),
+      meetingOwnerRole: textProp(props["Meeting owner role"]),
+      agenda: textProp(props.Agenda),
+      requiredParticipants: textProp(props["Required participants"]),
+      preReading: textProp(props["Pre-reading"]),
+      decisionsSought: textProp(props["Decisions sought"]),
+      minutesOwnerRole: textProp(props["Minutes owner role"]),
+      attendanceNotes: textProp(props["Attendance & apologies"]),
+      draftMinutes: textProp(props["Draft minutes"]),
+      outcomeSummary: textProp(props["Meeting outcome"]),
+      linkedActionIds: Array.isArray(props["Linked actions"]?.relation) ? props["Linked actions"].relation.map((item: any) => item.id).filter((id: unknown): id is string => typeof id === "string") : [],
     };
   } catch {
     return null;
@@ -147,6 +189,16 @@ export async function createMeeting(input: {
   meetingDate: string;
   summary: string;
   sensitivity: string;
+  meetingType: string;
+  purpose: string;
+  meetingTime: string;
+  venue: string;
+  meetingOwnerRole: string;
+  agenda: string;
+  requiredParticipants: string;
+  preReading: string;
+  decisionsSought: string;
+  minutesOwnerRole: string;
 }): Promise<{ id: string }> {
   const client = notion();
   const database_id = dbId("NOTION_MEETINGS_DATABASE_ID");
@@ -172,11 +224,59 @@ export async function createMeeting(input: {
   if (input.sensitivity) {
     properties.Sensitivity = { select: { name: input.sensitivity } };
   }
+  if (input.meetingType) properties["Meeting type"] = { select: { name: input.meetingType } };
+  const richTextFields: Record<string, string> = {
+    Purpose: input.purpose,
+    "Meeting time": input.meetingTime,
+    "Venue / meeting link": input.venue,
+    "Meeting owner role": input.meetingOwnerRole,
+    Agenda: input.agenda,
+    "Required participants": input.requiredParticipants,
+    "Pre-reading": input.preReading,
+    "Decisions sought": input.decisionsSought,
+    "Minutes owner role": input.minutesOwnerRole,
+  };
+  for (const [name, value] of Object.entries(richTextFields)) {
+    if (value.trim()) properties[name] = { rich_text: [{ text: { content: value.trim().slice(0, 1900) } }] };
+  }
   const page = await client.pages.create({
     parent: { database_id },
     properties: properties as any,
   });
   return { id: page.id };
+}
+
+export async function updateMeetingDraft(
+  id: string,
+  input: { attendanceNotes?: string; draftMinutes?: string; outcomeSummary?: string }
+): Promise<void> {
+  const client = notion();
+  const database_id = dbId("NOTION_MEETINGS_DATABASE_ID");
+  if (!client || !database_id) throw new Error("Notion meetings database not configured");
+  assertInternalDb(database_id, "NOTION_MEETINGS_DATABASE_ID");
+
+  const page: any = await client.pages.retrieve({ page_id: id });
+  if (
+    typeof page.parent?.database_id !== "string" ||
+    canonicalNotionId(page.parent.database_id) !== database_id
+  ) {
+    throw new Error("Refusing to update a page outside the configured internal Meetings database.");
+  }
+  const sensitivity = textProp(page.properties?.Sensitivity);
+  if (sensitivity !== "Standard") throw new Error("Draft collaboration is limited to Standard meeting records.");
+
+  const properties: Record<string, unknown> = {};
+  if (input.attendanceNotes !== undefined) {
+    properties["Attendance & apologies"] = { rich_text: [{ text: { content: input.attendanceNotes.slice(0, 1000) } }] };
+  }
+  if (input.draftMinutes !== undefined) {
+    properties["Draft minutes"] = { rich_text: [{ text: { content: input.draftMinutes.slice(0, 1900) } }] };
+  }
+  if (input.outcomeSummary !== undefined) {
+    properties["Meeting outcome"] = { rich_text: [{ text: { content: input.outcomeSummary.slice(0, 1000) } }] };
+  }
+  if (!Object.keys(properties).length) throw new Error("No draft fields supplied.");
+  await client.pages.update({ page_id: id, properties: properties as any });
 }
 
 export async function setMeetingStatus(
