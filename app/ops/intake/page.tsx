@@ -1,12 +1,13 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function IntakePage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
+  const [meetingType, setMeetingType] = useState("Executive");
   const [conveningBody, setConveningBody] = useState("");
   const [meetingDate, setMeetingDate] = useState("");
   const [meetingTime, setMeetingTime] = useState("");
@@ -22,31 +23,16 @@ export default function IntakePage() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
-  const meetingPack = useMemo(() => [
-    ["Purpose", purpose],
-    ["Proposed time", meetingTime ? `${meetingTime} WAT (Africa/Lagos)` : ""],
-    ["Venue / meeting link", venue],
-    ["Meeting owner role", ownerRole],
-    ["Agenda", agenda],
-    ["Required participants by role", participants],
-    ["Pre-reading / papers", preReading],
-    ["Decisions or outcomes sought", decisions],
-    ["Minutes owner role", minutesOwner],
-    ["Additional notes", notes],
-  ].filter(([, value]) => String(value).trim()).map(([label, value]) => `${label}:\n${String(value).trim()}`).join("\n\n"), [
-    purpose, meetingTime, venue, ownerRole, agenda, participants, preReading, decisions, minutesOwner, notes,
-  ]);
-
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
-    if (pending || meetingPack.length > 1900) return;
+    if (pending) return;
     setPending(true);
     setError(null);
     try {
       const response = await fetch("/ops/api/meetings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, conveningBody, meetingDate, summary: meetingPack, sensitivity: "Standard" }),
+        body: JSON.stringify({ title, conveningBody, meetingDate, summary: notes, sensitivity: "Standard", meetingType, purpose, meetingTime, venue, meetingOwnerRole: ownerRole, agenda, requiredParticipants: participants, preReading, decisionsSought: decisions, minutesOwnerRole: minutesOwner }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -82,9 +68,17 @@ export default function IntakePage() {
       <form onSubmit={onSubmit} aria-busy={pending} className="space-y-5 rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
         <section className="space-y-4">
           <div><p className="text-[10px] font-bold uppercase tracking-[.14em] text-gold-700">01 · Meeting identity</p><h2 className="mt-1 font-serif text-xl text-forest-950">What is being convened?</h2></div>
-          <div>
-            <label htmlFor="title" className="block text-sm font-semibold text-ink-950">Meeting title <span className="text-red-700">*</span></label>
-            <input id="title" required minLength={5} maxLength={200} autoComplete="off" value={title} onChange={(e) => setTitle(e.target.value)} className={field} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="title" className="block text-sm font-semibold text-ink-950">Meeting title <span className="text-red-700">*</span></label>
+              <input id="title" required minLength={5} maxLength={200} autoComplete="off" value={title} onChange={(e) => setTitle(e.target.value)} className={field} />
+            </div>
+            <div>
+              <label htmlFor="meeting-type" className="block text-sm font-semibold text-ink-950">Meeting type</label>
+              <select id="meeting-type" value={meetingType} onChange={(e) => setMeetingType(e.target.value)} className={field}>
+                <option>Executive</option><option>Department coordination</option><option>Council / Chamber</option><option>Working group</option><option>External engagement</option>
+              </select>
+            </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div><label htmlFor="body" className="block text-sm font-semibold text-ink-950">Convening body</label><input id="body" maxLength={200} autoComplete="organization" value={conveningBody} onChange={(e) => setConveningBody(e.target.value)} className={field} placeholder="e.g. Executive Council" /></div>
@@ -109,14 +103,13 @@ export default function IntakePage() {
           <div><label htmlFor="notes" className="block text-sm font-semibold text-ink-950">Additional notes</label><textarea id="notes" rows={2} maxLength={250} value={notes} onChange={(e) => setNotes(e.target.value)} className={area} /></div>
         </section>
 
-        <div className="rounded-xl border border-line bg-cream-50 p-3">
-          <div className="flex items-center justify-between gap-3"><p className="text-xs font-semibold text-ink-950">Meeting brief length</p><p className={`text-xs font-semibold tabular-nums ${meetingPack.length > 1900 ? "text-red-700" : "text-ink-600"}`}>{meetingPack.length}/1900</p></div>
-          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-line"><div className={`h-full rounded-full ${meetingPack.length > 1900 ? "bg-red-700" : "bg-forest-800"}`} style={{ width: `${Math.min(100, meetingPack.length / 19)}%` }} /></div>
-          <p className="mt-2 text-[10px] leading-4 text-ink-600">The existing Meetings database stores the structured brief in its approved Summary field. No new database properties or duplicate register are introduced.</p>
+        <div className="rounded-xl border border-[#d7e4d9] bg-[#f0f5ef] p-3">
+          <p className="text-xs font-semibold text-[#285a3c]">Structured institutional record</p>
+          <p className="mt-1 text-[10px] leading-4 text-[#526a58]">Purpose, time, venue, agenda, participants, pre-reading and decision items are stored in dedicated fields in the existing Meetings database. The record begins as New and remains subject to human review.</p>
         </div>
 
         {error ? <p role="alert" aria-live="assertive" className="rounded-control border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p> : null}
-        <button type="submit" disabled={pending || title.trim().length < 5 || !meetingDate || !purpose.trim() || !ownerRole.trim() || meetingPack.length > 1900} className="inline-flex min-h-[48px] w-full items-center justify-center rounded-control bg-forest-900 px-4 text-sm font-semibold text-white hover:bg-forest-800 disabled:cursor-not-allowed disabled:opacity-50">
+        <button type="submit" disabled={pending || title.trim().length < 5 || !meetingDate || !purpose.trim() || !ownerRole.trim()} className="inline-flex min-h-[48px] w-full items-center justify-center rounded-control bg-forest-900 px-4 text-sm font-semibold text-white hover:bg-forest-800 disabled:cursor-not-allowed disabled:opacity-50">
           {pending ? "Creating meeting brief…" : "Create meeting brief"}
         </button>
       </form>
