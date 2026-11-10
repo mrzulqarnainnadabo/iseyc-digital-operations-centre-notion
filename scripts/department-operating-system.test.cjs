@@ -49,7 +49,7 @@ test("Notion adapters use the actual live register titles, property types and se
   for (const source of [programmes, workplans]) {
     assert.match(source, /"Programme \/ Work Item"/);
     assert.match(source, /"Education & Capacity Building"/);
-    assert.match(source, /"Software & Technology"/);
+    assert.match(source, /"Digital Systems & Technology"/);
     assert.match(source, /Status: \{ status: \{ name: "Proposed" \} \}/);
   }
   assert.match(programmes, /"Work Type": \{ select: \{ name: "Programme" \} \}/);
@@ -76,6 +76,8 @@ test("unknown Notion department values remain Unspecified across all registers",
     assert.doesNotMatch(adapter, /let departmentId: OpsDepartmentId = "education"/);
   }
   assert.match(model, /case "software & technology":\s*return "digital-systems"/);
+  assert.match(model, /case "civic department":\s*return "civic-affairs"/);
+  assert.match(model, /WORKPLAN_REGISTER_ENV = PROGRAMME_REGISTER_ENV/);
   assert.match(model, /case "civic department":\s*return "civic-affairs"/);
 });
 
