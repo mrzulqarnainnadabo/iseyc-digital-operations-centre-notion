@@ -37,6 +37,9 @@ export async function PATCH(
   }
   const progressUpdate = input.progressUpdate.trim();
   const blocker = input.blocker.trim();
+  if (!progressUpdate || (input.status === "Blocked" && !blocker)) {
+    return privateJson({ ok: false, error: "A progress update is required, and a blocker reason is required for Blocked status." }, { status: 400 });
+  }
   if (progressUpdate.length > 1000 || blocker.length > 500) {
     return privateJson({ ok: false, error: "Progress update or blocker exceeds the allowed length." }, { status: 400 });
   }
