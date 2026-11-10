@@ -62,6 +62,7 @@ export type MeetingRecord = {
 export type MeetingPage = {
   meetings: MeetingRecord[];
   nextCursor: string | null;
+  hasMore: boolean;
 };
 
 /**
@@ -75,7 +76,7 @@ export async function listMeetings(options: {
 } = {}): Promise<MeetingPage> {
   const client = notion();
   const database_id = dbId("NOTION_MEETINGS_DATABASE_ID");
-  if (!client || !database_id) return { meetings: [], nextCursor: null };
+  if (!client || !database_id) return { meetings: [], nextCursor: null, hasMore: false };
   assertInternalDb(database_id, "NOTION_MEETINGS_DATABASE_ID");
 
   const pageSize = Math.min(50, Math.max(1, Math.floor(options.pageSize ?? 25)));
@@ -112,6 +113,7 @@ export async function listMeetings(options: {
   return {
     meetings,
     nextCursor: res.has_more ? res.next_cursor ?? null : null,
+    hasMore: res.has_more === true,
   };
 }
 
