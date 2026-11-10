@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 
 type Option = { id: string; title: string; detail: string; status: string; url: string; organisationId?: string; verified?: boolean; relationshipStatus?: string };
 type Invitation = { id: string; title: string; organisation: string; contact: string; meeting: string; status: string; participation: string; purpose: string; subject: string; draft: string; sentOn: string; url: string };
-type Data = { organisations: Option[]; contacts: Option[]; meetings: Option[]; invitations: Invitation[] };
+type Data = { organisations: Option[]; contacts: Option[]; meetings: Option[]; invitations: Invitation[]; invitationsNextCursor: string | null; invitationsHasMore: boolean };
 
 const organisationTypes = ["Government institution", "Civil society organisation", "University or research institution", "Private sector", "Development partner", "Professional association", "Community organisation", "Media organisation", "Other"];
 const participationTypes = ["Observer", "Presenter", "Technical contributor", "Panelist", "Resource person", "Institutional representative", "Prospective partner", "Host", "Other"];
@@ -16,7 +16,7 @@ const eligibleOrganisation = (x: Option) => x.status === "Verified" && !["Paused
 export default function ExternalEngagementPage() {
   const searchParams = useSearchParams();
   const requestedMeetingId = searchParams.get("meetingId") || "";
-  const [data, setData] = useState<Data>({ organisations: [], contacts: [], meetings: [], invitations: [] });
+  const [data, setData] = useState<Data>({ organisations: [], contacts: [], meetings: [], invitations: [], invitationsNextCursor: null, invitationsHasMore: false });
   const [loading, setLoading] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const [activeView, setActiveView] = useState<"directory" | "invitations" | "agreements">("invitations");
@@ -47,20 +47,25 @@ export default function ExternalEngagementPage() {
   const [inviteOwner, setInviteOwner] = useState("");
   const [inviteChannel, setInviteChannel] = useState("Email");
 
-  async function refresh() {
+  async function refresh(appendInvitations = false) {
     setLoading(true); setError("");
+    const cursor = appendInvitations ? data.invitationsNextCursor : null;
     try {
-      const response = await fetch("/ops/api/external-engagement", { cache: "no-store" });
+      const suffix = cursor ? `?cursor=${encodeURIComponent(cursor)}` : "";
+      const response = await fetch(`/ops/api/external-engagement${suffix}`, { cache: "no-store" });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "External engagement registers could not be loaded.");
-      setData(result as Data);
+      if (!Array.isArray(result.invitations) || (result.invitationsNextCursor !== null && typeof result.invitationsNextCursor !== "string") || typeof result.invitationsHasMore !== "boolean") throw new Error("The invitation register returned an invalid pagination response.");
+      setData(current => appendInvitations
+        ? { ...result, invitations: [...current.invitations, ...result.invitations] }
+        : result as Data);
       setLoaded(true);
       setContactOrg(current => current || result.organisations?.[0]?.id || "");
       setInviteOrg(current => current && result.organisations?.some((x: Option) => x.id === current && eligibleOrganisation(x)) ? current : result.organisations?.find(eligibleOrganisation)?.id || "");
       setMeetingId(current => { const candidate = requestedMeetingId || current; return result.meetings?.some((x: Option) => x.id === candidate) ? candidate : result.meetings?.[0]?.id || ""; });
     } catch (cause) {
       setLoaded(false);
-      setData({ organisations: [], contacts: [], meetings: [], invitations: [] });
+      if (!appendInvitations) setData({ organisations: [], contacts: [], meetings: [], invitations: [], invitationsNextCursor: null, invitationsHasMore: false });
       setError(cause instanceof Error ? cause.message : "The service could not be reached.");
     } finally { setLoading(false); }
   }
@@ -185,8 +190,9 @@ export default function ExternalEngagementPage() {
     </form>
 
     <section className="space-y-3">
-      <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-serif text-2xl text-forest-950">Invitation register</h2><p className="text-xs text-ink-600">First page of the connected Notion register.</p></div><button onClick={()=>void refresh()} disabled={loading || busy} className="min-h-10 rounded-control border border-line bg-white px-4 text-sm font-semibold">{loading ? "Refreshing…" : "Refresh"}</button></div>
+      <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-serif text-2xl text-forest-950">Invitation register</h2><p className="text-xs text-ink-600">{data.invitations.length} loaded · {data.invitationsHasMore ? "more records available" : "end of connected register"}</p></div><button onClick={()=>void refresh()} disabled={loading || busy} className="min-h-10 rounded-control border border-line bg-white px-4 text-sm font-semibold">{loading ? "Refreshing…" : "Refresh"}</button></div>
       {data.invitations.length ? data.invitations.map(x=><article key={x.id} className="rounded-card border border-line bg-white p-4"><div className="flex flex-wrap items-start justify-between gap-2"><h3 className="font-semibold text-forest-950">{x.title}</h3><span className="rounded-full border border-line bg-cream-50 px-2.5 py-1 text-xs">{x.status}</span></div><p className="mt-1 text-xs text-ink-600">{x.participation || "Role not recorded"} · {x.purpose}</p>{x.subject ? <p className="mt-2 text-sm font-semibold text-forest-950">{x.subject}</p> : null}{x.draft ? <p className="mt-1 whitespace-pre-wrap text-sm text-ink-700">{x.draft}</p> : null}<p className="mt-2 text-xs text-ink-600">Meeting: {data.meetings.find(m=>m.id===x.meeting)?.title || (x.meeting ? "Linked meeting not in loaded page" : "—")} · Organisation: {data.organisations.find(o=>o.id===x.organisation)?.title || (x.organisation ? "Linked organisation not in loaded page" : "—")}{x.sentOn ? ` · Sent ${x.sentOn}` : ""}</p>{x.url ? <a href={x.url} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-9 items-center text-sm font-semibold text-forest-800 underline">Open Notion invitation ↗</a> : null}</article>) : <p className="rounded-card border border-line bg-white p-4 text-sm text-ink-600">{loading ? "Loading invitations…" : !loaded ? "Register unavailable. Check the source connection above." : "No invitation records are currently returned."}</p>}
+      {data.invitationsHasMore ? <button type="button" onClick={()=>void refresh(true)} disabled={loading || busy || !data.invitationsNextCursor} className="min-h-11 rounded-control border border-line bg-white px-4 text-sm font-semibold disabled:opacity-50">{loading ? "Loading…" : "Load more invitations"}</button> : null}
     </section>    </> : null}
   </div>;
 }
