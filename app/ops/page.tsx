@@ -219,6 +219,25 @@ export default async function CommandBriefPage() {
         </div>
       </section>
 
+      <details className="rounded-xl border border-[#e1e5dc] bg-white px-4 py-3">
+        <summary className="min-h-9 cursor-pointer list-none text-xs font-bold text-[#315b45]">Environment configuration <span className="ml-1 text-[#a7833f]">＋</span></summary>
+        <ul className="mt-2 grid gap-2 text-[11px] sm:grid-cols-2 lg:grid-cols-3">
+          {([
+            ["Staff key", flags.staffKey],
+            ["Notion token", flags.token],
+            ["Meetings database", flags.meetings],
+            ["Media database", flags.media],
+            ["Chamber database", flags.chamber],
+            ["Actions database", flags.actions],
+          ] as const).map(([label, configured]) => (
+            <li key={label} className="flex items-center justify-between gap-3 rounded-lg bg-[#f6f7f3] px-3 py-2">
+              <span className="text-[#68736b]">{label}</span>
+              <span className={configured ? "font-bold text-[#28664a]" : "font-medium text-[#8a6b34]"}>{configured ? "Configured" : "Not connected"}</span>
+            </li>
+          ))}
+        </ul>
+      </details>
+
       <section className="rounded-xl border border-[#dce4dc] bg-[#edf2ec] p-4 sm:flex sm:items-center sm:justify-between sm:gap-4">
         <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Published civic systems</p><p className="mt-1 text-xs text-[#68736b]">Separate public platforms connected to ISEYC’s civic work.</p></div>
         <div className="mt-3 flex flex-wrap gap-2 sm:mt-0">
