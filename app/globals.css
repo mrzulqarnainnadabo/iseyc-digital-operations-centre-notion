@@ -118,3 +118,118 @@ button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
 .dept-card--health { border-left-color: #a7833f; }
 .dept-card--technology { border-left-color: #194b3b; }
 .dept-card--civic { border-left-color: #755f27; }
+
+
+/* ISEYC Digital Operations Centre — department-led visual system */
+.dept-workspace-card { isolation: isolate; }
+.dept-workspace-card::before {
+  position: absolute;
+  z-index: -1;
+  top: -4.5rem;
+  right: -3.5rem;
+  width: 14rem;
+  height: 14rem;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: .08;
+  content: "";
+}
+.dept-workspace-card::after {
+  position: absolute;
+  z-index: -1;
+  top: -2.4rem;
+  right: -1.5rem;
+  width: 9rem;
+  height: 9rem;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: .08;
+  content: "";
+}
+.dept-workspace-card--education { color: #28664a; }
+.dept-workspace-card--health { color: #987638; }
+.dept-workspace-card--digital { color: #315c68; }
+.dept-workspace-card--civic { color: #765f37; }
+.dept-workspace-glyph {
+  display: grid;
+  width: 5rem;
+  height: 5rem;
+  place-items: center;
+  border-radius: 1.25rem;
+  background: color-mix(in srgb, currentColor 8%, white);
+}
+.dept-workspace-glyph svg { color: currentColor; }
+.ops-department-hero { min-height: 16rem; }
+.ops-department-orbit {
+  position: absolute;
+  top: -7rem;
+  right: 2rem;
+  width: 25rem;
+  height: 25rem;
+  border: 1px solid rgb(255 255 255 / 9%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.ops-department-orbit::before,
+.ops-department-orbit::after {
+  position: absolute;
+  inset: 2.5rem;
+  border: 1px solid rgb(211 183 127 / 24%);
+  border-radius: 50%;
+  content: "";
+}
+.ops-department-orbit::after { inset: 5rem; border-color: rgb(255 255 255 / 9%); }
+.ops-department-seal {
+  position: relative;
+  display: grid;
+  width: 11rem;
+  height: 11rem;
+  place-items: center;
+  border: 1px solid rgb(217 197 155 / 55%);
+  border-radius: 50%;
+  color: #e6d4ad;
+}
+.ops-department-seal::before,
+.ops-department-seal::after {
+  position: absolute;
+  inset: .65rem;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 50%;
+  content: "";
+}
+.ops-department-seal::after { inset: 1.55rem; border-color: rgb(217 197 155 / 25%); }
+.ops-department-seal span { font-family: Georgia, serif; font-size: 3.5rem; line-height: 1; }
+.ops-department-seal i,
+.ops-department-seal b,
+.ops-department-seal em { position: absolute; width: .4rem; height: .4rem; border-radius: 50%; background: #d9c59b; }
+.ops-department-seal i { top: .4rem; left: calc(50% - .2rem); }
+.ops-department-seal b { right: .4rem; top: calc(50% - .2rem); }
+.ops-department-seal em { bottom: .4rem; left: calc(50% - .2rem); }
+.ops-department-nav { scrollbar-width: thin; }
+.ops-department-nav a {
+  display: inline-flex;
+  min-height: 2.65rem;
+  flex: 0 0 auto;
+  align-items: center;
+  border: 1px solid #e1e5dc;
+  border-radius: 999px;
+  background: white;
+  padding: 0 .95rem;
+  color: #315b45;
+  font-size: .72rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+.ops-department-nav a:hover { border-color: #9eaf9f; background: #f3f6f1; }
+.ops-department-nav a:focus-visible { outline: 3px solid #a7833f; outline-offset: 2px; }
+.ops-department details > summary::-webkit-details-marker { display: none; }
+.ops-department details > summary:focus-visible { outline: 3px solid #a7833f; outline-offset: 3px; }
+@media (max-width: 640px) {
+  .ops-department-orbit { top: -3rem; right: -12rem; width: 20rem; height: 20rem; }
+  .dept-workspace-glyph { width: 4.25rem; height: 4.25rem; }
+  .dept-workspace-glyph svg { width: 3.5rem; height: 3.5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dept-workspace-card, .ops-department-nav a { transition: none; }
+}
