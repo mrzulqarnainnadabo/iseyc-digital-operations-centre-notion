@@ -16,6 +16,7 @@ export default function CouncilRolesPage() {
           <div className="mt-5 flex flex-wrap gap-2">
             <span className="rounded-full border border-white/20 px-3 py-1.5 text-[11px]">Role templates only</span>
             <span className="rounded-full border border-[#d9c59b]/40 bg-[#d9c59b]/10 px-3 py-1.5 text-[11px] text-[#ead9b5]">No appointments or permissions created</span>
+            <a href="https://github.com/mrzulqarnainnadabo/iseyc-digital-operations-centre-notion/blob/feat/council-role-guides/docs/PRESIDENTIAL-COUNCIL-OPERATING-COMPACT.md" className="inline-flex min-h-9 items-center rounded-full border border-[#d7ddcf] bg-white px-3 text-[10px] font-bold text-[#315b45] hover:bg-[#f7f8f3]">Read operating compact ↗</a>
           </div>
         </div>
       </header>
