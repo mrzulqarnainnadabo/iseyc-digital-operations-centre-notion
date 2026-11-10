@@ -55,9 +55,6 @@ export default async function DepartmentDeskPage({
   }
 
   const today = new Date().toISOString().slice(0, 10);
-  const upcoming = meetings
-    .filter((meeting) => meeting.meetingDate && meeting.meetingDate >= today)
-    .sort((a, b) => a.meetingDate.localeCompare(b.meetingDate));
   const recent = [...meetings]
     .sort((a, b) => b.meetingDate.localeCompare(a.meetingDate))
     .slice(0, 8);
@@ -90,6 +87,7 @@ export default async function DepartmentDeskPage({
           ["#work-plans", "Work plans"],
           ["#reports", "Reports"],
           ["#meetings", "Meetings"],
+          ["#tools", "Tools"],
           ["#coordination", "Coordination"],
         ].map(([href, label]) => (
           <a key={href} href={href} className="inline-flex min-h-[40px] shrink-0 items-center rounded-full border border-line bg-white px-3 text-forest-900 hover:border-forest-800">{label}</a>
@@ -131,14 +129,41 @@ export default async function DepartmentDeskPage({
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Operating structure</p>
           <h2 className="font-serif text-xl text-forest-950 sm:text-2xl">Functional areas</h2>
+          <p className="mt-1 max-w-3xl text-sm leading-6 text-ink-600">
+            Each function defines responsibility, typical activities, expected outputs and how work is
+            documented. Functions are institutional structure — not evidence that staff are assigned.
+          </p>
         </div>
         <div className="grid gap-3 md:grid-cols-2">
           {profile.functions.map((fn) => (
             <article key={fn.id} className="rounded-card border border-line bg-white p-4 shadow-card sm:p-5">
               <h3 className="font-semibold text-forest-950">{fn.title}</h3>
               <p className="mt-2 text-sm leading-6 text-ink-700">{fn.responsibility}</p>
-              <p className="mt-3 text-xs leading-5 text-ink-600"><span className="font-semibold text-ink-700">Documentation:</span> {fn.documentation}</p>
-              <p className="mt-1 text-xs leading-5 text-ink-600"><span className="font-semibold text-ink-700">Coordinates with:</span> {fn.coordinatesWith.join(" · ")}</p>
+              <div className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-ink-600">Activities</p>
+                  <ul className="mt-1 list-disc space-y-1 pl-4 text-ink-700">
+                    {fn.activities.map((a) => (
+                      <li key={a}>{a}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-ink-600">Outputs</p>
+                  <ul className="mt-1 list-disc space-y-1 pl-4 text-ink-700">
+                    {fn.outputs.map((o) => (
+                      <li key={o}>{o}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <p className="mt-3 text-xs leading-5 text-ink-600">
+                <span className="font-semibold text-ink-700">Documentation:</span> {fn.documentation}
+              </p>
+              <p className="mt-1 text-xs leading-5 text-ink-600">
+                <span className="font-semibold text-ink-700">Coordinates with:</span>{" "}
+                {fn.coordinatesWith.join(" · ")}
+              </p>
             </article>
           ))}
         </div>
@@ -181,6 +206,37 @@ export default async function DepartmentDeskPage({
           <Link href="/ops/intake" className="inline-flex min-h-[44px] items-center rounded-control bg-forest-900 px-4 text-sm font-semibold text-white hover:bg-forest-800">Schedule a department meeting</Link>
           <Link href="/ops/actions" className="inline-flex min-h-[44px] items-center rounded-control border border-line px-4 text-sm font-semibold text-forest-950">Open Actions register</Link>
         </div>
+      </section>
+
+      <section id="tools" className="rounded-card border border-line bg-white p-5 shadow-card">
+        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">
+          Shared institutional registers
+        </p>
+        <h2 className="mt-1 font-serif text-xl text-forest-950">Operational tools</h2>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-ink-600">
+          Department programmes, work plans and reports use dedicated APIs when configured. Day-to-day
+          coordination continues through the shared registers below. Authority limits on those registers
+          still apply.
+        </p>
+        <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            ["/ops/actions", "Actions register"],
+            ["/ops/intake", "Meeting intake"],
+            ["/ops/queue", "Meeting queue"],
+            ["/ops/media", "Communications"],
+            ["/ops/chamber", "Digital Chamber"],
+            ["/ops/partners", "External engagement"],
+          ].map(([href, label]) => (
+            <li key={href}>
+              <Link
+                href={href}
+                className="inline-flex min-h-[44px] w-full items-center rounded-control border border-line px-3 text-sm font-semibold text-forest-800 hover:border-forest-800"
+              >
+                {label} →
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section id="coordination" className="rounded-card border border-line bg-white p-5 shadow-card">
