@@ -17,7 +17,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const CURSOR_RE = /^[a-f0-9-]{32,36}$/i;
-const DATE_RE = /^\\d{4}-\\d{2}-\\d{2}$/;
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 function validDate(value: string): boolean {
   if (!DATE_RE.test(value)) return false;
   const parsed = Date.parse(value + "T00:00:00.000Z");
