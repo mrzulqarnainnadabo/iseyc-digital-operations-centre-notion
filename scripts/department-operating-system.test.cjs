@@ -44,7 +44,7 @@ test("department desks mount programme work-plan and report panels with tools", 
   assert.match(desk, /DepartmentProgrammePanel/);
   assert.match(desk, /DepartmentWorkPlanPanel/);
   assert.match(desk, /DepartmentReportPanel/);
-  assert.match(desk, /id="tools"/);
+  assert.match(desk, /id="shared-tools"/);
   assert.match(desk, /fn\.activities/);
   assert.match(desk, /fn\.outputs/);
   assert.match(desk, /task register/i);
