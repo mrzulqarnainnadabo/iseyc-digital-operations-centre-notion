@@ -101,10 +101,7 @@ export async function POST(request: NextRequest) {
     "objective",
     "deliverable",
     "dueDate",
-    "dependencies",
     "accountableRole",
-    "progressNote",
-    "evidenceNote",
   ];
   if (Object.keys(input).some((key) => !allowed.includes(key))) {
     return privateJson({ ok: false, error: "Unexpected fields." }, { status: 400 });
