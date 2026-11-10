@@ -30,10 +30,18 @@ function read(prop: any): string {
   if (prop.type === "relation") return (prop.relation || []).map((x: any) => x.id).join(",");
   return "";
 }
-async function query(kind: Kind) {
+async function query(kind: Kind, cursor?: string) {
   const { client, id } = database(kind);
-  const result = await client.databases.query({ database_id: id, page_size: 50 });
-  return result.results.filter((p: any) => p.object === "page");
+  const result = await client.databases.query({
+    database_id: id,
+    page_size: 50,
+    ...(cursor ? { start_cursor: cursor } : {}),
+  });
+  return {
+    pages: result.results.filter((p: any) => p.object === "page"),
+    nextCursor: result.next_cursor || null,
+    hasMore: result.has_more === true,
+  };
 }
 function row(page: any, titleProp: string, detailProp: string, statusProp: string): ExternalOption {
   const props = page.properties || {};
@@ -46,14 +54,14 @@ export async function listExternalOptions() {
   const [orgPages, contactPages, meetings] = await Promise.all([
     query("organisations"), query("contacts"), listMeetings({ pageSize: 50 }),
   ]);
-  const organisations = orgPages.map((p: any) => ({ ...row(p, "Organisation", "Organisation type", "Verification status"), relationshipStatus: read(p.properties?.["Relationship status"]), detail: read(p.properties?.["Organisation type"]) }));
-  const contacts = contactPages.map((p: any) => ({ ...row(p, "Contact", "Official role", "Contact status"), organisationId: read(p.properties?.Organisation).split(",")[0] || "", verified: p.properties?.Verified?.checkbox === true }));
+  const organisations = orgPages.pages.map((p: any) => ({ ...row(p, "Organisation", "Organisation type", "Verification status"), relationshipStatus: read(p.properties?.["Relationship status"]), detail: read(p.properties?.["Organisation type"]) }));
+  const contacts = contactPages.pages.map((p: any) => ({ ...row(p, "Contact", "Official role", "Contact status"), organisationId: read(p.properties?.Organisation).split(",")[0] || "", verified: p.properties?.Verified?.checkbox === true }));
   const meetingOptions = meetings.meetings.filter((m: MeetingRecord) => m.status === "Approved" && m.sensitivity === "Standard").map((m: MeetingRecord) => ({ id: m.id, title: m.title, detail: m.meetingDate, status: m.status, url: "" }));
   return { organisations, contacts, meetings: meetingOptions };
 }
-export async function listExternalInvitations() {
-  const pages = await query("invitations");
-  return pages.map((p: any) => {
+export async function listExternalInvitations(cursor?: string) {
+  const result = await query("invitations", cursor);
+  const invitations = result.pages.map((p: any) => {
     const x = p.properties || {};
     return {
       id: p.id, title: read(x.Invitation) || "Untitled invitation",
@@ -63,6 +71,7 @@ export async function listExternalInvitations() {
       sentOn: read(x["Sent on"]), url: p.url || "",
     };
   });
+  return { invitations, nextCursor: result.nextCursor, hasMore: result.hasMore };
 }
 export async function createOrganisation(input: { name: string; type: string; website?: string; email?: string; phone?: string; location?: string; owner?: string }) {
   const { client, id } = database("organisations");
