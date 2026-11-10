@@ -30,7 +30,7 @@ test("every internal operations navigation link resolves to a real page", () => 
   const internal = DOC_NAV.filter((item) => !item.external);
   assert.ok(internal.length > 0, "operations navigation should not be empty");
   for (const item of internal) {
-    assert.ok(pages.has(item.href), `Navigation item "${item.label}" points to missing route ${item.href}`);
+    assert.ok(pages.has(item.href.split("#")[0]), `Navigation item "${item.label}" points to missing route ${item.href}`);
   }
 });
 
@@ -44,9 +44,9 @@ test("every operations page is covered by the authenticated operations layout", 
   assert.ok(pages.length >= 6, "route inventory should include the current operations modules");
 });
 
-test("external navigation is restricted to the two published civic products", () => {
+test("external navigation points only to published ISEYC civic intelligence products", () => {
   const external = DOC_NAV.filter((item) => item.external);
-  assert.deepEqual(external.map((item) => item.label).sort(), ["Civic Brain", "Civic Mandate"]);
+  assert.deepEqual(external.map((item) => item.label).sort(), ["Civic Brain", "Civic Mandate", "Civic Observatory"]);
   assert.ok(external.every((item) => item.href.startsWith("https://")));
   assert.ok(external.every((item) => !/operators|admin|submission|member/i.test(item.href)));
 });
@@ -134,7 +134,7 @@ test("institutional design tokens and reduced-motion accessibility are present",
     assert.ok(css.includes(token), `Missing design token ${token}`);
   }
   assert.match(css, /prefers-reduced-motion/);
-  assert.match(shell, /aria-label="Mobile navigation"/);
+  assert.match(shell, /aria-label="Primary mobile navigation"/);\n  assert.doesNotMatch(shell, /aria-label="Mobile navigation"/);\n  assert.match(shell, /fixed inset-x-0 bottom-0/);
   assert.match(shell, /aria-label="Primary navigation"/);
   assert.match(shell, /min-h-\[44px\]/);
   assert.match(dashboard, /Not operational/);
