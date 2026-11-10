@@ -7,7 +7,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 type Kind = "actions" | "media" | "chamber";
 type RecordRow = {
   id: string; title: string; status: string; detail: string; date: string; url: string;
-  department?: string; priority?: string; expectedEvidence?: string; blocker?: string; sourceMeetingId?: string;
+  department?: string; priority?: string; expectedEvidence?: string; blocker?: string; sourceMeetingId?: string; notes?: string;
   purpose?: string; chairRole?: string; secretaryRole?: string; agenda?: string;
   attendanceBasis?: string; decisionItems?: string; draftMinutes?: string; decisionOutcome?: string;
 };
