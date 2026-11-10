@@ -1,7 +1,7 @@
 import { dbId, notion, assertInternalDb, getMeeting } from "@/lib/notion";
 
 export type RegisterKind = "actions" | "media" | "chamber";
-type Row = { id: string; title: string; status: string; detail: string; date: string; url: string; department: string; priority: string; expectedEvidence: string; blocker: string; sourceMeetingId: string; notes: string; purpose: string; chairRole: string; secretaryRole: string; agenda: string; attendanceBasis: string; decisionItems: string; draftMinutes: string; decisionOutcome: string };
+type Row = { id: string; title: string; status: string; detail: string; date: string; url: string; department: string; priority: string; expectedEvidence: string; blocker: string; sourceMeetingId: string; notes: string; progressUpdate: string; purpose: string; chairRole: string; secretaryRole: string; agenda: string; attendanceBasis: string; decisionItems: string; draftMinutes: string; decisionOutcome: string };
 const CONFIG = {
   actions: { env: "NOTION_ACTIONS_DATABASE_ID", title: "Name", status: "Status", detail: "Owner", date: "Due date" },
   media: { env: "NOTION_MEDIA_DATABASE_ID", title: "Name", status: "Status", detail: "Notes", date: "" },
@@ -46,6 +46,7 @@ export async function listRegister(kind: RegisterKind, cursor?: string): Promise
       blocker: readText(props["Blocker / support required"]),
       sourceMeetingId: Array.isArray(props["Source meeting"]?.relation) && typeof props["Source meeting"].relation[0]?.id === "string" ? props["Source meeting"].relation[0].id : "",
       notes: readText(props.Notes),
+      progressUpdate: readText(props["Progress update"]),
       purpose: readText(props["Session purpose"]),
       chairRole: readText(props["Chair role"]),
       secretaryRole: readText(props["Secretary role"]),
@@ -123,4 +124,30 @@ export async function createRegisterDraft(kind: RegisterKind, input: {
 }
 export function isRegisterKind(value: string): value is RegisterKind {
   return value === "actions" || value === "media" || value === "chamber";
+}
+
+export async function updateActionProgress(
+  id: string,
+  input: { status: "In progress" | "Blocked"; progressUpdate: string; blocker: string }
+): Promise<void> {
+  const { client, databaseId } = database("actions");
+  const page: any = await client.pages.retrieve({ page_id: id });
+  if (
+    typeof page.parent?.database_id !== "string" ||
+    page.parent.database_id.replace(/-/g, "").toLowerCase() !== databaseId
+  ) {
+    throw new Error("Action record not found in the configured register.");
+  }
+  const currentStatus = readText(page.properties?.Status);
+  if (!["Open", "In progress", "Blocked"].includes(currentStatus)) {
+    throw new Error("This action is not available for working-progress updates.");
+  }
+  await client.pages.update({
+    page_id: id,
+    properties: {
+      Status: { select: { name: input.status } },
+      "Progress update": { rich_text: [{ text: { content: input.progressUpdate.slice(0, 1000) } }] },
+      "Blocker / support required": { rich_text: [{ text: { content: input.blocker.slice(0, 500) } }] },
+    } as any,
+  });
 }
