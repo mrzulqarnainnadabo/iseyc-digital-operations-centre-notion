@@ -67,9 +67,11 @@ export default function ExternalEngagementPage() {
         ? { ...current, invitations: [...current.invitations, ...result.invitations], invitationsNextCursor: result.invitationsNextCursor, invitationsHasMore: result.invitationsHasMore }
         : result as Data);
       setLoaded(true);
-      setContactOrg(current => current || result.organisations?.[0]?.id || "");
-      setInviteOrg(current => current && result.organisations?.some((x: Option) => x.id === current && eligibleOrganisation(x)) ? current : result.organisations?.find(eligibleOrganisation)?.id || "");
-      setMeetingId(current => { const candidate = requestedMeetingId || current; return result.meetings?.some((x: Option) => x.id === candidate) ? candidate : result.meetings?.[0]?.id || ""; });
+      if (!appendInvitations) {
+        setContactOrg(current => current || result.organisations?.[0]?.id || "");
+        setInviteOrg(current => current && result.organisations?.some((x: Option) => x.id === current && eligibleOrganisation(x)) ? current : result.organisations?.find(eligibleOrganisation)?.id || "");
+        setMeetingId(current => { const candidate = requestedMeetingId || current; return result.meetings?.some((x: Option) => x.id === candidate) ? candidate : result.meetings?.[0]?.id || ""; });
+      }
     } catch (cause) {
       if (!appendInvitations) {
         setLoaded(false);
@@ -85,12 +87,19 @@ export default function ExternalEngagementPage() {
     try {
       const response = await fetch(`/ops/api/external-engagement?${kind}Cursor=${encodeURIComponent(cursor)}`, { cache: "no-store" });
       const result = await response.json();
-      if (!response.ok || !Array.isArray(result[kind])) throw new Error(result.error || `Could not load more ${kind}.`);
+      const nextCursorKey = `${kind}NextCursor`;
+      const hasMoreKey = `${kind}HasMore`;
+      if (!response.ok || !Array.isArray(result[kind]) || (result[nextCursorKey] !== null && typeof result[nextCursorKey] !== "string") || typeof result[hasMoreKey] !== "boolean") throw new Error(result.error || `Could not load more ${kind}.`);
       setData(current => {
-        if (kind === "organisations") return { ...current, organisations: [...current.organisations, ...result.organisations], organisationsNextCursor: result.organisationsNextCursor, organisationsHasMore: result.organisationsHasMore === true };
-        if (kind === "contacts") return { ...current, contacts: [...current.contacts, ...result.contacts], contactsNextCursor: result.contactsNextCursor, contactsHasMore: result.contactsHasMore === true };
-        return { ...current, meetings: [...current.meetings, ...result.meetings], meetingsNextCursor: result.meetingsNextCursor, meetingsHasMore: result.meetingsHasMore === true };
+        if (kind === "organisations") return { ...current, organisations: [...current.organisations, ...result.organisations], organisationsNextCursor: result.organisationsNextCursor, organisationsHasMore: result.organisationsHasMore };
+        if (kind === "contacts") return { ...current, contacts: [...current.contacts, ...result.contacts], contactsNextCursor: result.contactsNextCursor, contactsHasMore: result.contactsHasMore };
+        return { ...current, meetings: [...current.meetings, ...result.meetings], meetingsNextCursor: result.meetingsNextCursor, meetingsHasMore: result.meetingsHasMore };
       });
+      if (kind === "organisations") {
+        setContactOrg(current => current || result.organisations?.[0]?.id || "");
+        setInviteOrg(current => current || result.organisations?.find(eligibleOrganisation)?.id || "");
+      }
+      if (kind === "meetings") setMeetingId(current => current || result.meetings?.[0]?.id || "");
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : `Could not load more ${kind}.`);
     } finally { setLoading(false); }
