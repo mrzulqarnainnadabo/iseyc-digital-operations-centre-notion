@@ -9,8 +9,9 @@ const ENV = "NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID" as const;
 const DEPARTMENT_SELECT: Record<OpsDepartmentId, string> = {
   education: "Education & Capacity Building",
   health: "Health & Well-being",
-  "digital-systems": "Digital Systems & Technology",
-  "civic-affairs": "Civic Affairs & Public Accountability",
+  // Persist using exact live Notion select options; UI labels remain canonical.
+  "digital-systems": "Software & Technology",
+  "civic-affairs": "Civic Department",
 };
 
 function database() {
