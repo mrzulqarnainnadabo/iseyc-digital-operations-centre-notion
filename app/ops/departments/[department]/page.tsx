@@ -18,7 +18,7 @@ const ALL_DEPARTMENTS: { id: OpsDepartmentId; name: string }[] = [
   { id: "education", name: "Education & Capacity Building" },
   { id: "health", name: "Health & Well-being" },
   { id: "digital-systems", name: "Digital Systems & Technology" },
-  { id: "civic-affairs", name: "Civic Affairs" },
+  { id: "civic-affairs", name: "Civic Affairs & Public Accountability" },
 ];
 
 const DEPARTMENT_STYLE: Record<OpsDepartmentId, { number: string; short: string; focus: string; accent: string; label: string }> = {
@@ -27,6 +27,57 @@ const DEPARTMENT_STYLE: Record<OpsDepartmentId, { number: string; short: string;
   "digital-systems": { number: "03", short: "Inclusion · Infrastructure · Innovation", focus: "Digital capacity", accent: "digital", label: "Connected systems" },
   "civic-affairs": { number: "04", short: "Participation · Engagement · Accountability", focus: "Civic responsibility", accent: "civic", label: "Public participation" },
 };
+
+function DepartmentMark({ department }: { department: OpsDepartmentId }) {
+  const common = "h-40 w-40 text-[#e4d3aa]";
+  if (department === "education") return (
+    <div className="ops-department-mark ops-department-mark--education" aria-hidden="true">
+      <svg viewBox="0 0 160 160" className={common} fill="none">
+        <circle cx="80" cy="80" r="69" stroke="currentColor" strokeOpacity=".35" />
+        <circle cx="80" cy="80" r="55" stroke="currentColor" strokeOpacity=".18" />
+        <path d="M30 53c19-8 36-4 50 7v57c-14-11-31-15-50-7V53Z" stroke="currentColor" strokeWidth="2.5" />
+        <path d="M130 53c-19-8-36-4-50 7v57c14-11 31-15 50-7V53Z" stroke="currentColor" strokeWidth="2.5" />
+        <path d="M43 68c10-2 20 0 28 5M43 81c10-2 20 0 28 5M117 68c-10-2-20 0-28 5M117 81c-10-2-20 0-28 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+      <span>LEARNING</span>
+    </div>
+  );
+  if (department === "health") return (
+    <div className="ops-department-mark ops-department-mark--health" aria-hidden="true">
+      <svg viewBox="0 0 160 160" className={common} fill="none">
+        <circle cx="80" cy="80" r="69" stroke="currentColor" strokeOpacity=".35" />
+        <circle cx="80" cy="80" r="53" stroke="currentColor" strokeOpacity=".18" />
+        <path d="M19 83h31l13-29 21 58 16-38 10 9h31" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M80 24v112M24 80h112" stroke="currentColor" strokeOpacity=".16" />
+      </svg>
+      <span>WELL-BEING</span>
+    </div>
+  );
+  if (department === "digital-systems") return (
+    <div className="ops-department-mark ops-department-mark--digital" aria-hidden="true">
+      <svg viewBox="0 0 160 160" className={common} fill="none">
+        <circle cx="80" cy="80" r="69" stroke="currentColor" strokeOpacity=".35" />
+        <path d="M80 30 35 55v50l45 25 45-25V55L80 30Z" stroke="currentColor" strokeWidth="2" />
+        <path d="m35 55 45 25 45-25M80 80v50" stroke="currentColor" strokeWidth="2" />
+        {[ [80,30],[35,55],[125,55],[80,80],[35,105],[125,105],[80,130] ].map(([x,y]) => <circle key={x+":"+y} cx={x} cy={y} r="4" fill="currentColor" />)}
+      </svg>
+      <span>CONNECTED SYSTEMS</span>
+    </div>
+  );
+  return (
+    <div className="ops-department-mark ops-department-mark--civic" aria-hidden="true">
+      <svg viewBox="0 0 160 160" className={common} fill="none">
+        <circle cx="80" cy="80" r="69" stroke="currentColor" strokeOpacity=".35" />
+        <circle cx="80" cy="80" r="48" stroke="currentColor" strokeWidth="2" />
+        <circle cx="80" cy="80" r="27" stroke="currentColor" strokeWidth="2" />
+        <path d="M80 18v124M18 80h124" stroke="currentColor" strokeOpacity=".5" />
+        <circle cx="80" cy="18" r="4" fill="currentColor" /><circle cx="142" cy="80" r="4" fill="currentColor" />
+        <circle cx="80" cy="142" r="4" fill="currentColor" /><circle cx="18" cy="80" r="4" fill="currentColor" />
+      </svg>
+      <span>PUBLIC ACCOUNTABILITY</span>
+    </div>
+  );
+}
 
 export default async function DepartmentDeskPage({
   params,
@@ -80,9 +131,7 @@ export default async function DepartmentDeskPage({
             </div>
           </div>
           <div className="hidden lg:flex lg:justify-center">
-            <div className="ops-department-seal" aria-hidden="true">
-              <span>{style.number}</span><i /><b /><em />
-            </div>
+            <DepartmentMark department={department} />
           </div>
         </div>
         <div className="relative grid grid-cols-3 divide-x divide-white/10 border-t border-white/10 bg-black/10">
@@ -187,7 +236,7 @@ export default async function DepartmentDeskPage({
         ))}</ul> : <p className="mt-4 rounded-xl border border-dashed border-[#d7ddd4] bg-white/70 p-4 text-xs leading-5 text-[#6c786f]">No matching department meetings were found on the loaded page. This does not establish that no department activity exists.</p>}
       </section>
 
-      <section id="tools" className="scroll-mt-5 rounded-2xl border border-[#dce4dc] bg-white p-5 sm:p-6">
+      <section id="shared-tools" className="scroll-mt-5 rounded-2xl border border-[#dce4dc] bg-white p-5 sm:p-6">
         <div className="flex flex-wrap items-end justify-between gap-2"><div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">Institution-wide support</p><h2 className="mt-1 font-serif text-2xl text-[#173c30]">Shared registers</h2></div><span className="text-[10px] text-[#7a837c]">Common tools · not additional departments</span></div>
         <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {[
