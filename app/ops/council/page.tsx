@@ -33,7 +33,7 @@ export default function CouncilRolesPage() {
             <h2 className="mt-1 font-serif text-xl text-[#173c30]">A clear operating rhythm, not another layer of meetings</h2>
             <p className="mt-2 text-xs leading-5 text-[#68736b]">See the proposed weekly coordination, monthly council review, decision gates, financial controls and department approval pathway. This is a governance proposal for review, not a substitute for ISEYC's constitution or approved delegations.</p>
           </div>
-          <Link href="/docs/PRESIDENTIAL-COUNCIL-OPERATING-COMPACT.md" className="inline-flex min-h-10 items-center rounded-lg border border-[#d9dfd7] px-3 py-2 text-xs font-semibold text-[#194b3b] hover:bg-[#f4f6f2]">Read operating compact <span aria-hidden="true" className="ml-2">→</span></Link>
+          <Link href="https://github.com/mrzulqarnainnadabo/iseyc-digital-operations-centre-notion/blob/feat/council-role-guides/docs/PRESIDENTIAL-COUNCIL-OPERATING-COMPACT.md" className="inline-flex min-h-10 items-center rounded-lg border border-[#d9dfd7] px-3 py-2 text-xs font-semibold text-[#194b3b] hover:bg-[#f4f6f2]">Read operating compact on GitHub <span aria-hidden="true" className="ml-2">→</span></Link>
         </div>
       </section>
 
