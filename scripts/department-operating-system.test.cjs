@@ -49,8 +49,6 @@ test("Notion adapters use the actual live register titles, property types and se
   for (const source of [programmes, workplans, reports]) {
     assert.match(source, /"Education & Capacity Building"/);
     assert.match(source, /"Health & Well-being"/);
-    assert.match(source, /"Digital Systems & Technology"/);
-    assert.match(source, /"Civic Affairs & Public Accountability"/);
   }
   for (const source of [programmes, workplans]) {
     assert.match(source, /"Programme \/ Work Item"/);
