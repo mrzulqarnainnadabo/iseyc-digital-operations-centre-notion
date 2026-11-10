@@ -14,6 +14,20 @@ type Meeting = {
   meetingDate: string;
   summary: string;
   sensitivity: string;
+  meetingType: string;
+  purpose: string;
+  meetingTime: string;
+  venue: string;
+  meetingOwnerRole: string;
+  agenda: string;
+  requiredParticipants: string;
+  preReading: string;
+  decisionsSought: string;
+  minutesOwnerRole: string;
+  attendanceNotes: string;
+  draftMinutes: string;
+  outcomeSummary: string;
+  linkedActionIds: string[];
 };
 
 export default function ReviewPage() {
@@ -128,7 +142,53 @@ export default function ReviewPage() {
         </div>
       </dl>
 
-      {meeting.status === "Approved" && meeting.sensitivity === "Standard" ? <section className="rounded-card border border-forest-200 bg-white p-4"><p className="text-xs font-semibold uppercase tracking-widest text-gold-700">External participation</p><h2 className="mt-1 font-serif text-xl text-forest-950">Invite organisations or contributors</h2><p className="mt-1 text-sm leading-5 text-ink-600">Prepare organisation-specific invitations linked to this approved meeting. Each invitation remains a draft until separately approved and dispatched.</p><Link href={`/ops/partners?meetingId=${encodeURIComponent(meeting.id)}`} className="mt-3 inline-flex min-h-[44px] items-center rounded-control bg-forest-900 px-4 text-sm font-semibold text-white">Prepare external invitations</Link></section> : null}
+      <section className="space-y-4">
+        <div className="rounded-card border border-line bg-white p-5 shadow-card">
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Meeting brief</p>
+          <h2 className="mt-1 font-serif text-xl text-forest-950">{meeting.meetingType || "Meeting"} preparation</h2>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {[
+              ["Purpose", meeting.purpose],
+              ["Proposed time", meeting.meetingTime ? `${meeting.meetingTime} WAT` : ""],
+              ["Venue / meeting link", meeting.venue],
+              ["Meeting owner role", meeting.meetingOwnerRole],
+              ["Minutes owner role", meeting.minutesOwnerRole],
+            ].filter(([, value]) => value).map(([label, value]) => <div key={label}><p className="text-[10px] font-bold uppercase tracking-[.12em] text-ink-600">{label}</p><p className="mt-1 whitespace-pre-wrap text-sm leading-5 text-ink-900">{value}</p></div>)}
+          </div>
+        </div>
+        {[
+          ["Agenda", meeting.agenda],
+          ["Required participants · roles", meeting.requiredParticipants],
+          ["Pre-reading and papers", meeting.preReading],
+          ["Decisions / outcomes sought", meeting.decisionsSought],
+        ].some(([, value]) => value) ? <div className="rounded-card border border-line bg-white p-5">
+          <p className="text-[10px] font-bold uppercase tracking-[.14em] text-gold-700">Preparation</p>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2">
+            {[
+              ["Agenda", meeting.agenda],
+              ["Required participants · roles", meeting.requiredParticipants],
+              ["Pre-reading and papers", meeting.preReading],
+              ["Decisions / outcomes sought", meeting.decisionsSought],
+            ].filter(([, value]) => value).map(([label, value]) => <div key={label}><p className="text-xs font-semibold text-forest-950">{label}</p><p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-ink-700">{value}</p></div>)}
+          </div>
+        </div> : null}
+        {[
+          ["Attendance notes · draft", meeting.attendanceNotes],
+          ["Draft minutes", meeting.draftMinutes],
+          ["Outcome summary · draft", meeting.outcomeSummary],
+        ].some(([, value]) => value) ? <div className="rounded-card border border-[#e7d9b8] bg-[#fbf8ef] p-5">
+          <p className="text-[10px] font-bold uppercase tracking-[.14em] text-[#8a6b34]">After the meeting · draft records</p>
+          <div className="mt-3 space-y-4">
+            {[
+              ["Attendance notes · draft", meeting.attendanceNotes],
+              ["Draft minutes", meeting.draftMinutes],
+              ["Outcome summary · draft", meeting.outcomeSummary],
+            ].filter(([, value]) => value).map(([label, value]) => <div key={label}><p className="text-xs font-semibold text-[#6e5425]">{label}</p><p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-[#514a3a]">{value}</p></div>)}
+          </div>
+        </div> : null}
+      </section>
+
+            {meeting.status === "Approved" && meeting.sensitivity === "Standard" ? <section className="rounded-card border border-forest-200 bg-white p-4"><p className="text-xs font-semibold uppercase tracking-widest text-gold-700">External participation</p><h2 className="mt-1 font-serif text-xl text-forest-950">Invite organisations or contributors</h2><p className="mt-1 text-sm leading-5 text-ink-600">Prepare organisation-specific invitations linked to this approved meeting. Each invitation remains a draft until separately approved and dispatched.</p><Link href={`/ops/partners?meetingId=${encodeURIComponent(meeting.id)}`} className="mt-3 inline-flex min-h-[44px] items-center rounded-control bg-forest-900 px-4 text-sm font-semibold text-white">Prepare external invitations</Link></section> : null}
 
       {error ? <p className="rounded-control border border-red-200 bg-red-50 p-3 text-sm text-red-800" role="alert">{error}</p> : null}
 
