@@ -130,7 +130,7 @@ export default async function DepartmentDeskPage({
               <span className="rounded-full border border-[#d9c59b]/35 bg-[#d9c59b]/10 px-3 py-1.5 text-[11px] font-medium text-[#ead9b5]">Coordination workspace</span>
             </div>
           </div>
-          <div className="hidden lg:flex lg:justify-center">
+          <div className="flex justify-center lg:justify-center">
             <DepartmentMark department={department} />
           </div>
         </div>
