@@ -21,10 +21,6 @@ function database() {
   return { client, databaseId };
 }
 
-export function departmentProgrammesConfigured(): boolean {
-  return Boolean(process.env.NOTION_TOKEN?.trim() && dbId(ENV));
-}
-
 export function departmentWorkPlansConfigured(): boolean {
   return departmentProgrammesConfigured();
 }
