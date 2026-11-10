@@ -16,9 +16,9 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
   const [title, setTitle] = useState("");
   const [objectives, setObjectives] = useState("");
   const [accountableRole, setAccountableRole] = useState("");
-  const [targetCommunity, setTargetCommunity] = useState("");
-  const [geography, setGeography] = useState("");
-  const [status, setStatus] = useState<"Draft" | "Planning">("Draft");
+  const [acceptanceCriteria, setAcceptanceCriteria] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const refresh = useCallback(
     async (append = false) => {
@@ -78,9 +78,9 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
           departmentId,
           objectives,
           accountableRole,
-          targetCommunity,
-          geography,
-          status,
+          deliverables: acceptanceCriteria,
+          startDate,
+          endDate,
         }),
       });
       const j = await r.json();
@@ -88,9 +88,9 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
       setTitle("");
       setObjectives("");
       setAccountableRole("");
-      setTargetCommunity("");
-      setGeography("");
-      setStatus("Draft");
+      setAcceptanceCriteria("");
+      setStartDate("");
+      setEndDate("");
       await refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not save programme.");
@@ -108,8 +108,7 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
           </p>
           <h2 className="mt-1 font-serif text-xl text-forest-950">Programmes & initiatives</h2>
           <p className="mt-1 max-w-2xl text-sm leading-6 text-ink-600">
-            Shared institutional register filtered to this department. Creation is limited to Planning
-            or Draft. Role titles do not assign appointments.
+            Shared institutional register filtered to this department. Creation is limited to Proposed. Role titles do not assign appointments.
           </p>
         </div>
         <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-900">
@@ -120,12 +119,12 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
       {configured !== false ? (
         <details className="rounded-xl border border-[#dfe6df] bg-[#fafbf8] p-3">
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-[#194b3b]">
-            <span>Prepare a programme draft<span className="mt-1 block text-xs font-normal text-[#68736b]">Saved as Draft or Planning only. This does not approve or start a programme.</span></span>
+            <span>Prepare a programme draft<span className="mt-1 block text-xs font-normal text-[#68736b]">Saved as Proposed in the live register. This does not approve or start a programme.</span></span>
             <span aria-hidden="true" className="text-lg text-[#a7833f]">＋</span>
           </summary>
           <div className="mt-3">
           <form onSubmit={submit} className="rounded-card border border-line bg-white p-4 shadow-card sm:p-5">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Create draft</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Create proposal</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
               Title · required
@@ -148,44 +147,21 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
                 className="mt-1 w-full rounded-control border border-line bg-cream-50 px-3 py-2 text-sm font-normal"
               />
             </label>
-            <label className="block text-sm font-semibold text-ink-800">
-              Target community
-              <input
-                maxLength={500}
-                value={targetCommunity}
-                onChange={(e) => setTargetCommunity(e.target.value)}
-                className="mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal"
-              />
-            </label>
-            <label className="block text-sm font-semibold text-ink-800">
-              Geography
-              <input
-                maxLength={500}
-                value={geography}
-                onChange={(e) => setGeography(e.target.value)}
-                className="mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal"
-              />
-            </label>
-            <label className="block text-sm font-semibold text-ink-800">
+                        <label className="block text-sm font-semibold text-ink-800">
               Accountable role · title only
-              <input
-                maxLength={180}
-                value={accountableRole}
-                onChange={(e) => setAccountableRole(e.target.value)}
-                placeholder="Role title — not a personal appointment"
-                className="mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal"
-              />
+              <input maxLength={180} value={accountableRole} onChange={(e) => setAccountableRole(e.target.value)} placeholder="Role title — not a personal appointment" className="mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal" />
             </label>
             <label className="block text-sm font-semibold text-ink-800">
-              Initial status
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value as "Draft" | "Planning")}
-                className="mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal"
-              >
-                <option value="Draft">Draft</option>
-                <option value="Planning">Planning</option>
-              </select>
+              Start date
+              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal" />
+            </label>
+            <label className="block text-sm font-semibold text-ink-800">
+              Due date
+              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal" />
+            </label>
+            <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
+              Acceptance criteria
+              <textarea maxLength={1800} rows={2} value={acceptanceCriteria} onChange={(e) => setAcceptanceCriteria(e.target.value)} className="mt-1 w-full rounded-control border border-line bg-cream-50 px-3 py-2 text-sm font-normal" />
             </label>
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -194,7 +170,7 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
               disabled={busy || !title.trim()}
               className="min-h-11 rounded-control bg-forest-900 px-5 text-sm font-semibold text-white hover:bg-forest-800 disabled:opacity-50"
             >
-              {busy ? "Saving…" : "Save programme draft"}
+              {busy ? "Saving…" : "Save programme proposal"}
             </button>
             <button
               type="button"
