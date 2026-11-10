@@ -72,7 +72,7 @@ test("unknown Notion department values remain Unspecified across all registers",
     "lib/notion-department-reports.ts",
   ]) {
     const adapter = read(file);
-    assert.match(adapter, /departmentIdFromNotionSelect\(deptRaw\)/);
+    assert.match(adapter, /departmentIdFromNotionSelect\(textProp\(props\.Department\)\)/);
     assert.doesNotMatch(adapter, /let departmentId: OpsDepartmentId = "education"/);
   }
   assert.match(model, /case "software & technology":\s*return "digital-systems"/);
