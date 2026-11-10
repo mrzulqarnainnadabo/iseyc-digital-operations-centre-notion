@@ -95,6 +95,10 @@ test("actions, chamber and communications expose authenticated Notion-backed ini
   const component = fs.readFileSync(path.join(root, "components/OperationalRegister.tsx"), "utf8");
   assert.match(component, /Save to Notion/);
   assert.match(component, /human-authorised/);
+  assert.match(component, /Accountable owner role · required/);
+  assert.match(component, /required minLength=\{2\} maxLength=\{180\}/);
+  assert.match(component, /does not assign access or imply a named appointment/);
+
   const api = fs.readFileSync(path.join(opsRoot, "api/registers/[kind]/route.ts"), "utf8");
   assert.match(api, /isSameOriginRequest/);
   assert.match(api, /requireStaffSession/);
