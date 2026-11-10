@@ -14,13 +14,13 @@ Support programme management, work planning and departmental reporting without i
 | Actions / follow-ups | Shared Actions register (existing) |
 | Communications | Shared Media register (existing) |
 | External partners | Shared external engagement registers (existing) |
-| Programmes | Department-scoped rows in one programmes database (proposed) |
-| Work plans | Department-scoped rows in one work-plans database (proposed) |
-| Department reports | Department-scoped rows in one reports database (proposed) |
+| Programmes | Department-scoped rows · API + UI implemented · env required |
+| Work plans | Department-scoped rows · API + UI implemented · env required |
+| Department reports | Department-scoped rows · API + UI implemented · env required |
 
 Do not create four separate programme databases per department unless governance requires isolation beyond a Department property filter.
 
-## Proposed Notion databases
+## Notion databases (create & share to go live)
 
 ### 1. DCC — Department Programmes
 
@@ -63,5 +63,10 @@ Suggested properties: Name, Department, Report type, Period, Summary, Challenges
 ## Application behaviour today
 
 - `lib/department-operations.ts` defines mandates, functions and record models.
+- Routes: `GET/POST /ops/api/department-programmes`, `department-workplans`, `department-reports`.
+- Adapters: `lib/notion-department-programmes.ts`, `notion-department-workplans.ts`, `notion-department-reports.ts`.
+- UI panels on each department desk: programme, work-plan and report create/list with pagination.
+- Creation limited to Draft/Planning (programmes), Planned (work plans), Draft (reports).
 - Department workspaces show honest **Not connected** states when env vars are absent.
 - No demo programmes, officers or statistics are generated.
+- `assertInternalDb` allowlists the three `NOTION_DEPARTMENT_*` env names.
