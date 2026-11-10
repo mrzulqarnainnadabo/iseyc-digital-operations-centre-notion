@@ -9,7 +9,7 @@ type Props = { departmentId: OpsDepartmentId; departmentName: string };
 export default function DepartmentProgrammePanel({ departmentId, departmentName }: Props) {
   const [rows, setRows] = useState<ProgrammeRecord[]>([]);
   const [error, setError] = useState("");
-  const [configured, setConfigured] = useState<boolean | null>(null);
+  const [connectionState, setConnectionState] = useState<"checking" | "connected" | "not-configured" | "error">("checking");
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -31,7 +31,7 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
         const r = await fetch(`/ops/api/department-programmes?${qs}`, { cache: "no-store" });
         const j = await r.json();
         if (r.status === 503) {
-          setConfigured(false);
+          setConnectionState("not-configured");
           setRows([]);
           setLoaded(true);
           setNextCursor(null);
@@ -42,12 +42,13 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
         if (!Array.isArray(j.records)) {
           throw new Error("The register returned an invalid response. No records are shown.");
         }
-        setConfigured(true);
+        setConnectionState("connected");
         setRows((current) => (append ? [...current, ...j.records] : j.records));
         setNextCursor(j.hasMore ? j.nextCursor : null);
         setLoaded(true);
       } catch (e) {
         if (!append) {
+          setConnectionState("error");
           setRows([]);
           setLoaded(false);
           setNextCursor(null);
@@ -112,11 +113,11 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
           </p>
         </div>
         <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-900">
-          {configured === false ? "Not connected" : configured ? "Connected · Proposed only" : "Checking…"}
+          {connectionState === "checking" ? "Checking…" : connectionState === "connected" ? "Connected · Proposed only" : connectionState === "not-configured" ? "Not connected" : "Connection error"}
         </span>
       </div>
 
-      {configured !== false ? (
+      {connectionState === "connected" ? (
         <details className="rounded-xl border border-[#dfe6df] bg-[#fafbf8] p-3">
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-[#194b3b]">
             <span>Prepare a programme proposal<span className="mt-1 block text-xs font-normal text-[#68736b]">Saved as Proposed in the live register. This does not approve or start a programme.</span></span>
@@ -185,11 +186,16 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
           </div>
         </details>
       ) : (
-        <p className="rounded-card border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
-          Configure <code className="text-xs">NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID</code> and share
-          the database with the DOC Notion integration. No programme records are invented while the
-          register is disconnected.
-        </p>
+        {connectionState === "checking" ? (
+          <p role="status" className="rounded-control border border-line bg-white p-3 text-sm text-ink-600">Checking the Notion register…</p>
+        ) : connectionState === "not-configured" ? (
+          <p className="rounded-control border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">Configure <code className="text-xs">NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID</code> and share the database with the DOC Notion integration. No programme records are invented while the register is disconnected.</p>
+        ) : (
+          <div className="rounded-control border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
+            <p>The register connection could not be verified. Draft creation is disabled until the connection is restored.</p>
+            <button type="button" onClick={() => void refresh()} disabled={busy} className="mt-2 min-h-10 rounded-control border border-amber-300 px-3 font-semibold disabled:opacity-50">Retry connection</button>
+          </div>
+        )}
       )}
 
       {error ? (
@@ -200,7 +206,7 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
 
       {!loaded && !error ? <p className="text-sm text-ink-600">Loading programmes…</p> : null}
 
-      {loaded && configured && rows.length === 0 ? (
+      {loaded && connectionState === "connected" && rows.length === 0 ? (
         <p className="rounded-card border border-line bg-white p-4 text-sm text-ink-600">
           No programmes on the returned page for this department.
         </p>
