@@ -107,3 +107,17 @@ test("readiness documents department operating architecture without inventing li
   assert.match(readiness, /NOTION_DEPARTMENT_/);
   assert.match(readiness, /No programme instances are invented/);
 });
+
+
+test("department readiness and environment example document the two actual shared Notion registers", () => {
+  const readiness = read("app/ops/readiness/page.tsx");
+  const env = read(".env.example");
+  assert.match(readiness, /IDCC — Programmes & Work Register/);
+  assert.match(readiness, /IDCC — Department Reports & Scorecards/);
+  assert.match(readiness, /Work Type = Operations/);
+  assert.match(readiness, /do not create a duplicate work-plan database/);
+  assert.doesNotMatch(readiness, /Create and share DCC Department Programmes, Work Plans and Reports databases/);
+  assert.match(env, /NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID=/);
+  assert.match(env, /NOTION_DEPARTMENT_REPORTS_DATABASE_ID=/);
+  assert.doesNotMatch(env, /NOTION_DEPARTMENT_WORKPLANS_DATABASE_ID=/);
+});
