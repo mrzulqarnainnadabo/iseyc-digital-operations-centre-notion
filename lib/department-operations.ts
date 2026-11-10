@@ -71,7 +71,7 @@ export type WorkPlanStatus =
 
 export type ReportType = "Weekly" | "Monthly" | "Quarterly" | "Annual" | "Unspecified";
 
-/** Canonical programme fields for a future Notion-backed register. */
+/** Canonical programme view model backed by the shared Notion register. */
 export type ProgrammeRecord = {
   id: string;
   title: string;
@@ -90,7 +90,7 @@ export type ProgrammeRecord = {
   url: string;
 };
 
-/** Canonical work-plan item fields. */
+/** Canonical work-plan view model backed by the shared Notion register. */
 export type WorkPlanRecord = {
   id: string;
   title: string;
