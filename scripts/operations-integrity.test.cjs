@@ -512,10 +512,14 @@ test("department workspaces use distinct identity marks and every in-page naviga
   assert.match(page, /id="shared-tools"/);
   assert.match(page, /\["#shared-tools", "Shared tools"\]/);
   assert.doesNotMatch(page, /id="tools"/);
-  assert.match(styles, /ops-department-mark--education/);
-  assert.match(styles, /ops-department-mark--health/);
-  assert.match(styles, /ops-department-mark--digital/);
-  assert.match(styles, /ops-department-mark--civic/);
+  assert.match(page, /ops-department-mark--education/);
+  assert.match(page, /ops-department-mark--health/);
+  assert.match(page, /ops-department-mark--digital/);
+  assert.match(page, /ops-department-mark--civic/);
+  assert.match(styles, /ops-department--education \.ops-department-mark/);
+  assert.match(styles, /ops-department--health \.ops-department-mark/);
+  assert.match(styles, /ops-department--digital \.ops-department-mark/);
+  assert.match(styles, /ops-department--civic \.ops-department-mark/);
   assert.match(definitions, /name: "Digital Systems & Technology"/);
   assert.match(definitions, /name: "Civic Affairs & Public Accountability"/);
 });
