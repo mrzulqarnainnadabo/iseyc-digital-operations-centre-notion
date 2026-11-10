@@ -484,3 +484,21 @@ test("council role guide defines bounded templates without inventing appointment
   assert.match(framework, /Automation should handle reminders/);
   assert.ok(DOC_NAV.some((item) => item.href === "/ops/council"));
 });
+
+test("Presidential Council guide links to a bounded operating compact", () => {
+  const page = read("app/ops/council/page.tsx");
+  const compact = read("docs/PRESIDENTIAL-COUNCIL-OPERATING-COMPACT.md");
+  assert.match(page, /Council roles & leadership guide/);
+  assert.match(page, /\/docs\/PRESIDENTIAL-COUNCIL-OPERATING-COMPACT\.md/);
+  for (const heading of [
+    "Council operating rhythm",
+    "Decision and approval gates",
+    "Department approval cycle",
+    "Meeting record standard",
+    "Lean council test",
+    "Review and adoption"
+  ]) assert.ok(compact.includes(heading), `Operating compact missing section: ${heading}`);
+  assert.match(compact, /Authority not configured/);
+  assert.match(compact, /shared staff key cannot prove who attended/);
+  assert.match(compact, /Automation must not approve/);
+});
