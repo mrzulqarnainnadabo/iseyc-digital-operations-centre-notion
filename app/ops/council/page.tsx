@@ -16,55 +16,95 @@ export default function CouncilRolesPage() {
           <div className="mt-5 flex flex-wrap gap-2">
             <span className="rounded-full border border-white/20 px-3 py-1.5 text-[11px]">Role templates only</span>
             <span className="rounded-full border border-[#d9c59b]/40 bg-[#d9c59b]/10 px-3 py-1.5 text-[11px] text-[#ead9b5]">No appointments or permissions created</span>
+            <a href="https://github.com/mrzulqarnainnadabo/iseyc-digital-operations-centre-notion/blob/feat/council-role-guides/docs/PRESIDENTIAL-COUNCIL-OPERATING-COMPACT.md" className="inline-flex min-h-9 items-center rounded-full border border-[#d7ddcf] bg-white px-3 text-[10px] font-bold text-[#315b45] hover:bg-[#f7f8f3]">Read operating compact ↗</a>
           </div>
         </div>
       </header>
 
-      <section className="grid gap-3 sm:grid-cols-3">
-        <article className="rounded-xl border border-[#e1e5dc] bg-white p-4"><p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#8a6b34]">Operating principle</p><h2 className="mt-2 font-serif text-xl text-[#173c30]">Clear ownership</h2><p className="mt-1 text-xs leading-5 text-[#68736b]">Every role has a defined purpose, recurring practice and escalation path.</p></article>
-        <article className="rounded-xl border border-[#e1e5dc] bg-white p-4"><p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#8a6b34]">Development principle</p><h2 className="mt-2 font-serif text-xl text-[#173c30]">Learn while serving</h2><p className="mt-1 text-xs leading-5 text-[#68736b]">Each office has a practical development focus, not just a title.</p></article>
-        <article className="rounded-xl border border-[#e1e5dc] bg-white p-4"><p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#8a6b34]">Governance principle</p><h2 className="mt-2 font-serif text-xl text-[#173c30]">Authority is explicit</h2><p className="mt-1 text-xs leading-5 text-[#68736b]">A role description is not an appointment, identity check or system permission.</p></article>
-      </section>
-
-      <section className="rounded-2xl border border-[#dfe6df] bg-white p-5 sm:p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="max-w-2xl">
-            <p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">How the council works</p>
-            <h2 className="mt-1 font-serif text-xl text-[#173c30]">A clear operating rhythm, not another layer of meetings</h2>
-            <p className="mt-2 text-xs leading-5 text-[#68736b]">See the proposed weekly coordination, monthly council review, decision gates, financial controls and department approval pathway. This is a governance proposal for review, not a substitute for ISEYC's constitution or approved delegations.</p>
+      <section aria-labelledby="council-map-title" className="relative overflow-hidden rounded-[26px] border border-[#dfe5dc] bg-[#f1f2eb] p-5 sm:p-7">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full border border-[#bda879]/30" />
+        <div aria-hidden="true" className="pointer-events-none absolute -right-8 -top-12 h-48 w-48 rounded-full border border-[#bda879]/25" />
+        <div className="relative flex flex-wrap items-end justify-between gap-3">
+          <div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">Institutional architecture · 01</p><h2 id="council-map-title" className="mt-1 font-serif text-2xl text-[#173c30] sm:text-3xl">The leadership system</h2><p className="mt-2 max-w-xl text-xs leading-5 text-[#68736b]">A functional map of the proposed council roles. Grouping shows each office's institutional function; it does not create a reporting line or grant authority.</p></div>
+          <span className="rounded-full border border-[#d7ddcf] bg-white/80 px-3 py-1.5 text-[10px] font-semibold text-[#526457]">14 role templates · no appointments</span>
+        </div>
+        <div className="relative mt-7 flex flex-col items-center">
+          <div className="relative z-10 flex w-full max-w-sm items-center gap-4 rounded-2xl border border-[#c5b184] bg-[#173f32] px-5 py-4 text-white shadow-[0_12px_28px_rgba(18,59,47,.14)]">
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-[#d9c59b]/60 bg-white/5 font-serif text-xl text-[#e7d7b4]">P</div>
+            <div className="min-w-0"><p className="text-[9px] font-bold uppercase tracking-[.2em] text-[#d9c59b]">Presidential leadership</p><p className="mt-1 text-sm font-semibold leading-5">National President</p><p className="text-[10px] text-white/60">Council chair · institutional direction</p></div>
+            <span className="ml-auto text-xl text-[#d9c59b]" aria-hidden="true">✳</span>
           </div>
-          <Link href="https://github.com/mrzulqarnainnadabo/iseyc-digital-operations-centre-notion/blob/feat/council-role-guides/docs/PRESIDENTIAL-COUNCIL-OPERATING-COMPACT.md" className="inline-flex min-h-10 items-center rounded-lg border border-[#d9dfd7] px-3 py-2 text-xs font-semibold text-[#194b3b] hover:bg-[#f4f6f2]">Read operating compact on GitHub <span aria-hidden="true" className="ml-2">→</span></Link>
+          <div className="h-7 w-px bg-[#b59b65]" />
+          <div className="grid w-full gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {ROLE_GROUPS.filter((group) => group !== "Presidential leadership").map((group, index) => {
+              const roles = COUNCIL_ROLES.filter((role) => role.group === group);
+              const accents = ["#285b47", "#8b713e", "#4d6972", "#77604b", "#6d6382"];
+              const symbols = ["↔", "◈", "◎", "⚖", "✧"];
+              return <article key={group} className="relative overflow-hidden rounded-2xl border border-[#dfe5dc] bg-white p-4 shadow-[0_3px_12px_rgba(25,54,39,.035)]">
+                <div className="absolute inset-x-0 top-0 h-1" style={{backgroundColor:accents[index]}} />
+                <div className="flex items-start justify-between gap-3">
+                  <div><p className="text-[9px] font-bold uppercase tracking-[.16em] text-[#8a6b34]">Function {String(index+2).padStart(2,"0")}</p><h3 className="mt-1 text-sm font-bold text-[#173c30]">{group}</h3></div>
+                  <span className="grid h-9 w-9 place-items-center rounded-xl bg-[#f2f3ed] font-serif text-xl" style={{color:accents[index]}} aria-hidden="true">{symbols[index]}</span>
+                </div>
+                <p className="mt-1 text-[10px] text-[#778078]">{roles.length} role {roles.length===1?"template":"templates"}</p>
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {roles.map((role) => <a key={role.id} href={"#"+role.id} className="rounded-full border border-[#e4e8e1] bg-[#fafbf8] px-2.5 py-1.5 text-[10px] font-semibold text-[#405b49] transition hover:border-[#bca574] hover:bg-[#f7f2e7]">{role.title}</a>)}
+                </div>
+              </article>;
+            })}
+          </div>
+        </div>
+        <div className="relative mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[#d9dfd5] pt-4">
+          <p className="text-[10px] leading-4 text-[#68736b]">Independent governance and advisory roles retain their separate procedural boundaries.</p>
+          <a href="#role-guides" className="inline-flex min-h-9 items-center rounded-full bg-[#173f32] px-4 text-[10px] font-bold text-white hover:bg-[#285b47]">Explore role guides ↓</a>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-[#e1e5dc] bg-[#f4f3ed] p-5 sm:p-6">
+      <section className="grid gap-3 sm:grid-cols-3">
+        {[
+          ["01","Mandate","Purpose, responsibilities and reporting context."],
+          ["02","Practice","Weekly rhythm and expected working habits."],
+          ["03","Boundary","Development pathway and limits of authority."]
+        ].map(([number,title,detail]) => <article key={number} className="flex gap-3 rounded-xl border border-[#e1e5dc] bg-white p-4"><span className="font-serif text-2xl text-[#b18c4b]">{number}</span><div><h3 className="text-xs font-bold text-[#173c30]">{title}</h3><p className="mt-1 text-[10px] leading-4 text-[#68736b]">{detail}</p></div></article>)}
+      </section>
+
+      <section id="role-guides" className="rounded-2xl border border-[#dfe5dc] bg-white p-5 sm:p-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
-          <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Proposed lean structure</p><h2 className="mt-1 font-serif text-2xl text-[#173c30]">One council · clear operating lanes</h2></div>
-          <span className="text-xs text-[#68736b]">{COUNCIL_ROLES.length} role templates</span>
+          <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Leadership field guide</p><h2 className="mt-1 font-serif text-2xl text-[#173c30]">The operating rhythm</h2></div>
+          <span className="text-[10px] text-[#68736b]">Proposed · subject to governance approval</span>
         </div>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {ROLE_GROUPS.map((group) => {
-            const roles = COUNCIL_ROLES.filter((role) => role.group === group);
-            return <article key={group} className="rounded-xl border border-[#e0e4db] bg-white p-4">
-              <h3 className="text-xs font-bold text-[#173c30]">{group}</h3>
-              <p className="mt-1 text-[10px] text-[#7a837c]">{roles.length} role templates</p>
-              <ul className="mt-3 space-y-2">{roles.map((role) => <li key={role.id}><a href={"#"+role.id} className="text-xs font-medium leading-5 text-[#315b45] underline-offset-2 hover:underline">{role.title}</a></li>)}</ul>
-            </article>;
-          })}
+        <div className="mt-5 grid gap-2 sm:grid-cols-4">
+          {[
+            ["01","Prepare","Department leads surface evidence, proposals and delivery needs."],
+            ["02","Coordinate","Executive roles clarify dependencies, ownership and timing."],
+            ["03","Deliberate","The council reviews matters within its verified mandate."],
+            ["04","Record","Decisions, owners and follow-up are captured for review."]
+          ].map(([number,title,detail],index) => <div key={number} className="relative rounded-xl bg-[#f4f5ef] p-4">
+            <div className="flex items-center justify-between"><span className="font-serif text-2xl text-[#b18c4b]">{number}</span>{index<3?<span className="hidden text-lg text-[#b18c4b] sm:block" aria-hidden="true">→</span>:null}</div>
+            <h3 className="mt-3 text-xs font-bold text-[#173c30]">{title}</h3><p className="mt-1 text-[10px] leading-4 text-[#68736b]">{detail}</p>
+          </div>)}
         </div>
+        <p className="mt-4 border-l-2 border-[#b18c4b] pl-3 text-[10px] leading-5 text-[#68736b]">This is a proposed working rhythm—not proof of an adopted constitution, an authorised delegation or a completed decision.</p>
       </section>
 
-      {ROLE_GROUPS.map((group) => (
+            {ROLE_GROUPS.map((group) => (
         <section key={group} className="space-y-3">
           <div className="flex items-center gap-3"><span className="h-px w-7 bg-[#b18c4b]" /><h2 className="font-serif text-xl text-[#173c30]">{group}</h2></div>
           <div className="grid gap-3 lg:grid-cols-2">
             {COUNCIL_ROLES.filter((role) => role.group === group).map((role) => (
-              <article id={role.id} key={role.id} className="scroll-mt-24 rounded-2xl border border-[#e1e5dc] bg-white p-5 sm:p-6">
+              <article id={role.id} key={role.id} className="scroll-mt-24 rounded-2xl border border-[#e1e5dc] border-l-[3px] border-l-[#b18c4b] bg-white p-5 shadow-[0_4px_18px_rgba(20,49,38,.035)] sm:p-6">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <h3 className="max-w-xl font-serif text-xl leading-tight text-[#173c30]">{role.title}</h3>
                   <span className="rounded-full border border-[#e5dfd0] bg-[#fbf8ef] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[.12em] text-[#806638]">Template</span>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-[#5f6c63]">{role.purpose}</p>
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  {[
+                    [role.responsibilities.length,"Core duties"],
+                    [role.weeklyPractice.length,"Weekly practices"],
+                    [role.development.length,"Growth areas"]
+                  ].map(([count,label]) => <div key={label} className="rounded-xl bg-[#f3f5ef] px-3 py-2.5"><p className="font-serif text-xl tabular-nums text-[#173c30]">{count}</p><p className="mt-0.5 text-[9px] font-semibold uppercase tracking-[.1em] text-[#788177]">{label}</p></div>)}
+                </div>
                 <div className="mt-4 rounded-xl bg-[#f4f6f2] p-3"><p className="text-[9px] font-bold uppercase tracking-[.14em] text-[#8a6b34]">Reports to / works within</p><p className="mt-1 text-xs leading-5 text-[#405348]">{role.reportsTo}</p></div>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   <div><h4 className="text-[10px] font-bold uppercase tracking-[.14em] text-[#8a6b34]">Core responsibilities</h4><ul className="mt-2 space-y-2">{role.responsibilities.map((item) => <li key={item} className="flex gap-2 text-xs leading-5 text-[#5f6c63]"><span className="text-[#a7833f]">•</span>{item}</li>)}</ul></div>
