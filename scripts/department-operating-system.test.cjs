@@ -66,7 +66,7 @@ test("Notion adapters use the actual live register titles, property types and se
     assert.match(source, /"civic-affairs": "Civic Department"/);
   }
   assert.doesNotMatch(reports, /props\.Name|props\["Report type"\]|Status: \{ select:/);
-  assert.match(reports, /"Reporting Period Start": \{\s*date: \{ start: input\.periodStart, \.\.\.\(input\.periodEnd/);
+  assert.match(reports, /properties\["Reporting Period Start"\]: \{\s*date: \{ start: input\.periodStart, \.\.\.\(input\.periodEnd/);
   assert.match(reports, /props\["Reporting Period Start"\]\?\.date\?\.end/);
   assert.doesNotMatch(reports, /Reporting Period End/);
 
