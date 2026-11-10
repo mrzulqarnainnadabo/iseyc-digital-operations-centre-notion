@@ -56,8 +56,8 @@ const modules = [
     name: "Department programmes & work plans",
     route: "/ops/departments/education",
     state: "Not operational",
-    detail: "Programme, work-plan and report APIs and department UI panels are implemented. Live Notion persistence requires NOTION_DEPARTMENT_*_DATABASE_ID and integration share. No programme instances are invented when disconnected.",
-    dependency: "Create and share DCC Department Programmes, Work Plans and Reports databases; set NOTION_DEPARTMENT_*_DATABASE_ID; department-scoped access with verified appointments.",
+    detail: "Programme, work-plan and report APIs and department UI panels are implemented. Live persistence uses the existing IDCC — Programmes & Work Register for both programmes and operational work-plan items, plus the IDCC — Department Reports & Scorecards register. No programme instances are invented when disconnected.",
+    dependency: "Share the two existing IDCC registers with the integration and configure NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID and NOTION_DEPARTMENT_REPORTS_DATABASE_ID. Work-plan items use Work Type = Operations in the shared Programmes & Work Register; do not create a duplicate work-plan database. Department-scoped access with verified appointments remains required.",
   },
   {
     name: "Audit & security operations",
