@@ -90,13 +90,20 @@ export default function CouncilRolesPage() {
         <section key={group} className="space-y-3">
           <div className="flex items-center gap-3"><span className="h-px w-7 bg-[#b18c4b]" /><h2 className="font-serif text-xl text-[#173c30]">{group}</h2></div>
           <div className="grid gap-3 lg:grid-cols-2">
-            {COUNCIL_ROLES.filter((role) => role.group === group).map((role) => (
-              <article id={role.id} key={role.id} className="scroll-mt-24 rounded-2xl border border-[#e1e5dc] bg-white p-5 sm:p-6">
+            {COUNCIL_ROLES.filter((role) => role.group === group).map((role, roleIndex) => (
+              <article id={role.id} key={role.id} className="scroll-mt-24 rounded-2xl border border-[#e1e5dc] border-l-[3px] border-l-[#b18c4b] bg-white p-5 shadow-[0_4px_18px_rgba(20,49,38,.035)] sm:p-6">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <h3 className="max-w-xl font-serif text-xl leading-tight text-[#173c30]">{role.title}</h3>
                   <span className="rounded-full border border-[#e5dfd0] bg-[#fbf8ef] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[.12em] text-[#806638]">Template</span>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-[#5f6c63]">{role.purpose}</p>
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  {[
+                    [role.responsibilities.length,"Core duties"],
+                    [role.weeklyPractice.length,"Weekly practices"],
+                    [role.development.length,"Growth areas"]
+                  ].map(([count,label]) => <div key={label} className="rounded-xl bg-[#f3f5ef] px-3 py-2.5"><p className="font-serif text-xl tabular-nums text-[#173c30]">{count}</p><p className="mt-0.5 text-[9px] font-semibold uppercase tracking-[.1em] text-[#788177]">{label}</p></div>)}
+                </div>
                 <div className="mt-4 rounded-xl bg-[#f4f6f2] p-3"><p className="text-[9px] font-bold uppercase tracking-[.14em] text-[#8a6b34]">Reports to / works within</p><p className="mt-1 text-xs leading-5 text-[#405348]">{role.reportsTo}</p></div>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   <div><h4 className="text-[10px] font-bold uppercase tracking-[.14em] text-[#8a6b34]">Core responsibilities</h4><ul className="mt-2 space-y-2">{role.responsibilities.map((item) => <li key={item} className="flex gap-2 text-xs leading-5 text-[#5f6c63]"><span className="text-[#a7833f]">•</span>{item}</li>)}</ul></div>
