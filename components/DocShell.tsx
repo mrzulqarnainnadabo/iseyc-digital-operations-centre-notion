@@ -90,10 +90,14 @@ export function DocShell({ children }: { children: React.ReactNode }) {
         </main>
         <footer className="border-t border-line bg-white/70 px-4 py-4 sm:px-6 lg:px-8">
           <div className="mx-auto flex max-w-7xl flex-col gap-2 text-xs text-ink-600 sm:flex-row sm:items-center sm:justify-between">
-            <p>Initiative for Sustainable Evolution for Youth and Community</p>
+            <div className="space-y-1">
+              <p className="font-semibold text-forest-950">Initiative for Sustainable Evolution for Youth and Community</p>
+              <p className="text-[11px] font-medium text-gold-700">Empowering Youth, Shaping Communities</p>
+            </div>
             <nav aria-label="Institutional references" className="flex flex-wrap gap-x-4 gap-y-2">
+              <a className="min-h-[32px] inline-flex items-center underline-offset-2 hover:text-forest-800 hover:underline" href="mailto:iseycglobal@gmail.com">iseycglobal@gmail.com</a>
+              <a className="min-h-[32px] inline-flex items-center underline-offset-2 hover:text-forest-800 hover:underline" href="https://www.instagram.com/iseyc_global/" target="_blank" rel="noopener noreferrer">@iseyc_global ↗</a>
               <a className="min-h-[32px] inline-flex items-center underline-offset-2 hover:text-forest-800 hover:underline" href="https://2027-street-mandate.vercel.app/methodology" target="_blank" rel="noopener noreferrer">Mandate methodology ↗</a>
-              <a className="min-h-[32px] inline-flex items-center underline-offset-2 hover:text-forest-800 hover:underline" href="mailto:iseycglobal@gmail.com">Contact ISEYC</a>
             </nav>
           </div>
         </footer>
