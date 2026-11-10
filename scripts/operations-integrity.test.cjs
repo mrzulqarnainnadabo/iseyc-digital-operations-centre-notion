@@ -480,7 +480,7 @@ test("council role guide defines bounded templates without inventing appointment
   }
   assert.match(page, /No appointments or permissions created/);
   assert.match(page, /Personal development and authority limits/);
-  assert.match(framework, /existing **IDCC — Appointment & Role Register**/);
+  assert.ok(framework.includes("existing **IDCC — Appointment & Role Register**"));
   assert.match(framework, /Automation should handle reminders/);
   assert.ok(DOC_NAV.some((item) => item.href === "/ops/council"));
 });
