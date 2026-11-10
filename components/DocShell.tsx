@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { DOC_NAV, GROUPS } from "@/lib/nav";
+import { DOC_NAV, GROUPS, MOBILE_NAV } from "@/lib/nav";
 
 export function DocShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -83,12 +83,9 @@ export function DocShell({ children }: { children: React.ReactNode }) {
             </div>
             <button type="button" onClick={logout} className="min-h-[44px] shrink-0 rounded-control px-3 text-xs font-semibold text-ink-700 hover:bg-white lg:hidden">Sign out</button>
           </div>
-          <nav aria-label="Mobile navigation" className="flex gap-1 overflow-x-auto px-3 pb-3 lg:hidden">
-            {DOC_NAV.filter((item) => !item.external).map((item) => navLink(item, true))}
-          </nav>
         </header>
 
-        <main id="main-content" tabIndex={-1} className="w-full flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <main id="main-content" tabIndex={-1} className="w-full flex-1 px-4 py-6 pb-28 sm:px-6 sm:py-8 lg:px-8 lg:pb-8">
           {children}
         </main>
         <footer className="border-t border-line bg-white/70 px-4 py-4 sm:px-6 lg:px-8">
@@ -101,6 +98,19 @@ export function DocShell({ children }: { children: React.ReactNode }) {
           </div>
         </footer>
       </div>
+      <nav aria-label="Primary mobile navigation" className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-line bg-white/95 px-2 pt-2 pb-[calc(.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(16,45,34,.08)] backdrop-blur lg:hidden">
+        {MOBILE_NAV.map((item) => {
+          const active = item.href === "/ops"
+            ? pathname === "/ops"
+            : pathname === item.href || pathname.startsWith(item.href + "/");
+          return (
+            <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={`flex min-h-[54px] flex-col items-center justify-center gap-1 rounded-lg px-1 text-[10px] font-semibold transition-colors ${active ? "bg-forest-50 text-forest-950" : "text-ink-600 hover:bg-cream-50 hover:text-forest-950"}`}>
+              <span aria-hidden="true" className={`h-1 w-5 rounded-full ${active ? "bg-gold-600" : "bg-transparent"}`} />
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }
