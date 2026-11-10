@@ -54,7 +54,7 @@ test("unknown Notion department values remain Unspecified across all registers",
 });
 
 test("department desks mount programme work-plan and report panels with tools", () => {
-  assert.match(read("components/DepartmentProgrammePanel.tsx"), /Save programme draft/);
+  assert.match(read("components/DepartmentProgrammePanel.tsx"), /Save programme proposal/);
   assert.match(read("components/DepartmentWorkPlanPanel.tsx"), /Save work-plan item/);
   assert.match(read("components/DepartmentReportPanel.tsx"), /Save report draft/);
   const desk = read("app/ops/departments/[department]/page.tsx");
