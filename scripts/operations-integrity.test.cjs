@@ -272,7 +272,7 @@ test("external invitation register uses validated cursor pagination and preserve
   assert.match(adapter, /start_cursor/);
   assert.match(adapter, /next_cursor/);
   assert.match(adapter, /has_more/);
-  assert.match(adapter, /listExternalInvitations\(cursor\?\)/);
+  assert.match(adapter, /listExternalInvitations\\(cursor\\\?: string\\)/);
   assert.match(route, /Invalid invitation pagination cursor/);
   assert.match(route, /invitationsNextCursor/);
   assert.match(route, /invitationsHasMore/);
@@ -336,7 +336,7 @@ test("external engagement keeps contact channels private and invitations as unse
   const route = read("app/ops/api/external-engagement/route.ts");
   const page = read("app/ops/partners/page.tsx");
   const start = adapter.indexOf("export async function listExternalOptions()");
-  const end = adapter.indexOf("export async function listExternalInvitations()", start);
+  const end = adapter.indexOf("export async function listExternalInvitations(", start);
   assert.ok(start >= 0 && end > start);
   const publicListing = adapter.slice(start, end);
   assert.doesNotMatch(publicListing, /Work email|Work phone|\.email|\.phone_number/i);
