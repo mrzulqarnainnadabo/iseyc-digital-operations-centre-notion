@@ -49,7 +49,7 @@ test("department operating model defines the shared intelligence-to-action bound
     "Civic Department",
     "Civic Mandate",
     "Civic Brain",
-    "published-only",
+    "only records explicitly approved for publication",
     "Kaduna South",
     "not a prevalence estimate",
     "human review",
