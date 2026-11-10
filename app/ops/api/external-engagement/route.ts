@@ -17,12 +17,24 @@ const validUrl = (value: string) => {
   try { return new URL(value).protocol === "https:"; } catch { return false; }
 };
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   if (!(await requireStaffSession())) return privateJson({ ok: false, error: "Unauthorized" }, { status: 401 });
   if (!externalRegistersConfigured()) return privateJson({ ok: false, error: "External engagement registers are not configured in this environment. No records are shown." }, { status: 503 });
+  const cursor = new URL(request.url).searchParams.get("cursor") || undefined;
+  if (cursor && !/^[a-f0-9-]{32,36}$/i.test(cursor)) {
+    return privateJson({ ok: false, error: "Invalid invitation pagination cursor." }, { status: 400 });
+  }
   try {
-    const [options, invitations] = await Promise.all([listExternalOptions(), listExternalInvitations()]);
-    return privateJson({ ok: true, ...options, invitations, source: "notion", scope: "first page only" });
+    const [options, invitationPage] = await Promise.all([listExternalOptions(), listExternalInvitations(cursor)]);
+    return privateJson({
+      ok: true, ...options,
+      invitations: invitationPage.invitations,
+      invitationsNextCursor: invitationPage.nextCursor,
+      invitationsHasMore: invitationPage.hasMore,
+      source: "notion",
+      optionsScope: "first page only (up to 50 records per directory)",
+      invitationsScope: "cursor-paginated",
+    });
   } catch {
     return privateJson({ ok: false, error: "External engagement records could not be retrieved. No cached or estimated records are shown." }, { status: 502 });
   }
