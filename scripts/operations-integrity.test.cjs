@@ -269,6 +269,30 @@ test("external engagement prevents duplicate records and rejects stale meeting h
   assert.match(page, /activeView === "agreements"/);
 });
 
+test("external organisation, contact and approved-meeting selectors paginate independently", () => {
+  const notion = read("lib/notion.ts");
+  const adapter = read("lib/external-engagement.ts");
+  const route = read("app/ops/api/external-engagement/route.ts");
+  const page = read("app/ops/partners/page.tsx");
+  assert.match(notion, /hasMore: boolean/);
+  assert.match(notion, /hasMore: res\.has_more === true/);
+  assert.match(adapter, /listExternalOptions\(cursors: \{ organisations\?: string; contacts\?: string; meetings\?: string \}/);
+  assert.match(adapter, /organisationsNextCursor: orgPages\.nextCursor/);
+  assert.match(adapter, /contactsNextCursor: contactPages\.nextCursor/);
+  assert.match(adapter, /meetingsNextCursor: meetings\.nextCursor/);
+  assert.match(route, /organisationsCursor/);
+  assert.match(route, /contactsCursor/);
+  assert.match(route, /meetingsCursor/);
+  assert.match(route, /optionsScope: "independently cursor-paginated/);
+  assert.match(page, /Load more organisations/);
+  assert.match(page, /Load more contacts/);
+  assert.match(page, /Load more approved meetings/);
+  assert.match(page, /loadMoreOptions\(kind: OptionKind\)/);
+  assert.match(page, /organisationsHasMore/);
+  assert.match(page, /contactsHasMore/);
+  assert.match(page, /meetingsHasMore/);
+});
+
 test("external invitation register uses validated cursor pagination and preserves loaded records", () => {
   const adapter = read("lib/external-engagement.ts");
   const route = read("app/ops/api/external-engagement/route.ts");
