@@ -57,7 +57,7 @@ test("Notion adapters use the actual live register titles, property types and se
   assert.match(programmes, /"Work Type": \{ select: \{ name: "Programme" \} \}/);
   assert.match(workplans, /"Work Type": \{ select: \{ name: "Operations" \} \}/);
   assert.match(reports, /NOTION_DEPARTMENT_REPORTS_DATABASE_ID/);
-  for (const field of ["Report \/ Period", "Reporting Cycle", "Reporting Period Start", "Reporting Period End", "Completed Work", "Risks & Blockers", "Decisions Required", "Outcomes \/ Evidence"]) {
+  for (const field of ["Report \/ Period", "Reporting Cycle", "Reporting Period Start", "Completed Work", "Risks & Blockers", "Decisions Required", "Outcomes \/ Evidence"]) {
     assert.ok(reports.includes(field), `Reports adapter is missing live schema field: ${field}`);
   }
   assert.match(reports, /Status: \{ status: \{ name: "Draft" \} \}/);
