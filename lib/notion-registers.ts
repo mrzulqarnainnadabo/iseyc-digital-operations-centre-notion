@@ -27,16 +27,21 @@ function database(kind: RegisterKind) {
 export function registerConfigured(kind: RegisterKind) {
   return Boolean(process.env.NOTION_TOKEN?.trim() && dbId(config(kind).env));
 }
-export async function listRegister(kind: RegisterKind): Promise<Row[]> {
+export async function listRegister(kind: RegisterKind, cursor?: string): Promise<{ rows: Row[]; nextCursor: string | null; hasMore: boolean }> {
   const { client, databaseId } = database(kind);
-  const response = await client.databases.query({ database_id: databaseId, page_size: 50 });
-  return response.results.filter((p: any) => p.object === "page").map((p: any) => {
+  const response = await client.databases.query({
+    database_id: databaseId,
+    page_size: 50,
+    ...(cursor ? { start_cursor: cursor } : {}),
+  });
+  const rows = response.results.filter((p: any) => p.object === "page").map((p: any) => {
     const props = p.properties || {};
     return { id: p.id, title: readText(props[config(kind).title]) || "Untitled record",
       status: readText(props[config(kind).status]) || "Unspecified",
       detail: kind === "media" ? [readText(props.Notes), readText(props.Channel)].filter(Boolean).join(" · ") : readText(props[config(kind).detail]), date: config(kind).date ? readText(props[config(kind).date]) : "",
       url: typeof p.url === "string" ? p.url : "" };
   });
+  return { rows, nextCursor: response.next_cursor || null, hasMore: response.has_more === true };
 }
 export async function createRegisterDraft(kind: RegisterKind, input: { title: string; detail?: string; date?: string; channel?: string }) {
   const { client, databaseId } = database(kind);
