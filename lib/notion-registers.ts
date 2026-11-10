@@ -1,7 +1,7 @@
 import { dbId, notion, assertInternalDb, getMeeting } from "@/lib/notion";
 
 export type RegisterKind = "actions" | "media" | "chamber";
-type Row = { id: string; title: string; status: string; detail: string; date: string; url: string; department: string; priority: string; expectedEvidence: string; blocker: string; sourceMeetingId: string };
+type Row = { id: string; title: string; status: string; detail: string; date: string; url: string; department: string; priority: string; expectedEvidence: string; blocker: string; sourceMeetingId: string; purpose: string; chairRole: string; secretaryRole: string; agenda: string; attendanceBasis: string; decisionItems: string; draftMinutes: string; decisionOutcome: string };
 const CONFIG = {
   actions: { env: "NOTION_ACTIONS_DATABASE_ID", title: "Name", status: "Status", detail: "Owner", date: "Due date" },
   media: { env: "NOTION_MEDIA_DATABASE_ID", title: "Name", status: "Status", detail: "Notes", date: "" },
@@ -45,6 +45,14 @@ export async function listRegister(kind: RegisterKind, cursor?: string): Promise
       expectedEvidence: readText(props["Expected evidence"]),
       blocker: readText(props["Blocker / support required"]),
       sourceMeetingId: Array.isArray(props["Source meeting"]?.relation) && typeof props["Source meeting"].relation[0]?.id === "string" ? props["Source meeting"].relation[0].id : "",
+      purpose: readText(props["Session purpose"]),
+      chairRole: readText(props["Chair role"]),
+      secretaryRole: readText(props["Secretary role"]),
+      agenda: readText(props.Agenda),
+      attendanceBasis: readText(props["Attendance and quorum basis"]),
+      decisionItems: readText(props["Decision items"]),
+      draftMinutes: readText(props["Draft minutes"]),
+      decisionOutcome: readText(props["Decision outcome"]),
     };
   });
   return { rows, nextCursor: response.next_cursor || null, hasMore: response.has_more === true };
@@ -60,6 +68,14 @@ export async function createRegisterDraft(kind: RegisterKind, input: {
   blocker?: string;
   notes?: string;
   sourceMeetingId?: string;
+  purpose?: string;
+  chairRole?: string;
+  secretaryRole?: string;
+  agenda?: string;
+  attendanceBasis?: string;
+  decisionItems?: string;
+  draftMinutes?: string;
+  decisionOutcome?: string;
 }) {
   const { client, databaseId } = database(kind);
   const properties: Record<string, unknown> = {
@@ -87,6 +103,19 @@ export async function createRegisterDraft(kind: RegisterKind, input: {
     properties.Status = { select: { name: "Scheduled" } };
     if (input.date) properties["Session date"] = { date: { start: input.date } };
     if (input.detail) properties.Summary = { rich_text: [{ text: { content: input.detail.slice(0, 1800) } }] };
+    const chamberFields: Record<string, string | undefined> = {
+      "Session purpose": input.purpose,
+      "Chair role": input.chairRole,
+      "Secretary role": input.secretaryRole,
+      Agenda: input.agenda,
+      "Attendance and quorum basis": input.attendanceBasis,
+      "Decision items": input.decisionItems,
+      "Draft minutes": input.draftMinutes,
+      "Decision outcome": input.decisionOutcome,
+    };
+    for (const [name, value] of Object.entries(chamberFields)) {
+      if (value?.trim()) properties[name] = { rich_text: [{ text: { content: value.trim().slice(0, 1800) } }] };
+    }
   }
   const page = await client.pages.create({ parent: { database_id: databaseId }, properties: properties as any });
   return { id: page.id, url: (page as any).url || "" };
