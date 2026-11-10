@@ -106,7 +106,26 @@ export default async function ExecutiveDeskPage() {
         </div>
       </header>
 
-      <section className="grid gap-4 lg:grid-cols-[1.2fr_.8fr]">
+      <section aria-label="Executive coordination functions" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {[
+          {number:"01",symbol:"✳",title:"Institutional direction",office:"National President",detail:"Strategic priorities, council leadership and institutional integrity.",tone:"border-t-[#b18c4b]"},
+          {number:"02",symbol:"⌘",title:"Executive coordination",office:"Chief of Staff",detail:"Presidential priorities, executive calendar and cross-office follow-through.",tone:"border-t-[#315b45]"},
+          {number:"03",symbol:"▤",title:"Institutional records",office:"Secretary-General",detail:"Governance records, draft minutes, correspondence and decision history.",tone:"border-t-[#4d6972]"},
+          {number:"04",symbol:"◫",title:"Operational delivery",office:"COO · CFO",detail:"Department coordination, delivery oversight and financial stewardship.",tone:"border-t-[#806b8c]"}
+        ].map((item) => <article key={item.number} className={`relative overflow-hidden rounded-2xl border border-[#e1e5dc] border-t-[3px] bg-white p-4 shadow-[0_4px_16px_rgba(20,49,38,.035)] ${item.tone}`}>
+          <div className="flex items-start justify-between"><span className="text-[9px] font-bold tracking-[.18em] text-[#a7833f]">{item.number} / OFFICE</span><span aria-hidden="true" className="grid h-9 w-9 place-items-center rounded-xl bg-[#f1f3ed] font-serif text-xl text-[#315b45]">{item.symbol}</span></div>
+          <h2 className="mt-4 font-serif text-lg leading-tight text-[#173c30]">{item.title}</h2>
+          <p className="mt-1 text-[10px] font-bold uppercase tracking-[.1em] text-[#8a6b34]">{item.office}</p>
+          <p className="mt-2 text-xs leading-5 text-[#68736b]">{item.detail}</p>
+        </article>)}
+      </section>
+
+      <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#e1e5dc] bg-[#f4f3ed] px-4 py-3">
+        <div><p className="text-[9px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Council reference</p><p className="mt-1 text-xs text-[#526157]">See the complete role architecture, operating expectations and authority boundaries.</p></div>
+        <Link href="/ops/council" className="inline-flex min-h-10 items-center rounded-full bg-[#173f32] px-4 text-xs font-bold text-white hover:bg-[#285b47]">Open council architecture ↗</Link>
+      </section>
+
+            <section className="grid gap-4 lg:grid-cols-[1.2fr_.8fr]">
         <article className="rounded-2xl border border-[#e1e5dc] bg-white p-5 sm:p-6">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Executive schedule</p><h2 className="mt-1 font-serif text-2xl text-[#173c30]">Upcoming meetings</h2></div>
