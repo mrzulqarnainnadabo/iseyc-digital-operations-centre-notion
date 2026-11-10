@@ -60,7 +60,7 @@ test("Notion adapters use the actual live register titles, property types and se
 
 test("unknown Notion department values remain Unspecified across all registers", () => {
   const model = read("lib/department-operations.ts");
-  assert.match(model, /export type DepartmentRecordId = OpsDepartmentId \| "Unspecified"/);
+  assert.match(model, /export type DepartmentRecordId = OpsDepartmentId \\| "Cross-departmental" \\| "Unspecified"/);
   assert.match(model, /default:\s*return "Unspecified"/);
   for (const file of [
     "lib/notion-department-programmes.ts",
