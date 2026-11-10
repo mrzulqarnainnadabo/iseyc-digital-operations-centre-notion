@@ -4,6 +4,7 @@ import {
   type DepartmentReportRecord,
   type OpsDepartmentId,
   type ReportType,
+  departmentIdFromNotionSelect,
 } from "@/lib/department-operations";
 
 const ENV = "NOTION_DEPARTMENT_REPORTS_DATABASE_ID" as const;
@@ -41,13 +42,7 @@ function mapReportType(raw: string): ReportType {
 function mapRow(page: any): DepartmentReportRecord {
   const props = page.properties || {};
   const deptRaw = textProp(props.Department);
-  let departmentId: OpsDepartmentId = "education";
-  for (const [id, label] of Object.entries(DEPARTMENT_SELECT)) {
-    if (label === deptRaw) {
-      departmentId = id as OpsDepartmentId;
-      break;
-    }
-  }
+  const departmentId = departmentIdFromNotionSelect(deptRaw);
   const statusRaw = textProp(props.Status);
   const status =
     statusRaw === "Draft" ||

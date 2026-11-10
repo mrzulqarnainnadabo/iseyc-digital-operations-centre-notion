@@ -4,6 +4,7 @@ import {
   type OpsDepartmentId,
   type WorkPlanRecord,
   type WorkPlanStatus,
+  departmentIdFromNotionSelect,
 } from "@/lib/department-operations";
 
 const ENV = "NOTION_DEPARTMENT_WORKPLANS_DATABASE_ID" as const;
@@ -42,13 +43,7 @@ function mapStatus(raw: string): WorkPlanStatus {
 function mapRow(page: any): WorkPlanRecord {
   const props = page.properties || {};
   const deptRaw = textProp(props.Department);
-  let departmentId: OpsDepartmentId = "education";
-  for (const [id, label] of Object.entries(DEPARTMENT_SELECT)) {
-    if (label === deptRaw) {
-      departmentId = id as OpsDepartmentId;
-      break;
-    }
-  }
+  const departmentId = departmentIdFromNotionSelect(deptRaw);
   const programmeRelation = props.Programme?.relation;
   const programmeId =
     Array.isArray(programmeRelation) && programmeRelation[0]?.id

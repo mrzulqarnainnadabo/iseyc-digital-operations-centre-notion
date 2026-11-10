@@ -4,6 +4,7 @@ import {
   type OpsDepartmentId,
   type ProgrammeRecord,
   type ProgrammeStatus,
+  departmentIdFromNotionSelect,
 } from "@/lib/department-operations";
 
 const ENV = "NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID" as const;
@@ -45,13 +46,7 @@ function mapStatus(raw: string): ProgrammeStatus {
 function mapRow(page: any): ProgrammeRecord {
   const props = page.properties || {};
   const deptRaw = textProp(props.Department);
-  let departmentId: OpsDepartmentId = "education";
-  for (const [id, label] of Object.entries(DEPARTMENT_SELECT)) {
-    if (label === deptRaw || id === deptRaw.toLowerCase().replace(/\s+/g, "-")) {
-      departmentId = id as OpsDepartmentId;
-      break;
-    }
-  }
+  const departmentId = departmentIdFromNotionSelect(deptRaw);
   return {
     id: page.id,
     title: textProp(props.Name) || "Untitled programme",
