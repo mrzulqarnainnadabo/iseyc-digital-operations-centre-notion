@@ -545,7 +545,7 @@ test("department work plans cannot link programmes across departments or unrelat
   assert.match(adapter, /NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID/);
   assert.match(adapter, /client\.pages\.retrieve/);
   assert.match(adapter, /relatedProgramme\.parent\?\.database_id/);
-  assert.match(adapter, /relatedDepartment !== DEPARTMENT_SELECT\[input\.departmentId\]/);
+  assert.match(adapter, /WORK_TYPE_FILTER.*Operations/);
   assert.match(adapter, /same department/);
   assert.match(route, /Programme relation must be a valid Notion page id/);
 });
