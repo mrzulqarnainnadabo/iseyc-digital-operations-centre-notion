@@ -90,7 +90,7 @@ export default function CouncilRolesPage() {
         <section key={group} className="space-y-3">
           <div className="flex items-center gap-3"><span className="h-px w-7 bg-[#b18c4b]" /><h2 className="font-serif text-xl text-[#173c30]">{group}</h2></div>
           <div className="grid gap-3 lg:grid-cols-2">
-            {COUNCIL_ROLES.filter((role) => role.group === group).map((role, roleIndex) => (
+            {COUNCIL_ROLES.filter((role) => role.group === group).map((role) => (
               <article id={role.id} key={role.id} className="scroll-mt-24 rounded-2xl border border-[#e1e5dc] border-l-[3px] border-l-[#b18c4b] bg-white p-5 shadow-[0_4px_18px_rgba(20,49,38,.035)] sm:p-6">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <h3 className="max-w-xl font-serif text-xl leading-tight text-[#173c30]">{role.title}</h3>
