@@ -468,6 +468,21 @@ test("external engagement keeps contact channels private and invitations as unse
 });
 
 
+test("department draft forms are collapsed until requested and clearly explain their status", () => {
+  const programme = read("components/DepartmentProgrammePanel.tsx");
+  const workplan = read("components/DepartmentWorkPlanPanel.tsx");
+  const report = read("components/DepartmentReportPanel.tsx");
+  for (const [name, source] of [["programme", programme], ["work plan", workplan], ["report", report]]) {
+    assert.match(source, /<details className=/, `${name} form should be collapsible`);
+    assert.match(source, /<summary/, `${name} form needs a visible disclosure label`);
+  }
+  assert.match(programme, /Save programme draft/);
+  assert.match(workplan, /Save work-plan item/);
+  assert.match(report, /Save report draft/);
+  assert.match(programme, /Creation is limited to Planning/);
+  assert.match(report, /Draft only/);
+});
+
 test("department work plans cannot link programmes across departments or unrelated databases", () => {
   const adapter = read("lib/notion-department-workplans.ts");
   const route = read("app/ops/api/department-workplans/route.ts");
