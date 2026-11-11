@@ -83,11 +83,13 @@ function validMetric(value: unknown): value is DepartmentSnapshotMetric {
 function validRecord(value: unknown, departmentId: OpsDepartmentId): value is DepartmentSnapshot {
   if (!isRecord(value)) return false;
   const geography = value.geography;
+  const departmentIdValid = value.departmentId === undefined || value.departmentId === null || nonEmpty(value.departmentId);
+  const departmentIdsValid = value.departmentIds === undefined || (Array.isArray(value.departmentIds) && value.departmentIds.length <= 4 && value.departmentIds.every(nonEmpty));
   const departments = [
     ...(nonEmpty(value.departmentId) ? [value.departmentId] : []),
     ...(Array.isArray(value.departmentIds) ? value.departmentIds : []),
   ];
-  const matchesDepartment = departments.includes(departmentId);
+  const matchesDepartment = departmentIdValid && departmentIdsValid && departments.includes(departmentId);
   const metricsValid = Array.isArray(value.metrics) &&
     value.metrics.length > 0 &&
     value.metrics.length <= 20 &&
@@ -154,6 +156,7 @@ async function loadSnapshots(departmentId: OpsDepartmentId): Promise<DepartmentS
       !Number.isFinite(Date.parse(payload.retrievedAt)) ||
       !nonEmpty(payload.note) ||
       !Array.isArray(payload.limitations) ||
+      payload.limitations.length > 10 ||
       !payload.limitations.every(nonEmpty)) return invalid();
 
     if (payload.status === "empty") {
