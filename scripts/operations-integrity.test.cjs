@@ -678,4 +678,8 @@ test("meeting-to-action deep links can resolve an eligible meeting beyond the fi
   assert.match(meetingsApi, /legacySessionCanReadMeeting\(requestedMeeting\.sensitivity\)/);
   assert.match(meetingsApi, /meetings\.push\(requestedMeeting\)/);
   assert.match(register, /initialMeetingId \? `\?meetingId=/);
+  assert.match(register, /meetingHasMore/);
+  assert.match(register, /async function loadMoreMeetings\(\)/);
+  assert.match(register, /ops\/api\/meetings\?cursor=/);
+  assert.match(register, /Load more meeting options/);
 });
