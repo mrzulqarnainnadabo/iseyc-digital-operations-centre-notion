@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { StatusBadge } from "@/components/StatusBadge";
-import type { DepartmentEvidenceOption, OpsDepartmentId, ProgrammeRecord } from "@/lib/department-operations";
+import type { DepartmentEvidenceOption, OpsDepartmentId, ProgrammeRecord, WorkPriority, RiskLevel } from "@/lib/department-operations";
 
 type Props = { departmentId: OpsDepartmentId; departmentName: string; evidenceOptions: DepartmentEvidenceOption[] };
 
@@ -16,6 +16,9 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName,
   const [title, setTitle] = useState("");
   const [objectives, setObjectives] = useState("");
   const [accountableRole, setAccountableRole] = useState("");
+  const [priority, setPriority] = useState<WorkPriority>("Unspecified");
+  const [riskLevel, setRiskLevel] = useState<RiskLevel>("Unspecified");
+  const [contributors, setContributors] = useState("");
   const [acceptanceCriteria, setAcceptanceCriteria] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -79,6 +82,9 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName,
           departmentId,
           objectives,
           accountableRole,
+          priority,
+          riskLevel,
+          contributors,
           deliverables: acceptanceCriteria,
           startDate,
           endDate,
@@ -90,6 +96,9 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName,
       setTitle("");
       setObjectives("");
       setAccountableRole("");
+      setPriority("Unspecified");
+      setRiskLevel("Unspecified");
+      setContributors("");
       setAcceptanceCriteria("");
       setStartDate("");
       setEndDate("");
@@ -153,6 +162,30 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName,
                         <label className="block text-sm font-semibold text-ink-800">
               Accountable role · title only
               <input maxLength={180} value={accountableRole} onChange={(e) => setAccountableRole(e.target.value)} placeholder="Role title — not a personal appointment" className="mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal" />
+            </label>
+            <label className="block text-sm font-semibold text-ink-800">
+              Priority
+              <select value={priority} onChange={(e) => setPriority(e.target.value as WorkPriority)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal">
+                <option value="Unspecified">Not set</option>
+                <option value="Critical">Critical</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            </label>
+            <label className="block text-sm font-semibold text-ink-800">
+              Risk level
+              <select value={riskLevel} onChange={(e) => setRiskLevel(e.target.value as RiskLevel)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal">
+                <option value="Unspecified">Not assessed</option>
+                <option value="Low">Low</option>
+                <option value="Moderate">Moderate</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical</option>
+              </select>
+            </label>
+            <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
+              Supporting teams / roles
+              <input maxLength={1000} value={contributors} onChange={(e) => setContributors(e.target.value)} placeholder="Departments or role titles only — no personal or sensitive details" className="mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal" />
             </label>
             <label className="block text-sm font-semibold text-ink-800">
               Start date
@@ -242,6 +275,11 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName,
             {row.objectives ? (
               <p className="mt-2 text-sm leading-6 text-ink-700">{row.objectives}</p>
             ) : null}
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {row.priority !== "Unspecified" ? <span className="rounded-full border border-[#e4e8e1] bg-[#fafbf8] px-2.5 py-1 text-[10px] font-semibold text-[#405b49]">Priority · {row.priority}</span> : null}
+              {row.riskLevel !== "Unspecified" ? <span className="rounded-full border border-[#e4e8e1] bg-[#fafbf8] px-2.5 py-1 text-[10px] font-semibold text-[#805b27]">Risk · {row.riskLevel}</span> : null}
+            </div>
+            {row.contributors ? <p className="mt-2 text-xs text-ink-600"><span className="font-semibold text-ink-700">Supporting teams / roles:</span> {row.contributors}</p> : null}
             <dl className="mt-3 grid gap-2 text-xs text-ink-600 sm:grid-cols-2">
               {row.targetCommunity ? (
                 <div>
