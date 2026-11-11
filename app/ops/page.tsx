@@ -122,7 +122,7 @@ export default async function CommandBriefPage() {
         <div className="relative grid grid-cols-3 divide-x divide-white/10 border-t border-white/10 bg-black/10">
           <div className="px-4 py-3 sm:px-8"><p className="text-[9px] uppercase tracking-[.14em] text-white/50">Departments</p><p className="mt-1 text-sm font-semibold">04 workspaces</p></div>
           <div className="px-4 py-3 sm:px-8"><p className="text-[9px] uppercase tracking-[.14em] text-white/50">Review</p><p className="mt-1 text-sm font-semibold">Human-led</p></div>
-          <div className="px-4 py-3 sm:px-8"><p className="text-[9px] uppercase tracking-[.14em] text-white/50">Access</p><p className="mt-1 text-sm font-semibold">Coordination</p></div>
+          <div className="px-4 py-3 sm:px-8"><p className="text-[9px] uppercase tracking-[.14em] text-white/50">Access</p><p className="mt-1 text-sm font-semibold">Coordination only</p></div>
         </div>
       </section>
 
