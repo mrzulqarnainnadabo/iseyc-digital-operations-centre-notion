@@ -76,3 +76,25 @@ test("each department workspace renders only validated Observatory evidence or a
   assert.match(adapter, /technology:/);
   assert.match(adapter, /civic:/);
 });
+
+
+test("department snapshot adapter validates the Observatory v1 contract and preserves source distinctions", () => {
+  const adapter = read("lib/department-snapshots.ts");
+  const page = read("app/ops/departments/[department]/page.tsx");
+  assert.match(adapter, /https:\/\/iseyc-civic-intelligence-observatory\.vercel\.app/);
+  assert.match(adapter, /\/api\/evidence\/snapshots/);
+  assert.match(adapter, /iseyc-observatory-national-snapshots-v1/);
+  assert.match(adapter, /contractVersion !== "1\.0\.0"/);
+  assert.match(adapter, /payload\.recordCount !== payload\.records\.length/);
+  assert.match(adapter, /httpsUrl\(value\.sourceUrl\)/);
+  assert.match(adapter, /value\.limitations\.every\(nonEmpty\)/);
+  assert.match(adapter, /departmentIds/);
+  assert.match(adapter, /AbortSignal\.timeout\(8000\)/);
+  assert.match(page, /getDepartmentSnapshots\(department\)/);
+  assert.match(page, /Snapshot · not a live publisher feed/);
+  assert.match(page, /record\.referencePeriod/);
+  assert.match(page, /record\.geography\.label/);
+  assert.match(page, /record\.publisher/);
+  assert.match(page, /record\.limitations/);
+  assert.match(page, /No cached or estimated replacement records are shown/);
+});
