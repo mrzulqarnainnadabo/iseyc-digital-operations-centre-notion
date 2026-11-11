@@ -131,7 +131,7 @@ export default async function ReadinessPage() {
                 ? "The app has configuration values but could not retrieve this database. Check integration sharing and the database ID."
                 : result.schemaReady
                   ? "The app can retrieve the database and all required fields are present. No rows were read."
-                  : "The database is reachable, but these required fields are missing or have the wrong type: " + result.missingProperties.join(", ") + ".";
+                  : "The database is reachable, but these fields are missing, have the wrong type or lack required select options: " + result.missingProperties.join(", ") + ".";
             return (
               <article key={key} className="rounded-card border border-line bg-white p-4">
                 <div className="flex flex-wrap items-start justify-between gap-2">
