@@ -180,3 +180,15 @@ test("each department receives grounded evidence interpretation and a next verif
   assert.match(page, /What it cannot establish/);
   assert.match(page, /Next evidence step/);
 });
+
+test("Operations Centre homepage leads with an institutional visual and keeps department choices scannable", () => {
+  const page = read("app/ops/page.tsx");
+  assert.match(page, /role="img" aria-label="Four connected departments arranged around shared ISEYC institutional coordination"/);
+  assert.match(page, /One institution/);
+  assert.match(page, /Shared coordination/);
+  assert.match(page, /href="#departments"/);
+  assert.match(page, /dept-workspace-card--\$\{department\.tone\}/);
+  assert.match(page, /min-h-\[220px\]/);
+  assert.doesNotMatch(page, /department\.focus\.map/);
+  assert.doesNotMatch(page, /min-h-\[132px\]/);
+});
