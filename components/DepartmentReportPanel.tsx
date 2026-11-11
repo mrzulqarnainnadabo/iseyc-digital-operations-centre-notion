@@ -257,8 +257,6 @@ export default function DepartmentReportPanel({ departmentId, departmentName, ev
             {row.outputs ? <p className="mt-2 text-xs leading-5 text-ink-700"><span className="font-semibold">Outputs:</span> {row.outputs}</p> : null}
             {row.plannedWork ? <p className="mt-2 text-xs leading-5 text-ink-700"><span className="font-semibold">Planned work:</span> {row.plannedWork}</p> : null}
             {row.preparedByRole ? <p className="mt-2 text-[10px] text-ink-600">Prepared by role: {row.preparedByRole}</p> : null}
-            {row.reviewedByRole ? <p className="mt-1 text-[10px] text-ink-600">Reviewed by role: {row.reviewedByRole}</p> : null}
-            {row.budgetSummary ? <p className="mt-2 text-xs leading-5 text-ink-700"><span className="font-semibold">Budget summary:</span> {row.budgetSummary}</p> : null}
             {row.evidenceUrl ? <a href={row.evidenceUrl} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-9 items-center text-sm font-semibold text-forest-800 underline">Open evidence source ↗</a> : null}
             {row.dataLimitations ? <p className="mt-2 text-xs leading-5 text-ink-600"><span className="font-semibold">Limitations:</span> {row.dataLimitations}</p> : null}
           </li>
