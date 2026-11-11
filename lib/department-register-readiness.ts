@@ -56,9 +56,8 @@ async function checkRegister(
   envName: "NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID" | "NOTION_DEPARTMENT_REPORTS_DATABASE_ID",
   required: Record<string, string>,
 ): Promise<RegisterCheck> {
-  const client = notion();
   const databaseId = dbId(envName);
-  if (!client || !databaseId) {
+  if (!databaseId) {
     return {
       configured: false,
       accessible: false,
@@ -68,6 +67,15 @@ async function checkRegister(
   }
 
   try {
+    const client = notion();
+    if (!client) {
+      return {
+        configured: false,
+        accessible: false,
+        schemaReady: false,
+        missingProperties: [],
+      };
+    }
     assertInternalDb(databaseId, envName);
     const database: any = await client.databases.retrieve({ database_id: databaseId });
     const properties = database?.properties;
