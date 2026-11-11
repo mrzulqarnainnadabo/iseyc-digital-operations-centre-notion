@@ -190,7 +190,7 @@ test("actions, chamber and communications expose authenticated Notion-backed ini
   assert.match(component, /Save to Notion/);
   assert.match(component, /human-authorised/);
   assert.match(component, /Proposed owner role · required/);
-  assert.match(component, /Proposed · unassigned · awaiting authorised acceptance/);
+  assert.match(component, /Proposed action · unassigned · awaiting authorised acceptance/);
   assert.match(component, /Proposed action · unassigned · awaiting authorised acceptance/);
   assert.match(component, /Proposed session · not yet convened/);
   assert.match(component, /kind === "actions" \|\| kind === "chamber" \? "Proposed" : row.status/);
