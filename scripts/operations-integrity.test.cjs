@@ -663,6 +663,8 @@ test("department work-plan records can carry a validated source URL into a propo
   assert.match(actionsPage, /initialNotes/);
   assert.match(register, /initialNotes\?: string/);
   assert.match(register, /useState\(initialNotes\)/);
+  assert.match(register, /A work-plan reference was prefilled in these notes/);
+  assert.match(register, /text reference, not a database relation or approval/);
 });
 
 test("shared operational register creation stays unavailable until its Notion connection is confirmed", () => {
