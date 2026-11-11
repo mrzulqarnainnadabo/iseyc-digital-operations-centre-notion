@@ -34,6 +34,12 @@ function departmentFilter(departmentId?: OpsDepartmentId) {
 
 import type { DepartmentReportRecord, ReportType } from "@/lib/department-operations";
 
+function urlProp(prop: unknown): string {
+  if (!prop || typeof prop !== "object") return "";
+  const value = prop as Record<string, unknown>;
+  return value.type === "url" && typeof value.url === "string" ? value.url : "";
+}
+
 function mapReportType(raw: string): ReportType {
   const allowed: ReportType[] = ["Weekly", "Monthly", "Quarterly", "Annual"];
   return (allowed.includes(raw as ReportType) ? raw : "Unspecified") as ReportType;
@@ -57,6 +63,8 @@ function mapRow(page: any): DepartmentReportRecord {
     challenges: textProp(props["Risks & Blockers"]),
     outstandingActions: textProp(props["Decisions Required"]),
     recommendations: textProp(props["Outcomes / Evidence"]),
+    evidenceUrl: urlProp(props["Evidence Links"]),
+    dataLimitations: textProp(props["Data Limitations"]),
     status,
     url: typeof page.url === "string" ? page.url : "",
   };
@@ -90,6 +98,8 @@ export async function createDepartmentReportDraft(input: {
   challenges?: string;
   outstandingActions?: string;
   recommendations?: string;
+  evidenceUrl?: string;
+  dataLimitations?: string;
 }): Promise<{ id: string; url: string; status: string }> {
   const { client, databaseId } = database();
   if (!isOpsDepartmentId(input.departmentId)) throw new Error("Invalid department.");
@@ -113,6 +123,8 @@ export async function createDepartmentReportDraft(input: {
   if (input.challenges) properties["Risks & Blockers"] = { rich_text: [{ text: { content: input.challenges.slice(0, 1800) } }] };
   if (input.outstandingActions) properties["Decisions Required"] = { rich_text: [{ text: { content: input.outstandingActions.slice(0, 1800) } }] };
   if (input.recommendations) properties["Outcomes / Evidence"] = { rich_text: [{ text: { content: input.recommendations.slice(0, 1800) } }] };
+  if (input.evidenceUrl) properties["Evidence Links"] = { url: input.evidenceUrl };
+  if (input.dataLimitations) properties["Data Limitations"] = { rich_text: [{ text: { content: input.dataLimitations.slice(0, 1800) } }] };
   const page = await client.pages.create({ parent: { database_id: databaseId }, properties: properties as any });
   return { id: page.id, url: (page as any).url || "", status: "Draft" };
 }
