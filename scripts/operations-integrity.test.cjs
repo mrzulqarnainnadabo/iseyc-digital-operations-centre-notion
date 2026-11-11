@@ -52,7 +52,7 @@ test("external navigation points only to published ISEYC civic intelligence prod
   assert.ok(external.every((item) => !/operators|admin|submission|member/i.test(item.href)));
 });
 
-test("command home defines exactly four departments and keeps Communications as a shared function", () => {
+test("command home defines exactly four departments and keeps shared coordination separate", () => {
   const source = fs.readFileSync(path.join(opsRoot, "page.tsx"), "utf8");
   for (const name of [
     "Education & Capacity Building",
@@ -60,7 +60,7 @@ test("command home defines exactly four departments and keeps Communications as 
     "Digital Systems & Technology",
     "Civic Affairs"
   ]) assert.ok(source.includes(name), `Missing department: ${name}`);
-  assert.match(source, /Communications coordination/);
+  assert.match(source, /Shared coordination/);
   assert.match(source, /No confirmed appointments are recorded yet/);
   assert.doesNotMatch(source, /National coverage|members nationwide|appointed department head/i);
 });
