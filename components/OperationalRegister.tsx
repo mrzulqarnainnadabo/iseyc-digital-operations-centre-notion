@@ -299,9 +299,9 @@ export default function OperationalRegister({ kind, initialMeetingId = "" }: { k
             <article key={row.id} className={`overflow-hidden rounded-xl border border-line border-l-4 bg-white p-4 shadow-card transition-shadow hover:shadow-md sm:p-5 ${kind === "actions" ? "border-l-[#b99a61]" : kind === "chamber" ? "border-l-[#315b45]" : "border-l-[#668b91]"}`}>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-gold-700">{kind === "actions" ? "Action proposal" : kind === "chamber" ? "Council session" : "Communication draft"}</p>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-gold-700">{kind === "actions" ? "Proposed action · unassigned · awaiting authorised acceptance" : kind === "chamber" ? "Council session" : "Communication draft"}</p>
                   <h3 className="mt-1 font-serif text-lg leading-snug text-forest-950">{row.title}</h3>
-                  {kind === "actions" ? <p className="mt-1 text-xs font-medium text-ink-600">Unassigned · awaiting authorised acceptance</p> : kind === "chamber" ? <p className="mt-1 text-xs font-medium text-ink-600">Proposed · not yet convened</p> : null}
+                  {kind === "chamber" ? <p className="mt-1 text-xs font-medium text-ink-600">Proposed · not yet convened</p> : null}
                 </div>
                 <StatusBadge status={kind === "actions" || kind === "chamber" ? "Proposed" : row.status} />
               </div>
