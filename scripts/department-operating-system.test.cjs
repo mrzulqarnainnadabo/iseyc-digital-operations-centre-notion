@@ -54,7 +54,7 @@ test("Notion adapters use the actual live register titles, property types and se
     assert.match(source, /"Programme \/ Work Item"/);
     assert.match(source, /Status: \{ status: \{ name: "Proposed" \} \}/);
   }
-  assert.match(programmes, /"Work Type": \{ select: \{ name: "Programme" \} \}/);
+  assert.match(programmes, /"Work Type": \{ select: \{ name: "Programme" \} \}/);\n  assert.match(programmes, /evidenceNote: urlProp\(props\["Evidence \/ Deliverable"\]\)/);
   assert.match(workplans, /"Work Type": \{ select: \{ name: "Operations" \} \}/);
   assert.match(reports, /NOTION_DEPARTMENT_REPORTS_DATABASE_ID/);
   for (const field of ["Report \/ Period", "Reporting Cycle", "Reporting Period Start", "Completed Work", "Risks & Blockers", "Decisions Required", "Outcomes \/ Evidence"]) {
