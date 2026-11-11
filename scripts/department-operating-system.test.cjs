@@ -62,8 +62,8 @@ test("Notion adapters use the actual live register titles, property types and se
   }
   assert.match(reports, /Status: \{ status: \{ name: "Draft" \} \}/);
   for (const source of [programmes, workplans, reports]) {
-    assert.match(source, /"digital-systems": "Software & Technology"/);
-    assert.match(source, /"civic-affairs": "Civic Department"/);
+    assert.match(source, /"digital-systems": "Digital Systems & Technology"/);
+    assert.match(source, /"civic-affairs": "Civic Affairs & Public Accountability"/);
   }
   assert.doesNotMatch(reports, /props\.Name|props\["Report type"\]|Status: \{ select:/);
   assert.match(reports, /properties\["Reporting Period Start"\] = \{\s*date: \{ start: input\.periodStart, \.\.\.\(input\.periodEnd/);
@@ -139,8 +139,8 @@ test("department adapters preserve canonical UI labels while writing exact live 
     "lib/notion-department-reports.ts",
   ]) {
     const source = read(file);
-    assert.match(source, /"digital-systems": "Software & Technology"/);
-    assert.match(source, /"civic-affairs": "Civic Department"/);
+    assert.match(source, /"digital-systems": "Digital Systems & Technology"/);
+    assert.match(source, /"civic-affairs": "Civic Affairs & Public Accountability"/);
     assert.match(source, /Department: \{ select: \{ name: DEPARTMENT_SELECT\[input\.departmentId\] \} \}/);
   }
   assert.match(model, /case "software & technology":\s*return "digital-systems"/);
