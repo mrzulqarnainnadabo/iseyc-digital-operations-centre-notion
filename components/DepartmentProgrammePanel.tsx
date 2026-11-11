@@ -260,9 +260,10 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName,
       {!loaded && !error ? <p className="text-sm text-ink-600">Loading programmes…</p> : null}
 
       {loaded && configured && rows.length === 0 ? (
-        <p className="rounded-card border border-line bg-white p-4 text-sm text-ink-600">
-          No programmes on the returned page for this department.
-        </p>
+        <div className="rounded-xl border border-dashed border-[#d9e1d8] bg-[#f8faf7] p-4">
+          <p className="text-sm font-semibold text-[#35483d]">No programme proposals returned</p>
+          <p className="mt-1 text-xs leading-5 text-[#68736b]">There are no programme entries on the current result page for this department.</p>
+        </div>
       ) : null}
 
       <div className="space-y-3">
