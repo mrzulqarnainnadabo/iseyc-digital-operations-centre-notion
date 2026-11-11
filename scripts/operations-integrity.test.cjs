@@ -239,7 +239,7 @@ test("institutional design tokens and reduced-motion accessibility are present",
   assert.match(shell, /fixed inset-x-0 bottom-0/);
   assert.match(shell, /aria-label="Primary navigation"/);
   assert.match(shell, /min-h-\[44px\]/);
-  assert.match(dashboard, /Four departments organise the work/);
+  assert.match(dashboard, /Dedicated department workspaces\. Shared coordination\. Human decisions\./);
   assert.match(dashboard, /Drafts are not approvals/);
   assert.match(dashboard, /No confirmed appointments are recorded yet/);
 });
