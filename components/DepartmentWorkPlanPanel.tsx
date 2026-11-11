@@ -79,10 +79,14 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName, 
         departmentId,
         objective,
         deliverable,
+        startDate,
+        dueDate,
+        priority,
+        riskLevel,
+        contributors,
         accountableRole,
         evidenceUrl,
       };
-      if (dueDate) body.dueDate = dueDate;
       const r = await fetch("/ops/api/department-workplans", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
