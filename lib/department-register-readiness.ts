@@ -16,45 +16,45 @@ export type DepartmentRegisterReadiness = {
 const REQUIRED_PROPERTIES = {
   programmes: {
     Programme: {
-      "Programme / Work Item": "title",
-      Department: "select",
-      "Work Type": "select",
-      Status: "status",
-      "Intended Outcome": "rich_text",
-      "Acceptance Criteria": "rich_text",
-      "Accountable Role": "rich_text",
-      Priority: "select",
-      "Risk Level": "select",
-      Contributors: "rich_text",
-      "Start Date": "date",
-      "Due Date": "date",
-      "Evidence / Deliverable": "url",
+      "Programme / Work Item": { type: "title" },
+      Department: { type: "select", options: ["Education & Capacity Building", "Health & Well-being", "Digital Systems & Technology", "Civic Affairs & Public Accountability", "Cross-departmental"] },
+      "Work Type": { type: "select", options: ["Programme", "Project", "Training", "Research", "Operations", "Community Engagement"] },
+      Status: { type: "status" },
+      "Intended Outcome": { type: "rich_text" },
+      "Acceptance Criteria": { type: "rich_text" },
+      "Accountable Role": { type: "rich_text" },
+      Priority: { type: "select", options: ["Critical", "High", "Medium", "Low"] },
+      "Risk Level": { type: "select", options: ["Low", "Moderate", "High", "Critical"] },
+      Contributors: { type: "rich_text" },
+      "Start Date": { type: "date" },
+      "Due Date": { type: "date" },
+      "Evidence / Deliverable": { type: "url" },
     },
   },
   reports: {
     Reports: {
-      "Report / Period": "title",
-      Department: "select",
-      "Reporting Cycle": "select",
-      Status: "status",
-      "Reporting Period Start": "date",
-      "Reporting Period End": "date",
-      "Completed Work": "rich_text",
-      Outputs: "rich_text",
-      "Planned Work": "rich_text",
-      "Prepared By Role": "rich_text",
-      "Risks & Blockers": "rich_text",
-      "Decisions Required": "rich_text",
-      "Outcomes / Evidence": "rich_text",
-      "Evidence Links": "url",
-      "Data Limitations": "rich_text",
+      "Report / Period": { type: "title" },
+      Department: { type: "select", options: ["Education & Capacity Building", "Health & Well-being", "Digital Systems & Technology", "Civic Affairs & Public Accountability", "Cross-departmental"] },
+      "Reporting Cycle": { type: "select", options: ["Weekly", "Monthly", "Quarterly", "Annual"] },
+      Status: { type: "status" },
+      "Reporting Period Start": { type: "date" },
+      "Reporting Period End": { type: "date" },
+      "Completed Work": { type: "rich_text" },
+      Outputs: { type: "rich_text" },
+      "Planned Work": { type: "rich_text" },
+      "Prepared By Role": { type: "rich_text" },
+      "Risks & Blockers": { type: "rich_text" },
+      "Decisions Required": { type: "rich_text" },
+      "Outcomes / Evidence": { type: "rich_text" },
+      "Evidence Links": { type: "url" },
+      "Data Limitations": { type: "rich_text" },
     },
   },
 } as const;
 
 async function checkRegister(
   envName: "NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID" | "NOTION_DEPARTMENT_REPORTS_DATABASE_ID",
-  required: Record<string, string>,
+  required: Record<string, { type: string; options?: readonly string[] }>,
 ): Promise<RegisterCheck> {
   const databaseId = dbId(envName);
   if (!databaseId) {
@@ -89,7 +89,14 @@ async function checkRegister(
     }
 
     const missingProperties = Object.entries(required)
-      .filter(([name, type]) => properties[name]?.type !== type)
+      .filter(([name, specification]) => {
+        const property = properties[name];
+        if (property?.type !== specification.type) return true;
+        if (!specification.options) return false;
+        const available = property?.select?.options ?? [];
+        const names = Array.isArray(available) ? available.map((option: any) => option.name) : [];
+        return specification.options.some((option) => !names.includes(option));
+      })
       .map(([name]) => name);
 
     return {
