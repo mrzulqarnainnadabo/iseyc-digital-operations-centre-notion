@@ -84,7 +84,8 @@ test("department snapshot adapter validates the Observatory v1 contract and pres
   assert.match(adapter, /payload\.recordCount !== payload\.records\.length/);
   assert.match(adapter, /httpsUrl\(value\.sourceUrl\)/);
   assert.match(adapter, /value\.limitations\.every\(nonEmpty\)/);
-  assert.match(adapter, /departmentIds/);
+  assert.match(adapter, /departmentIds\.every\(nonEmpty\)/);
+  assert.match(adapter, /payload\.limitations\.length > 10/);
   assert.match(adapter, /AbortSignal\.timeout\(8000\)/);
   assert.match(page, /getDepartmentSnapshots\(department\)/);
   assert.match(page, /Snapshot · not a live publisher feed/);
