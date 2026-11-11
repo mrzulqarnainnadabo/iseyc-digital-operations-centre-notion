@@ -219,7 +219,7 @@ test("every Operations Centre API route is private and every mutation is same-or
     }
     assert.ok(source.includes("privateJson(") || source.includes("privateResponseHeaders("), `${route} must use private no-store response handling in its handler`);
 
-    const methods = [...source.matchAll(/export async function (GET|POST|PUT|PATCH|DELETE)\\s*\\(/g)]
+    const methods = [...source.matchAll(/export async function (GET|POST|PUT|PATCH|DELETE)\s*\(/g)]
       .map((match) => match[1]);
     for (const method of methods.filter((item) => item !== "GET")) {
       const body = source.slice(source.indexOf(`export async function ${method}`));
