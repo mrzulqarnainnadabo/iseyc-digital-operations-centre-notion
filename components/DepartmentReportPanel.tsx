@@ -244,7 +244,10 @@ export default function DepartmentReportPanel({ departmentId, departmentName, ev
       )}
 
       {error ? (<p role="alert" className="rounded-control border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">{error}</p>) : null}
-      {loaded && configured && rows.length === 0 ? (<p className="text-sm text-ink-600">No reports on the returned page for this department.</p>) : null}
+      {loaded && configured && rows.length === 0 ? (<div className="rounded-xl border border-dashed border-[#d9e1d8] bg-[#f8faf7] p-4">
+          <p className="text-sm font-semibold text-[#35483d]">No reports returned</p>
+          <p className="mt-1 text-xs leading-5 text-[#68736b]">There are no report entries on the current result page for this department.</p>
+        </div>) : null}
       <ul className="space-y-2">
         {rows.map((row) => (
           <li key={row.id} className="rounded-control border border-line bg-white p-3">
