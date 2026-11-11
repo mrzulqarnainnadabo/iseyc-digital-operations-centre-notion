@@ -125,7 +125,7 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
         </div>
         <section className="rounded-xl border border-amber-200 bg-amber-50 p-4">
           <p className="text-sm font-semibold text-amber-950">Authority and record boundary</p>
-          <p className="mt-1 text-xs leading-5 text-amber-900">A role label is not an appointment. The accountable role field does not assign access or imply a named appointment. A meeting reference is context, not proof of a decision. Records created here remain initial states. Approval, publication, closure and formal decisions remain human-authorised and require verified individual authority and audit.</p>
+          <p className="mt-1 text-xs leading-5 text-amber-900">A role label is not an appointment or an accepted action assignment. The proposed owner role field does not assign access or imply a named officer. A meeting reference is context, not proof of a decision. Records created here remain initial states. Approval, publication, closure and formal decisions remain human-authorised and require verified individual authority and audit.</p>
         </section>
       </header>
 
@@ -139,8 +139,8 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
 
           {kind === "actions" ? <>
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="block text-sm font-semibold text-ink-800">Accountable owner role · required
-                <input required minLength={2} maxLength={180} value={detail} onChange={(e) => setDetail(e.target.value)} className={field} placeholder="Role title only — no appointment claim" />
+              <label className="block text-sm font-semibold text-ink-800">Proposed owner role · required
+                <input required minLength={2} maxLength={180} value={detail} onChange={(e) => setDetail(e.target.value)} className={field} placeholder="Role title only — not a named or accepted assignment" />
               </label>
               <label className="block text-sm font-semibold text-ink-800">Due date · required
                 <input required type="date" value={date} onChange={(e) => setDate(e.target.value)} className={field} />
@@ -237,7 +237,7 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
           {rows.map((row) => (
             <article key={row.id} className="rounded-card border border-line bg-white p-4 shadow-card">
               <div className="flex flex-wrap items-start justify-between gap-2"><h3 className="font-semibold text-forest-950">{row.title}</h3><StatusBadge status={row.status} /></div>
-              {row.detail ? <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-ink-700">{row.detail}</p> : null}
+              {row.detail ? {kind === "actions" ? <p className="mt-2 text-sm leading-6 text-ink-700"><strong>Proposed owner role:</strong> {row.detail}</p> : <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-ink-700">{row.detail}</p>} : null}
               {row.date ? <p className="mt-1 text-xs text-ink-600">{row.date}</p> : null}
               {kind === "actions" ? <div className="mt-3 flex flex-wrap gap-2 text-[10px]">
                 {row.department ? <span className="rounded-full bg-cream-50 px-2.5 py-1 font-semibold text-forest-900">{row.department}</span> : null}
