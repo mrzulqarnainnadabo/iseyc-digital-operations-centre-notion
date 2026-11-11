@@ -39,7 +39,7 @@ Other existing Work Type options include Project, Training, Research and Communi
 | Accountable Role | Text | Role title only; does not appoint a person |
 | Start Date | Date | Programme start date |
 | Due Date | Date | Programme end date or work-plan due date |
-| Evidence / Deliverable | URL | Evidence link read by the programme adapter |
+| Evidence / Deliverable | URL | Optional HTTPS source/deliverable link read and written by programme and operations adapters |
 
 The live database also contains Priority, Risk Level, Budget Requested, Budget Approved, Actual Spend, Approval Reference, Contributors and Last Reviewed. These properties exist in Notion but are **not yet fully surfaced or governed by the current application adapters**. Do not assume that the app validates budgets, approvals or risk decisions.
 
@@ -80,8 +80,10 @@ The application creates programme and work-plan records in **Proposed** status. 
 | Risks & Blockers | Text | Challenges, constraints and unresolved risks |
 | Decisions Required | Text | Outstanding decisions and actions |
 | Outcomes / Evidence | Text | Outcome narrative and evidence summary |
+| Evidence Links | URL | Optional HTTPS source link read and written by the report adapter |
+| Data Limitations | Text | Limitations read and written by the report adapter |
 
-The live database also contains Evidence Links (URL), Outputs, Planned Work, Budget Summary, Data Limitations, Prepared By Role and Reviewed By Role. These fields are present in Notion but are **not yet all mapped into the current API and UI**. The current adapter reads/writes the two period dates as separate properties; it must not treat the start field as a date range.
+The live database also contains Outputs, Planned Work, Budget Summary, Prepared By Role and Reviewed By Role. These fields exist in Notion but are not yet mapped into the current API and UI. Evidence Links and Data Limitations are mapped; evidence URLs must use HTTPS. The current adapter reads/writes the two period dates as separate properties; it must not treat the start field as a date range.
 
 The application creates reports as **Draft**. A draft report is not accepted, certified or published. Submission, acceptance and outcome verification remain separate human-controlled decisions.
 

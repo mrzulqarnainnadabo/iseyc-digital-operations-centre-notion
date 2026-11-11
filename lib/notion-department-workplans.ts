@@ -91,6 +91,7 @@ export async function createDepartmentWorkPlanDraft(input: {
   deliverable?: string;
   dueDate?: string;
   accountableRole?: string;
+  evidenceUrl?: string;
 }): Promise<{ id: string; url: string; status: string }> {
   const { client, databaseId } = database();
   if (!isOpsDepartmentId(input.departmentId)) throw new Error("Invalid department.");
@@ -110,6 +111,7 @@ export async function createDepartmentWorkPlanDraft(input: {
     properties["Accountable Role"] = { rich_text: [{ text: { content: input.accountableRole.slice(0, 180) } }] };
   }
   if (input.dueDate) properties["Due Date"] = { date: { start: input.dueDate } };
+  if (input.evidenceUrl) properties["Evidence / Deliverable"] = { url: input.evidenceUrl };
   const page = await client.pages.create({ parent: { database_id: databaseId }, properties: properties as any });
   return { id: page.id, url: (page as any).url || "", status: "Proposed" };
 }

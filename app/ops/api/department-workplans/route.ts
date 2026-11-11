@@ -15,6 +15,16 @@ export const dynamic = "force-dynamic";
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const CURSOR_RE = /^[a-f0-9-]{32,36}$/i;
 
+function validEvidenceUrl(value: string): boolean {
+  if (!value) return true;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && !url.username && !url.password;
+  } catch {
+    return false;
+  }
+}
+
 function validDate(value: string): boolean {
   if (!DATE_RE.test(value)) return false;
   const parsed = Date.parse(value + "T00:00:00.000Z");
@@ -102,6 +112,7 @@ export async function POST(request: NextRequest) {
     "deliverable",
     "dueDate",
     "accountableRole",
+    "evidenceUrl",
   ];
   if (Object.keys(input).some((key) => !allowed.includes(key))) {
     return privateJson({ ok: false, error: "Unexpected fields." }, { status: 400 });
@@ -123,6 +134,11 @@ export async function POST(request: NextRequest) {
   }
   const str = (key: string, max: number) =>
     typeof input[key] === "string" ? (input[key] as string).trim().slice(0, max) : "";
+  const evidenceUrl = str("evidenceUrl", 2048);
+  if (!validEvidenceUrl(evidenceUrl)) {
+    return privateJson({ ok: false, error: "Evidence link must be a valid HTTPS URL." }, { status: 400 });
+  }
+
   try {
     const created = await createDepartmentWorkPlanDraft({
       title,
@@ -131,6 +147,7 @@ export async function POST(request: NextRequest) {
       deliverable: str("deliverable", 1800),
       dueDate: dueDate || undefined,
       accountableRole: str("accountableRole", 180),
+      evidenceUrl: evidenceUrl || undefined,
     });
     return privateJson(
       {

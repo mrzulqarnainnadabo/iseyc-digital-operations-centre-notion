@@ -19,6 +19,7 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
   const [acceptanceCriteria, setAcceptanceCriteria] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [evidenceUrl, setEvidenceUrl] = useState("");
 
   const refresh = useCallback(
     async (append = false) => {
@@ -81,6 +82,7 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
           deliverables: acceptanceCriteria,
           startDate,
           endDate,
+          evidenceUrl,
         }),
       });
       const j = await r.json();
@@ -91,6 +93,7 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
       setAcceptanceCriteria("");
       setStartDate("");
       setEndDate("");
+      setEvidenceUrl("");
       await refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not save programme.");
@@ -158,6 +161,11 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
             <label className="block text-sm font-semibold text-ink-800">
               Due date
               <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal" />
+            </label>
+            <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
+              Evidence / deliverable URL (optional)
+              <input type="url" maxLength={2048} value={evidenceUrl} onChange={(e) => setEvidenceUrl(e.target.value)} placeholder="https://…" className="mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal" />
+              <span className="mt-1 block text-xs font-normal text-ink-600">Link to the relevant Intelligence Observatory snapshot or source record.</span>
             </label>
             <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
               Acceptance criteria
@@ -244,6 +252,9 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName 
                 </div>
               )}
             </dl>
+            {row.evidenceNote ? (
+              <a href={row.evidenceNote} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-9 items-center text-sm font-semibold text-forest-800 underline">Open evidence / deliverable ↗</a>
+            ) : null}
             {row.url ? (
               <a
                 href={row.url}

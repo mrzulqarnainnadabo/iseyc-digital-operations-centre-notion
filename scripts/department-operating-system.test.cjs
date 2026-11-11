@@ -20,6 +20,11 @@ test("department programme work-plan and report APIs are authenticated draft-onl
   assert.doesNotMatch(programmeRoute, /input\.status|statusRaw/);
   assert.match(read("app/ops/api/department-workplans/route.ts"), /Proposed/);
   assert.match(read("app/ops/api/department-reports/route.ts"), /not institutional approval/);
+  for (const route of [programmeRoute, read("app/ops/api/department-workplans/route.ts"), read("app/ops/api/department-reports/route.ts")]) {
+    assert.match(route, /validEvidenceUrl/);
+    assert.match(route, /evidenceUrl/);
+  }
+  assert.match(read("app/ops/api/department-reports/route.ts"), /dataLimitations/);
   const reportRoute = read("app/ops/api/department-reports/route.ts");
   assert.match(reportRoute, /REPORT_TYPES: ReportType\[\] = \["Weekly", "Monthly", "Quarterly", "Annual"\]/);
   assert.match(reportRoute, /periodEnd < periodStart/);
@@ -56,6 +61,8 @@ test("Notion adapters use the actual live register titles, property types and se
   }
   assert.match(programmes, /"Work Type": \{ select: \{ name: "Programme" \} \}/);
   assert.match(programmes, /evidenceNote: urlProp\(props\["Evidence \/ Deliverable"\]\)/);
+  assert.match(programmes, /properties\["Evidence \/ Deliverable"\] = \{ url: input\.evidenceUrl \}/);
+  assert.match(workplans, /properties\["Evidence \/ Deliverable"\] = \{ url: input\.evidenceUrl \}/);
   assert.match(workplans, /"Work Type": \{ select: \{ name: "Operations" \} \}/);
   assert.match(reports, /NOTION_DEPARTMENT_REPORTS_DATABASE_ID/);
   for (const field of ["Report \/ Period", "Reporting Cycle", "Reporting Period Start", "Completed Work", "Risks & Blockers", "Decisions Required", "Outcomes \/ Evidence"]) {
@@ -70,6 +77,10 @@ test("Notion adapters use the actual live register titles, property types and se
   assert.match(reports, /properties\["Reporting Period Start"\] = \{ date: \{ start: input\.periodStart \} \}/);
   assert.match(reports, /properties\["Reporting Period End"\] = \{ date: \{ start: input\.periodEnd \} \}/);
   assert.match(reports, /periodEnd: textProp\(props\["Reporting Period End"\]\)/);
+  assert.match(reports, /evidenceUrl: urlProp\(props\["Evidence Links"\]\)/);
+  assert.match(reports, /dataLimitations: textProp\(props\["Data Limitations"\]\)/);
+  assert.match(reports, /properties\["Evidence Links"\] = \{ url: input\.evidenceUrl \}/);
+  assert.match(reports, /properties\["Data Limitations"\] = \{ rich_text:/);
 
 });
 
@@ -96,6 +107,9 @@ test("department desks mount programme work-plan and report panels with tools", 
   assert.match(read("components/DepartmentProgrammePanel.tsx"), /Save programme proposal/);
   assert.match(read("components/DepartmentWorkPlanPanel.tsx"), /Save work-plan item/);
   assert.match(read("components/DepartmentReportPanel.tsx"), /Save report draft/);
+  assert.match(read("components/DepartmentProgrammePanel.tsx"), /Evidence \/ deliverable URL/);
+  assert.match(read("components/DepartmentWorkPlanPanel.tsx"), /Evidence \/ deliverable URL/);
+  assert.match(read("components/DepartmentReportPanel.tsx"), /Data limitations/);
   const desk = read("app/ops/departments/[department]/page.tsx");
   assert.match(desk, /DepartmentProgrammePanel/);
   assert.match(desk, /DepartmentWorkPlanPanel/);

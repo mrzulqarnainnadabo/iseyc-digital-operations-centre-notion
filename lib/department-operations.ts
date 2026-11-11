@@ -119,6 +119,8 @@ export type DepartmentReportRecord = {
   challenges: string;
   outstandingActions: string;
   recommendations: string;
+  evidenceUrl: string;
+  dataLimitations: string;
   status: "Draft" | "Submitted" | "Under Review" | "Accepted" | "Revision Required" | "Archived" | "Unspecified";
   url: string;
 };
