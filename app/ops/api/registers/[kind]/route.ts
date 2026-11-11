@@ -68,7 +68,7 @@ export async function POST(request: NextRequest, context: Context) {
     if (sourceMeetingId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sourceMeetingId)) return privateJson({ ok: false, error: "Choose a valid source meeting." }, { status: 400 });
   }
   if (date && (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(date + "T00:00:00.000Z")) || new Date(date + "T00:00:00.000Z").toISOString().slice(0, 10) !== date)) return privateJson({ ok: false, error: "Date must be a valid calendar date in YYYY-MM-DD format." }, { status: 400 });
-  if ((kind === "actions" || kind === "chamber") && !date) return privateJson({ ok: false, error: kind === "actions" ? "An accountable owner and due date are required for every action." : "A session date is required before scheduling a Chamber session." }, { status: 400 });
+  if ((kind === "actions" || kind === "chamber") && !date) return privateJson({ ok: false, error: kind === "actions" ? "A proposed owner role and due date are required before an action can be recorded. This does not assign an officer." : "A session date is required before scheduling a Chamber session." }, { status: 400 });
   if (kind === "actions" && detail.length < 2) return privateJson({ ok: false, error: "Enter the responsible officer role for this action." }, { status: 400 });
   if (kind === "media" && !["X", "WhatsApp", "Website", "Other"].includes(channel)) return privateJson({ ok: false, error: "Choose a valid communications channel." }, { status: 400 });
   try {
