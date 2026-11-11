@@ -63,6 +63,11 @@ function mapRow(page: any): DepartmentReportRecord {
     challenges: textProp(props["Risks & Blockers"]),
     outstandingActions: textProp(props["Decisions Required"]),
     recommendations: textProp(props["Outcomes / Evidence"]),
+    outputs: textProp(props.Outputs),
+    plannedWork: textProp(props["Planned Work"]),
+    preparedByRole: textProp(props["Prepared By Role"]),
+    reviewedByRole: textProp(props["Reviewed By Role"]),
+    budgetSummary: textProp(props["Budget Summary"]),
     evidenceUrl: urlProp(props["Evidence Links"]),
     dataLimitations: textProp(props["Data Limitations"]),
     status,
@@ -98,6 +103,9 @@ export async function createDepartmentReportDraft(input: {
   challenges?: string;
   outstandingActions?: string;
   recommendations?: string;
+  outputs?: string;
+  plannedWork?: string;
+  preparedByRole?: string;
   evidenceUrl?: string;
   dataLimitations?: string;
 }): Promise<{ id: string; url: string; status: string }> {
@@ -123,6 +131,9 @@ export async function createDepartmentReportDraft(input: {
   if (input.challenges) properties["Risks & Blockers"] = { rich_text: [{ text: { content: input.challenges.slice(0, 1800) } }] };
   if (input.outstandingActions) properties["Decisions Required"] = { rich_text: [{ text: { content: input.outstandingActions.slice(0, 1800) } }] };
   if (input.recommendations) properties["Outcomes / Evidence"] = { rich_text: [{ text: { content: input.recommendations.slice(0, 1800) } }] };
+  if (input.outputs) properties.Outputs = { rich_text: [{ text: { content: input.outputs.slice(0, 1800) } }] };
+  if (input.plannedWork) properties["Planned Work"] = { rich_text: [{ text: { content: input.plannedWork.slice(0, 1800) } }] };
+  if (input.preparedByRole) properties["Prepared By Role"] = { rich_text: [{ text: { content: input.preparedByRole.slice(0, 180) } }] };
   if (input.evidenceUrl) properties["Evidence Links"] = { url: input.evidenceUrl };
   if (input.dataLimitations) properties["Data Limitations"] = { rich_text: [{ text: { content: input.dataLimitations.slice(0, 1800) } }] };
   const page = await client.pages.create({ parent: { database_id: databaseId }, properties: properties as any });
