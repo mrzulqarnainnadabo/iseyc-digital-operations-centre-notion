@@ -168,7 +168,7 @@ export default function OperationalRegister({ kind, initialMeetingId = "" }: { k
           <span aria-hidden="true" className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border border-[#e5ddc9] bg-white text-sm font-semibold text-[#8a6b34]">i</span>
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#5b513d]">Authority boundary</p>
-            <p className="mt-1 text-xs leading-5 text-[#5d625a]">New entries begin as proposals. Role labels and meeting links do not assign people or certify decisions. Approval, publication and closure require separately verified human authority.</p>
+            <p className="mt-1 text-xs leading-5 text-[#5d625a]">New entries begin as proposals. Role labels and meeting links do not assign people or certify decisions. Approval, publication and closure remain human-authorised and require separately verified authority.</p>
           </div>
         </section>
       </header>
