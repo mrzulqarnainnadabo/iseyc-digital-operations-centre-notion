@@ -236,7 +236,7 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
       ) : configured === false ? (
         <section role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-4">
           <p className="text-sm font-semibold text-amber-950">Record entry unavailable</p>
-          <p className="mt-1 text-xs leading-5 text-amber-900">The {KIND_LABEL[kind].toLowerCase()} register is not confirmed as connected. Configure its Notion database access and refresh before creating records. No entry has been saved.</p>
+          <p className="mt-1 text-xs leading-5 text-amber-900">The {KIND_LABEL[kind].toLowerCase()} register could not be confirmed as available. Check the connection and access, then refresh before creating records. No entry has been saved.</p>
         </section>
       ) : (
         <p role="status" className="rounded-xl border border-[#e1e7df] bg-[#f8faf7] p-4 text-sm text-[#68736b]">Checking the register connection. Record entry becomes available only after the connection is confirmed.</p>
