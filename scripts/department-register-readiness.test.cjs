@@ -25,9 +25,15 @@ test("department register readiness checks the app's own credentials and exact s
     "Work Type",
     "Intended Outcome",
     "Acceptance Criteria",
+    "Priority",
+    "Risk Level",
+    "Contributors",
     "Report / Period",
     "Reporting Cycle",
     "Completed Work",
+    "Outputs",
+    "Planned Work",
+    "Prepared By Role",
     "Data Limitations",
   ]) assert.ok(adapter.includes(property), "required schema field missing: " + property);
 
