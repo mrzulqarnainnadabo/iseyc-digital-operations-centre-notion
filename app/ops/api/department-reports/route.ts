@@ -117,6 +117,9 @@ export async function POST(request: NextRequest) {
     "challenges",
     "outstandingActions",
     "recommendations",
+    "outputs",
+    "plannedWork",
+    "preparedByRole",
     "evidenceUrl",
     "dataLimitations",
   ];
@@ -167,6 +170,9 @@ export async function POST(request: NextRequest) {
       challenges: str("challenges", 1800),
       outstandingActions: str("outstandingActions", 1800),
       recommendations: str("recommendations", 1800),
+      outputs: str("outputs", 1800),
+      plannedWork: str("plannedWork", 1800),
+      preparedByRole: str("preparedByRole", 180),
       evidenceUrl: evidenceUrl || undefined,
       dataLimitations: str("dataLimitations", 1800),
     });
