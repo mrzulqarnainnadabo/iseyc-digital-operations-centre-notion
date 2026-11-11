@@ -27,7 +27,7 @@ const KIND_LABEL: Record<Kind, string> = { actions: "Actions", media: "Communica
 const field = "mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal text-ink-950";
 const area = "mt-1 w-full rounded-control border border-line bg-cream-50 px-3 py-2 text-sm font-normal leading-5 text-ink-950";
 
-export default function OperationalRegister({ kind, initialMeetingId = "" }: { kind: Kind; initialMeetingId?: string }) {
+export default function OperationalRegister({ kind, initialMeetingId = "", initialNotes = "" }: { kind: Kind; initialMeetingId?: string; initialNotes?: string }) {
   const [rows, setRows] = useState<RecordRow[]>([]);
   const [title, setTitle] = useState("");
   const [detail, setDetail] = useState("");
@@ -37,7 +37,7 @@ export default function OperationalRegister({ kind, initialMeetingId = "" }: { k
   const [priority, setPriority] = useState("Normal");
   const [expectedEvidence, setExpectedEvidence] = useState("");
   const [blocker, setBlocker] = useState("");
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useState(initialNotes);
   const [sourceMeetingId, setSourceMeetingId] = useState(initialMeetingId);
   const [meetings, setMeetings] = useState<MeetingOption[]>([]);
   const [meetingSourceError, setMeetingSourceError] = useState("");
