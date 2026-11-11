@@ -648,9 +648,9 @@ test("readiness register distinguishes not-operational modules from partial work
   assert.ok(readiness.includes("Not connected"));
   assert.ok(readiness.includes("not verified individual identity"));
   assert.ok(readiness.includes("Do not enter real membership"));
-  assert.ok(dashboard.includes("Environment configuration"));
+  assert.ok(readiness.includes("No programme instances are invented when disconnected"));
+  assert.ok(readiness.includes("NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID"));
   assert.ok(dashboard.includes("Not connected"));
-  assert.ok(dashboard.includes("Configured"));
   assert.ok(dashboard.includes('href="/ops/readiness"'));
 });
 
