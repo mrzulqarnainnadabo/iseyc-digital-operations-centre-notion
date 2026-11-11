@@ -262,6 +262,7 @@ export default async function DepartmentDeskPage({
                             <p className="text-[10px] font-medium leading-4 text-[#68736b]">{metric.label}</p>
                             <p className="mt-1 text-lg font-semibold leading-tight tabular-nums text-[#173c30]">{metric.value}</p>
                             <p className="mt-1 text-[9px] leading-4 text-[#7a837c]">{metric.unit} · {metric.period}</p>
+                            <p className="mt-1 text-[9px] leading-4 text-[#7a837c]">{metric.measurementType}</p>
                             {metric.interval ? <p className="mt-1 text-[9px] text-[#7a837c]">Published interval: {metric.interval}</p> : null}
                           </div>
                         ))}
