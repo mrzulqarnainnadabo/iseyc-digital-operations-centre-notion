@@ -60,7 +60,7 @@ test("department operating model defines the shared intelligence-to-action bound
 
 test("each department workspace renders only validated Observatory evidence or an explicit gap state", () => {
   const page = read("app/ops/departments/[department]/page.tsx");
-  assert.match(page, /getDepartmentEvidence\(profile\.publicSlug\)/);
+  assert.match(page, /getDepartmentEvidence\(evidenceSlug\)/);
   assert.match(page, /id="intelligence"/);
   assert.match(page, /evidence\.status === "ready" \|\| evidence\.status === "stale"/);
   assert.match(page, /evidence\.status === "not-integrated"/);
