@@ -19,9 +19,9 @@ const TITLES: Record<Kind, string> = {
   chamber: "Council and Chamber sessions",
 };
 const DETAILS: Record<Kind, string> = {
-  actions: "Record proposed follow-up work from meetings and departmental priorities. An initial register entry is not an accepted assignment; progress reporting waits for verified officer identity and assignment.",
-  media: "Prepare institutional communications for factual and editorial review. Draft creation does not approve, publish or dispatch content.",
-  chamber: "Prepare formal institutional sessions with an agenda, chair and secretary roles, attendance basis and draft decision notes. These records do not certify quorum or decisions.",
+  actions: "Propose follow-up work from meetings or department priorities. New entries are unassigned; progress requires verified officer identity and accepted assignment.",
+  media: "Prepare communications for factual and editorial review. Saving a draft does not approve or publish it.",
+  chamber: "Prepare Council sessions, agendas and draft notes. Records do not certify attendance, quorum or decisions.",
 };
 const KIND_LABEL: Record<Kind, string> = { actions: "Actions", media: "Communications", chamber: "Chamber" };
 const field = "mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal text-ink-950";
