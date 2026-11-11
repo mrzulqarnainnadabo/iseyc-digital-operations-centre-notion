@@ -7,6 +7,7 @@ import {
   getDepartmentOperatingProfile,
   isOpsDepartmentId,
   type OpsDepartmentId,
+  type DepartmentEvidenceOption,
 } from "@/lib/department-operations";
 import DepartmentProgrammePanel from "@/components/DepartmentProgrammePanel";
 import DepartmentWorkPlanPanel from "@/components/DepartmentWorkPlanPanel";
@@ -117,6 +118,17 @@ export default async function DepartmentDeskPage({
 
   const recent = [...meetings].sort((a, b) => b.meetingDate.localeCompare(a.meetingDate)).slice(0, 5);
   const [evidence, snapshots] = await Promise.all([evidencePromise, snapshotsPromise]);
+  const evidenceOptions: DepartmentEvidenceOption[] =
+    snapshots.status === "ready" || snapshots.status === "stale"
+      ? snapshots.records.map((record) => ({
+          id: record.id,
+          title: record.title,
+          publisher: record.publisher,
+          referencePeriod: record.referencePeriod,
+          geographyLabel: record.geography.label,
+          sourceUrl: record.sourceUrl,
+        }))
+      : [];
 
   return (
     <main className={`mx-auto max-w-7xl space-y-6 pb-8 ops-department ops-department--${style.accent}`}>
@@ -364,18 +376,18 @@ export default async function DepartmentDeskPage({
 
       <section id="programmes" className="scroll-mt-5 rounded-2xl border border-[#e1e5dc] bg-white p-4 shadow-[0_4px_18px_rgba(20,49,38,.04)] sm:p-6">
         <div className="mb-4 flex items-center gap-3"><span className="h-8 w-1 rounded-full bg-[#a7833f]" /><div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">01 · Department delivery</p><h2 className="font-serif text-2xl text-[#173c30]">Programmes</h2></div></div>
-        <DepartmentProgrammePanel departmentId={department} departmentName={profile.name} />
+        <DepartmentProgrammePanel departmentId={department} departmentName={profile.name} evidenceOptions={evidenceOptions} />
       </section>
 
       <section className="grid scroll-mt-5 gap-4 lg:grid-cols-2">
         <article id="work-plans" className="rounded-2xl border border-[#e1e5dc] bg-white p-4 shadow-[0_4px_18px_rgba(20,49,38,.04)] sm:p-5">
           <p className="mb-3 text-[10px] leading-4 text-[#7a837c]">A department task register is Not connected until its Notion register is configured. No task records are simulated.</p>
           <div className="mb-3 flex items-center gap-3"><span className="h-8 w-1 rounded-full bg-[#315b45]" /><div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">02 · Execution</p><h2 className="font-serif text-xl text-[#173c30]">Work plans</h2></div></div>
-          <DepartmentWorkPlanPanel departmentId={department} departmentName={profile.name} />
+          <DepartmentWorkPlanPanel departmentId={department} departmentName={profile.name} evidenceOptions={evidenceOptions} />
         </article>
         <article id="reports" className="scroll-mt-5 rounded-2xl border border-[#e1e5dc] bg-white p-4 shadow-[0_4px_18px_rgba(20,49,38,.04)] sm:p-5">
           <div className="mb-3 flex items-center gap-3"><span className="h-8 w-1 rounded-full bg-[#a7833f]" /><div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">03 · Documentation</p><h2 className="font-serif text-xl text-[#173c30]">Department reports</h2></div></div>
-          <DepartmentReportPanel departmentId={department} departmentName={profile.name} />
+          <DepartmentReportPanel departmentId={department} departmentName={profile.name} evidenceOptions={evidenceOptions} />
         </article>
       </section>
 
