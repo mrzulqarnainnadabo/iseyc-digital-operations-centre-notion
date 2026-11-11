@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { StatusBadge } from "@/components/StatusBadge";
-import type { DepartmentEvidenceOption, OpsDepartmentId, WorkPlanRecord } from "@/lib/department-operations";
+import type { DepartmentEvidenceOption, OpsDepartmentId, WorkPlanRecord, WorkPriority, RiskLevel } from "@/lib/department-operations";
 
 type Props = { departmentId: OpsDepartmentId; departmentName: string; evidenceOptions: DepartmentEvidenceOption[] };
 
@@ -16,7 +16,11 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName, 
   const [title, setTitle] = useState("");
   const [objective, setObjective] = useState("");
   const [deliverable, setDeliverable] = useState("");
+  const [startDate, setStartDate] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [priority, setPriority] = useState<WorkPriority>("Unspecified");
+  const [riskLevel, setRiskLevel] = useState<RiskLevel>("Unspecified");
+  const [contributors, setContributors] = useState("");
   const [accountableRole, setAccountableRole] = useState("");
   const [evidenceUrl, setEvidenceUrl] = useState("");
 
@@ -89,7 +93,11 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName, 
       setTitle("");
       setObjective("");
       setDeliverable("");
+      setStartDate("");
       setDueDate("");
+      setPriority("Unspecified");
+      setRiskLevel("Unspecified");
+      setContributors("");
       setAccountableRole("");
       setEvidenceUrl("");
       await refresh();
@@ -138,8 +146,28 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName, 
             <input maxLength={1800} value={deliverable} onChange={(e) => setDeliverable(e.target.value)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
           </label>
           <label className="block text-sm font-semibold text-ink-800">
+            Start date
+            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
+          </label>
+          <label className="block text-sm font-semibold text-ink-800">
             Due date
             <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
+          </label>
+          <label className="block text-sm font-semibold text-ink-800">
+            Priority
+            <select value={priority} onChange={(e) => setPriority(e.target.value as WorkPriority)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal">
+              <option value="Unspecified">Not set</option><option value="Critical">Critical</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option>
+            </select>
+          </label>
+          <label className="block text-sm font-semibold text-ink-800">
+            Risk level
+            <select value={riskLevel} onChange={(e) => setRiskLevel(e.target.value as RiskLevel)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal">
+              <option value="Unspecified">Not assessed</option><option value="Low">Low</option><option value="Moderate">Moderate</option><option value="High">High</option><option value="Critical">Critical</option>
+            </select>
+          </label>
+          <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
+            Supporting teams / roles
+            <input maxLength={1000} value={contributors} onChange={(e) => setContributors(e.target.value)} placeholder="Departments or role titles only — no personal or sensitive details" className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
           </label>
           <label className="block text-sm font-semibold text-ink-800">
             Accountable role · title only
@@ -192,7 +220,12 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName, 
               <StatusBadge status={row.status} />
             </div>
             {row.objective ? <p className="mt-1 text-sm text-ink-700">{row.objective}</p> : null}
-            <p className="mt-1 text-xs text-ink-600">{[row.dueDate && `Due ${row.dueDate}`, row.accountableRole, row.deliverable].filter(Boolean).join(" · ")}</p>
+            <p className="mt-1 text-xs text-ink-600">{[row.startDate && `Start ${row.startDate}`, row.dueDate && `Due ${row.dueDate}`, row.accountableRole, row.deliverable].filter(Boolean).join(" · ")}</p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {row.priority !== "Unspecified" ? <span className="rounded-full border border-[#e4e8e1] bg-[#fafbf8] px-2.5 py-1 text-[10px] font-semibold text-[#405b49]">Priority · {row.priority}</span> : null}
+              {row.riskLevel !== "Unspecified" ? <span className="rounded-full border border-[#e4e8e1] bg-[#fafbf8] px-2.5 py-1 text-[10px] font-semibold text-[#805b27]">Risk · {row.riskLevel}</span> : null}
+            </div>
+            {row.contributors ? <p className="mt-2 text-xs text-ink-600"><span className="font-semibold">Supporting teams / roles:</span> {row.contributors}</p> : null}
             {row.evidenceNote ? <a href={row.evidenceNote} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-9 items-center text-sm font-semibold text-forest-800 underline">Open evidence / deliverable ↗</a> : null}
           </li>
         ))}
