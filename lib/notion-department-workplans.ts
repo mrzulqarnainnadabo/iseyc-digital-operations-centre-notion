@@ -10,8 +10,8 @@ const DEPARTMENT_SELECT: Record<OpsDepartmentId, string> = {
   education: "Education & Capacity Building",
   health: "Health & Well-being",
   // Persist using exact live Notion select options; UI labels remain canonical.
-  "digital-systems": "Software & Technology",
-  "civic-affairs": "Civic Department",
+  "digital-systems": "Digital Systems & Technology",
+  "civic-affairs": "Civic Affairs & Public Accountability",
 };
 
 function database() {
