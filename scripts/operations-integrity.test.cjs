@@ -188,6 +188,8 @@ test("actions, chamber and communications expose authenticated Notion-backed ini
   }
   const component = fs.readFileSync(path.join(root, "components/OperationalRegister.tsx"), "utf8");
   assert.match(component, /Save to Notion/);
+  assert.match(component, /<option>Website<\/option><option>X<\/option><option>WhatsApp<\/option><option>Other<\/option>/);
+  assert.match(read("app/ops/api/registers/[kind]/route.ts"), /\["X", "WhatsApp", "Website", "Other"\]/);
   assert.match(component, /human-authorised/);
   assert.match(component, /Proposed owner role · required/);
   assert.match(component, /Proposed action · unassigned · awaiting authorised acceptance/);
