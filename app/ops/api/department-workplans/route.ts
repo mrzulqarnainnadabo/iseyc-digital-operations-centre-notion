@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { privateJson } from "@/lib/private-response";
 import { requireStaffSession } from "@/lib/auth";
 import { isSameOriginRequest, readBoundedJson } from "@/lib/request-security";
-import { isOpsDepartmentId, type OpsDepartmentId } from "@/lib/department-operations";
+import { isOpsDepartmentId, type OpsDepartmentId, type WorkPriority, type RiskLevel } from "@/lib/department-operations";
 import {
   createDepartmentWorkPlanDraft,
   departmentWorkPlansConfigured,
@@ -110,8 +110,12 @@ export async function POST(request: NextRequest) {
     "departmentId",
     "objective",
     "deliverable",
+    "startDate",
     "dueDate",
     "accountableRole",
+    "priority",
+    "riskLevel",
+    "contributors",
     "evidenceUrl",
   ];
   if (Object.keys(input).some((key) => !allowed.includes(key))) {
@@ -128,12 +132,27 @@ export async function POST(request: NextRequest) {
   if (!isOpsDepartmentId(departmentId)) {
     return privateJson({ ok: false, error: "Select a valid department." }, { status: 400 });
   }
+  const startDate = typeof input.startDate === "string" ? input.startDate.trim() : "";
   const dueDate = typeof input.dueDate === "string" ? input.dueDate.trim() : "";
-  if (dueDate && !validDate(dueDate)) {
-    return privateJson({ ok: false, error: "Due date must be YYYY-MM-DD." }, { status: 400 });
+  if ((startDate && !validDate(startDate)) || (dueDate && !validDate(dueDate))) {
+    return privateJson({ ok: false, error: "Work-plan dates must be valid YYYY-MM-DD dates." }, { status: 400 });
+  }
+  if (startDate && dueDate && dueDate < startDate) {
+    return privateJson({ ok: false, error: "Due date cannot be earlier than the start date." }, { status: 400 });
   }
   const str = (key: string, max: number) =>
     typeof input[key] === "string" ? (input[key] as string).trim().slice(0, max) : "";
+  const priority = str("priority", 20);
+  const riskLevel = str("riskLevel", 20);
+  const contributors = str("contributors", 1000);
+  const priorities: WorkPriority[] = ["Critical", "High", "Medium", "Low", "Unspecified"];
+  const risks: RiskLevel[] = ["Low", "Moderate", "High", "Critical", "Unspecified"];
+  if (priority && !priorities.includes(priority as WorkPriority)) {
+    return privateJson({ ok: false, error: "Select a valid work-plan priority." }, { status: 400 });
+  }
+  if (riskLevel && !risks.includes(riskLevel as RiskLevel)) {
+    return privateJson({ ok: false, error: "Select a valid work-plan risk level." }, { status: 400 });
+  }
   const evidenceUrl = str("evidenceUrl", 2048);
   if (!validEvidenceUrl(evidenceUrl)) {
     return privateJson({ ok: false, error: "Evidence link must be a valid HTTPS URL." }, { status: 400 });
@@ -145,8 +164,12 @@ export async function POST(request: NextRequest) {
       departmentId,
       objective: str("objective", 1800),
       deliverable: str("deliverable", 1800),
+      startDate: startDate || undefined,
       dueDate: dueDate || undefined,
       accountableRole: str("accountableRole", 180),
+      priority: (priority || "Unspecified") as WorkPriority,
+      riskLevel: (riskLevel || "Unspecified") as RiskLevel,
+      contributors: contributors || undefined,
       evidenceUrl: evidenceUrl || undefined,
     });
     return privateJson(
