@@ -36,3 +36,30 @@ The integration reads already published, source-attributed public data. It does 
 ## Remaining limitations
 
 The Observatory pilot is limited to its published indicators and source periods. It does not provide a broad department-evidence feed, direct software/technology indicators, civic public-service indicators, state/LGA or facility-level education or health coverage, or a durable retrieval log. IDCC currently has no background scheduler, alerting, source-change history, broken-link monitor, or durable operational error-reporting service. On-demand refresh after the per-runtime cache expires is the only automatic source refresh currently implemented; it is not a scheduled or shared refresh service. Public department copy and evidence mapping still need institutional review before any wider launch.
+
+
+## Curated department snapshot feed — connected in department workspaces
+
+The Observatory also exposes a separate read-only endpoint:
+
+- `GET /api/evidence/snapshots?departmentId=education`
+- `GET /api/evidence/snapshots?departmentId=health`
+- `GET /api/evidence/snapshots?departmentId=digital-systems`
+- `GET /api/evidence/snapshots?departmentId=civic-affairs`
+
+IDCC now consumes this endpoint server-side through `lib/department-snapshots.ts`. The adapter pins the Observatory host and source contract, validates the response version, record count, department mapping, HTTPS publisher URLs, metric fields, geography labels, retrieval dates and limitations, and rejects the entire response if a record fails validation. Requests have an eight-second timeout, a bounded ten-minute per-runtime cache and a one-minute failure cooldown. No browser-supplied upstream URL is accepted.
+
+The department workspace displays the source records and their publisher, evidence type, reference period, geography, metrics, retrieval date, interpretation, source links and limitations. It preserves values as published strings rather than coercing them into comparable numeric series. A record marked as a snapshot is never presented as a live publisher feed.
+
+The current Observatory bundle contains nine records, retrieved 10 November 2026. Department filters return only records explicitly linked by the Observatory:
+
+- **Education:** FME national and Kaduna State school-census snapshots, plus NITDA digital-literacy, NASENI innovation and ISN hub-assessment records where the source explicitly links them to education.
+- **Health:** WHO Nigeria health indicators and their indicator-specific periods and limitations.
+- **Software and Technology:** NITDA digital-literacy programme records, NASENI innovation programme records and ISN innovation-hub assessment records.
+- **Civic Affairs:** NIMC national and Kaduna State enrolment snapshot.
+
+These are uneven, dated source records, not four complete departmental datasets. Kaduna State values are not Kaduna South values. Programme reach is not population prevalence or proof of durable outcomes. Announcements are not implementation. NIMC enrolment is not a census or a service-access measure. The UI retains those source limitations with each record.
+
+The earlier World Bank national indicator pilot remains a separate supplementary series. It is not merged into the curated snapshot bundle, and its estimates are not represented as local measurements.
+
+A department with no matching snapshot, an invalid contract response or an unavailable endpoint receives an explicit state; the application does not fill gaps with proxy metrics, zeroes or invented activity.
