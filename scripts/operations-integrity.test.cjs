@@ -147,6 +147,9 @@ test("actions can be linked to an existing Standard meeting without granting dec
   assert.match(adapter, /properties\["Source meeting"\]/);
   assert.match(api, /sourceMeetingId/);
   assert.match(component, /Related meeting · optional/);
+  assert.match(api, /A proposed owner role and due date are required/);
+  assert.match(api, /This does not assign an officer/);
+  assert.doesNotMatch(api, /An accountable owner and due date are required/);
   assert.match(component, /does not certify a decision/);
 });
 
