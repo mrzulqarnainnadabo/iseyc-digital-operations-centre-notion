@@ -95,7 +95,8 @@ export default async function DepartmentDeskPage({
   const publicDef = getDepartment(profile.publicSlug);
   const style = DEPARTMENT_STYLE[department];
   const flags = configFlags();
-  const evidencePromise = getDepartmentEvidence(profile.publicSlug);
+  const evidenceSlug = department === "digital-systems" ? "technology" : department === "civic-affairs" ? "civic" : department;
+  const evidencePromise = getDepartmentEvidence(evidenceSlug);
   const snapshotsPromise = getDepartmentSnapshots(department);
 
   let meetings: Awaited<ReturnType<typeof listMeetings>>["meetings"] = [];
