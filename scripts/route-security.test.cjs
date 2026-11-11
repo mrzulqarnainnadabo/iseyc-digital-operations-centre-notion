@@ -71,7 +71,7 @@ for (const [route, contract] of Object.entries(contracts)) {
   test(`${route} preserves its reviewed method and security contract`, () => {
     const absolute = path.join(apiRoot, route);
     const source = fs.readFileSync(absolute, "utf8");
-    const exportedMethods = [...source.matchAll(/export async function (GET|POST|PUT|PATCH|DELETE)\s*\(/g)]
+    const methods = [...source.matchAll(/export async function (GET|POST|PUT|PATCH|DELETE)\s*\(/g)]
       .map((match) => match[1])
       .sort();
     assert.deepEqual(exportedMethods, [...contract.methods].sort(), "HTTP method surface changed");
@@ -215,7 +215,7 @@ test("every Operations Centre API route is private and every mutation is same-or
       `${route} must use private no-store response handling`
     );
 
-    const methods = [...source.matchAll(/export async function (GET|POST|PUT|PATCH|DELETE)\\s*\\(/g)]
+    const methods = [...source.matchAll(/export async function (GET|POST|PUT|PATCH|DELETE)\s*\(/g)]
       .map((match) => match[1]);
     for (const method of methods.filter((item) => item !== "GET")) {
       const body = source.slice(source.indexOf(`export async function ${method}`));
