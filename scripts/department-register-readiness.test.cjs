@@ -46,6 +46,9 @@ test("department register readiness checks the app's own credentials and exact s
   assert.match(adapter, /options: \["Low", "Moderate", "High", "Critical"\]/);
   assert.match(adapter, /specification\.options\.some/);
   assert.match(adapter, /property\?\.select\?\.options/);
+  assert.match(adapter, /property\?\.status\?\.options/);
+  assert.match(adapter, /options: \["Proposed", "Approved", "In Progress"/);
+  assert.match(adapter, /options: \["Draft", "Submitted", "Under Review"/);
   assert.match(page, /verifyDepartmentRegisterReadiness\(\)/);
   assert.match(page, /read-only check reads no programme or report rows and does not test write permissions or grant staff authority/);
   assert.match(page, /Access not verified/);
