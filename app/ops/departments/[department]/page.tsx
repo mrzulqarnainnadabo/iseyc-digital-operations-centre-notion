@@ -11,7 +11,6 @@ import {
 import DepartmentProgrammePanel from "@/components/DepartmentProgrammePanel";
 import DepartmentWorkPlanPanel from "@/components/DepartmentWorkPlanPanel";
 import DepartmentReportPanel from "@/components/DepartmentReportPanel";
-import DepartmentEvidencePanel from "@/components/DepartmentEvidencePanel";
 
 export const dynamic = "force-dynamic";
 
@@ -145,7 +144,6 @@ export default async function DepartmentDeskPage({
       <nav aria-label="Department workspace navigation" className="ops-department-nav flex gap-2 overflow-x-auto pb-1">
         {[
           ["#overview", "Overview"],
-          ["#evidence", "Evidence"],
           ["#functions", "Functions"],
           ["#programmes", "Programmes"],
           ["#work-plans", "Work plans"],
@@ -177,8 +175,6 @@ export default async function DepartmentDeskPage({
           </ol>
         </article>
       </section>
-
-      <DepartmentEvidencePanel departmentId={department} />
 
       <section id="functions" className="scroll-mt-5 space-y-3">
         <div className="flex flex-wrap items-end justify-between gap-2">
