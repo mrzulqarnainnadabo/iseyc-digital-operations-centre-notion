@@ -164,3 +164,19 @@ test("department report drafts distinguish completed outputs from planned work",
 });
 
 
+
+
+test("each department receives grounded evidence interpretation and a next verification step", () => {
+  const briefs = read("lib/department-evidence-briefs.ts");
+  const page = read("app/ops/departments/[department]/page.tsx");
+  for (const department of ["education", "health", "digital-systems", "civic-affairs"]) {
+    assert.match(briefs, new RegExp('"' + department + '"|\\b' + department + ':'));
+  }
+  assert.match(briefs, /classroom quality, teacher availability, learning outcomes/);
+  assert.match(briefs, /Kaduna facility conditions, medicine availability, staffing/);
+  assert.match(briefs, /household device ownership, internet quality, digital-skills prevalence/);
+  assert.match(briefs, /civic participation, public trust, representation, accountability/);
+  assert.match(page, /Turn evidence into better questions/);
+  assert.match(page, /What it cannot establish/);
+  assert.match(page, /Next evidence step/);
+});
