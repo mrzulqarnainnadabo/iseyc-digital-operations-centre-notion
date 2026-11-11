@@ -23,9 +23,16 @@ test("public root is a public composer and does not load restricted operations",
 test("public shell uses the official seal, clear navigation and verified product entry points", () => {
   const shell = read("components/PublicShell.tsx");
   assert.match(shell, /src="\/iseyc-seal\.svg"/);
-  for (const label of ["Home", "Explore", "Submit", "Explain", "Method", "Contact"]) {
+  // Public product line — not the brochure identity
+  assert.match(shell, /What communities report\. What evidence supports\. What is still unknown\./);
+  assert.doesNotMatch(shell, /Public Information & Civic Intelligence/);
+  for (const label of ["Home", "Departments", "Explore", "Report", "Method"]) {
     assert.match(shell, new RegExp(`label: "${label}"`));
   }
+  // Removed low-value chrome that inflated the nav
+  assert.doesNotMatch(shell, /label: "Explain"/);
+  assert.doesNotMatch(shell, /label: "Contact"/);
+  assert.doesNotMatch(shell, /public-mobile-menu/);
   for (const url of [
     "https://2027-street-mandate.vercel.app",
     "https://iseyc-civic-brain.vercel.app",
@@ -33,8 +40,8 @@ test("public shell uses the official seal, clear navigation and verified product
   ]) assert.ok(shell.includes(url));
   // Intentionally withhold unverified Observatory production URL
   assert.doesNotMatch(shell, /iseyc-civic-intelligence-observatory-p5rb607x3\.vercel\.app/);
-  assert.match(shell, /label: "Civic Intelligence Observatory"/);
-  assert.match(shell, /ISEYC · Non-partisan/);
+  assert.match(shell, /label: "Observatory"/);
+  assert.match(shell, /Youth-led public intelligence institution for Nigeria/);
   assert.match(shell, /Skip to content/);
 });
 
