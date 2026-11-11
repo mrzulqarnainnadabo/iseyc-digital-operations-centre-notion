@@ -161,14 +161,14 @@ export default async function DepartmentDeskPage({
         </div>
       </header>
 
-      <nav aria-label="Department workspace navigation" className="ops-department-nav flex flex-wrap items-center gap-2 pb-1">
+      <nav aria-label="Department workspace navigation" className="ops-department-nav flex min-w-0 flex-nowrap items-center gap-2 overflow-x-auto rounded-2xl border border-[#e1e5dc] bg-white p-2 shadow-[0_3px_14px_rgba(20,49,38,.04)]">
         <a href="#overview">Overview</a>
         <a href="#intelligence">Evidence</a>
         <a href="#programmes">Programmes</a>
         <a href="#work-plans">Work plans</a>
-        <details className="ops-department-nav-more relative">
-          <summary className="inline-flex min-h-[2.65rem] cursor-pointer list-none items-center rounded-full border border-[#e1e5dc] bg-[#f3f4ee] px-4 text-xs font-bold text-[#315b45] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a7833f]">More workspace areas <span aria-hidden="true" className="ml-2">＋</span></summary>
-          <div className="mt-2 flex flex-wrap gap-2 sm:absolute sm:left-0 sm:top-full sm:z-20 sm:min-w-56 sm:rounded-xl sm:border sm:border-[#e1e5dc] sm:bg-white sm:p-3 sm:shadow-lg">
+        <details className="ops-department-nav-more relative shrink-0">
+          <summary className="inline-flex min-h-[2.65rem] cursor-pointer list-none items-center rounded-full border border-[#d9dfd7] bg-[#f3f4ee] px-4 text-xs font-bold text-[#315b45] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a7833f]">More <span aria-hidden="true" className="ml-2">＋</span></summary>
+          <div className="absolute right-0 top-full z-30 mt-2 flex w-[min(18rem,calc(100vw-2rem))] flex-col gap-1 rounded-xl border border-[#e1e5dc] bg-white p-2 shadow-xl">
             <a href="#functions">Functions</a>
             <a href="#indicators">Indicator pilot</a>
             <a href="#reports">Reports</a>
