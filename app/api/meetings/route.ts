@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { privateJson } from "@/lib/private-response";
 import { requireStaffSession } from "@/lib/auth";
 import { isSameOriginRequest, readBoundedJson } from "@/lib/request-security";
-import { configFlags, createMeeting, listMeetings } from "@/lib/notion";
+import { configFlags, createMeeting, getMeeting, listMeetings } from "@/lib/notion";
 import { legacySessionCanCreateMeeting, legacySessionCanReadMeeting } from "@/lib/legacy-session-boundary";
 
 export const runtime = "nodejs";
@@ -23,8 +23,13 @@ export async function GET(req: NextRequest) {
 
   const requestUrl = new URL(req.url);
   const cursor = requestUrl.searchParams.get("cursor") || undefined;
-  if (cursor && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cursor)) {
+  const requestedMeetingId = requestUrl.searchParams.get("meetingId") || "";
+  const isNotionId = (value: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+  if (cursor && !isNotionId(cursor)) {
     return privateJson({ ok: false, error: "Invalid page cursor." }, { status: 400 });
+  }
+  if (requestedMeetingId && !isNotionId(requestedMeetingId)) {
+    return privateJson({ ok: false, error: "Invalid meeting reference." }, { status: 400 });
   }
 
   try {
@@ -32,6 +37,14 @@ export async function GET(req: NextRequest) {
     const meetings = page.meetings.filter((meeting) =>
       legacySessionCanReadMeeting(meeting.sensitivity)
     );
+    // A contextual deep link may point to a meeting outside the first page.
+    // Retrieve only that exact record and expose it only if it remains eligible.
+    if (requestedMeetingId && !meetings.some((meeting) => meeting.id === requestedMeetingId)) {
+      const requestedMeeting = await getMeeting(requestedMeetingId);
+      if (requestedMeeting && legacySessionCanReadMeeting(requestedMeeting.sensitivity)) {
+        meetings.push(requestedMeeting);
+      }
+    }
     return privateJson({
       ok: true,
       meetings,
