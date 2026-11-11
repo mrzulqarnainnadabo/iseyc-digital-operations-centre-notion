@@ -301,7 +301,7 @@ export default function OperationalRegister({ kind, initialMeetingId = "" }: { k
                 <div className="min-w-0 flex-1">
                   <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-gold-700">{kind === "actions" ? "Proposed action · unassigned · awaiting authorised acceptance" : kind === "chamber" ? "Council session" : "Communication draft"}</p>
                   <h3 className="mt-1 font-serif text-lg leading-snug text-forest-950">{row.title}</h3>
-                  {kind === "chamber" ? <p className="mt-1 text-xs font-medium text-ink-600">Proposed · not yet convened</p> : null}
+                  {kind === "chamber" ? <p className="mt-1 text-xs font-medium text-ink-600">Proposed session · not yet convened</p> : null}
                 </div>
                 <StatusBadge status={kind === "actions" || kind === "chamber" ? "Proposed" : row.status} />
               </div>
