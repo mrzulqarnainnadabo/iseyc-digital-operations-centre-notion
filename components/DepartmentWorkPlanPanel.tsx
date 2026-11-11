@@ -130,9 +130,8 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName, 
         </span>
       </div>
 
-      <p className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border border-[#e1e7df] bg-[#f8faf7] px-3 py-2 text-xs leading-5 text-[#59665d]">
-        <span>Need a follow-up? Copy the work-plan record’s Notion URL into the Action notes. The current registers do not create an automatic link, approval or assignment.</span>
-        <Link href="/ops/actions" className="inline-flex min-h-8 items-center font-semibold text-[#194b3b] underline underline-offset-2">Open Action register →</Link>
+      <p className="rounded-lg border border-[#e1e7df] bg-[#f8faf7] px-3 py-2 text-xs leading-5 text-[#59665d]">
+        Prepare an action from a work-plan item to carry its Notion source URL into the Action notes. This is a reference, not an automatic relation, approval or assignment.
       </p>
 
       {configured === true ? (
@@ -242,7 +241,10 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName, 
             </div>
             {row.contributors ? <p className="mt-2 text-xs text-ink-600"><span className="font-semibold">Supporting teams / roles:</span> {row.contributors}</p> : null}
             <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
-              {row.url ? <a href={row.url} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center text-xs font-semibold text-forest-800 underline underline-offset-2">Open work-plan record ↗</a> : null}
+              {row.url ? <>
+                <a href={row.url} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center text-xs font-semibold text-forest-800 underline underline-offset-2">Open work-plan record ↗</a>
+                <Link href={`/ops/actions?workPlanTitle=${encodeURIComponent(row.title)}&workPlanUrl=${encodeURIComponent(row.url)}`} className="inline-flex min-h-9 items-center rounded-full border border-[#dce4dc] bg-[#f7faf6] px-3 text-xs font-semibold text-forest-800 hover:bg-[#edf3ec]">Prepare action →</Link>
+              </> : null}
               {row.evidenceNote ? <a href={row.evidenceNote} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center text-xs font-semibold text-forest-800 underline underline-offset-2">Open evidence / deliverable ↗</a> : null}
             </div>
           </li>
