@@ -20,12 +20,15 @@ export function departmentIdFromNotionSelect(value: string): DepartmentRecordId 
   switch (value.trim().toLowerCase()) {
     case "education":
     case "education & capacity building":
+    case "education and capacity building":
       return "education";
     case "health":
     case "health & well-being":
+    case "department of health and well-being":
       return "health";
     case "digital systems":
     case "digital systems & technology":
+    case "software and technology":
     case "software & technology":
       return "digital-systems";
     case "civic affairs":
@@ -150,7 +153,7 @@ export const DEPARTMENT_OPERATING_PROFILES: Record<
 > = {
   education: {
     id: "education",
-    name: "Education & Capacity Building",
+    name: "Education and Capacity Building",
     publicSlug: "education",
     missionLink:
       "Supports ISEYC’s commitment to learning access, capability development and conditions that make participation possible.",
@@ -180,7 +183,7 @@ export const DEPARTMENT_OPERATING_PROFILES: Record<
         ],
         outputs: ["Access notes", "Programme plans", "Action records"],
         documentation: "Programme and work-plan registers; meeting notes; shared Actions register.",
-        coordinatesWith: ["Civic Affairs", "Digital Systems", "Communications"],
+        coordinatesWith: ["Civic Department", "Software and Technology", "Communications"],
       },
       {
         id: "edu-capacity",
@@ -194,7 +197,7 @@ export const DEPARTMENT_OPERATING_PROFILES: Record<
         ],
         outputs: ["Programme drafts", "Work-plan items", "Activity reports"],
         documentation: "Programme register; work plans; monthly department reports when available.",
-        coordinatesWith: ["Digital Systems", "Health"],
+        coordinatesWith: ["Software and Technology", "Health"],
       },
       {
         id: "edu-infra",
@@ -208,7 +211,7 @@ export const DEPARTMENT_OPERATING_PROFILES: Record<
         ],
         outputs: ["Evidence-linked notes", "Escalation actions"],
         documentation: "Programme evidence fields; Actions register; public evidence pages where appropriate.",
-        coordinatesWith: ["Digital Systems", "Civic Affairs"],
+        coordinatesWith: ["Software and Technology", "Civic Department"],
       },
       {
         id: "edu-partnerships",
@@ -222,7 +225,7 @@ export const DEPARTMENT_OPERATING_PROFILES: Record<
         ],
         outputs: ["Organisation prospects", "Invitation drafts"],
         documentation: "External engagement registers; Meetings register.",
-        coordinatesWith: ["Civic Affairs", "Communications"],
+        coordinatesWith: ["Civic Department", "Communications"],
       },
     ],
     meetingTerms: ["education", "capacity", "learning", "school", "teacher", "literacy"],
@@ -235,7 +238,7 @@ export const DEPARTMENT_OPERATING_PROFILES: Record<
   },
   health: {
     id: "health",
-    name: "Health & Well-being",
+    name: "Department of Health and Well-being",
     publicSlug: "health",
     missionLink:
       "Supports ISEYC’s focus on community health awareness, essential services access and responsible health engagement.",
@@ -279,7 +282,7 @@ export const DEPARTMENT_OPERATING_PROFILES: Record<
         ],
         outputs: ["Work-plan items", "Actions", "Evidence notes"],
         documentation: "Work plans; Actions register.",
-        coordinatesWith: ["Civic Affairs", "Digital Systems"],
+        coordinatesWith: ["Civic Department", "Software and Technology"],
       },
       {
         id: "hlt-facilities",
@@ -292,7 +295,7 @@ export const DEPARTMENT_OPERATING_PROFILES: Record<
         ],
         outputs: ["Programme notes", "Escalations"],
         documentation: "Programme evidence fields; Actions.",
-        coordinatesWith: ["Civic Affairs"],
+        coordinatesWith: ["Civic Department"],
       },
       {
         id: "hlt-partnerships",
@@ -305,7 +308,7 @@ export const DEPARTMENT_OPERATING_PROFILES: Record<
         ],
         outputs: ["Organisation and invitation drafts"],
         documentation: "External engagement registers.",
-        coordinatesWith: ["Civic Affairs", "Communications"],
+        coordinatesWith: ["Civic Department", "Communications"],
       },
     ],
     meetingTerms: ["health", "well-being", "wellbeing", "care", "facility", "clinic"],
@@ -318,7 +321,7 @@ export const DEPARTMENT_OPERATING_PROFILES: Record<
   },
   "digital-systems": {
     id: "digital-systems",
-    name: "Digital Systems & Technology",
+    name: "Software and Technology",
     publicSlug: "technology",
     missionLink:
       "Supports digital inclusion, institutional systems capacity and responsible technology use in community development.",
@@ -348,7 +351,7 @@ export const DEPARTMENT_OPERATING_PROFILES: Record<
         ],
         outputs: ["Programme drafts", "Work plans"],
         documentation: "Programme and work-plan registers.",
-        coordinatesWith: ["Education", "Civic Affairs"],
+        coordinatesWith: ["Education", "Civic Department"],
       },
       {
         id: "dig-infra",
@@ -376,7 +379,7 @@ export const DEPARTMENT_OPERATING_PROFILES: Record<
         ],
         outputs: ["Assessment notes", "Communications drafts"],
         documentation: "Programme notes; Communications; Access model docs.",
-        coordinatesWith: ["Civic Affairs", "Communications"],
+        coordinatesWith: ["Civic Department", "Communications"],
       },
       {
         id: "dig-ops",
@@ -403,7 +406,7 @@ export const DEPARTMENT_OPERATING_PROFILES: Record<
   },
   "civic-affairs": {
     id: "civic-affairs",
-    name: "Civic Affairs & Public Accountability",
+    name: "Civic Department",
     publicSlug: "civic",
     missionLink:
       "Supports non-partisan civic learning, community representation pathways and transparent institutional engagement.",
@@ -461,7 +464,7 @@ export const DEPARTMENT_OPERATING_PROFILES: Record<
         ],
         outputs: ["Report drafts", "Outstanding action lists"],
         documentation: "Department report register when connected; Actions.",
-        coordinatesWith: ["Digital Systems"],
+        coordinatesWith: ["Software and Technology"],
       },
       {
         id: "civ-stakeholders",

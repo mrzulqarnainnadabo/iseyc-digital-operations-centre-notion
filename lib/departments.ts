@@ -12,7 +12,7 @@ export type Department = {
 export const departments: Department[] = [
   {
     slug: "education",
-    name: "Education & Capacity Building",
+    name: "Education and Capacity Building",
     shortName: "Education",
     number: "01",
     summary: "Learning access, conditions and the capabilities people need to participate and progress.",
@@ -27,7 +27,7 @@ export const departments: Department[] = [
   },
   {
     slug: "health",
-    name: "Health & Well-being",
+    name: "Department of Health and Well-being",
     shortName: "Health",
     number: "02",
     summary: "Primary care, facility conditions, essential services and community well-being, read with care about what is verified.",
@@ -42,8 +42,8 @@ export const departments: Department[] = [
   },
   {
     slug: "technology",
-    name: "Digital Systems & Technology",
-    shortName: "Digital Systems",
+    name: "Software and Technology",
+    shortName: "Software & Technology",
     number: "03",
     summary: "Digital inclusion, skills, software innovation and responsible public-interest technology.",
     introduction: "Technology supports community development when people can access it, understand it and trust how it is used. This department considers digital capability alongside the infrastructure and safeguards that make technology useful.",
@@ -57,8 +57,8 @@ export const departments: Department[] = [
   },
   {
     slug: "civic",
-    name: "Civic Affairs & Public Accountability",
-    shortName: "Civic Affairs & Public Accountability",
+    name: "Civic Department",
+    shortName: "Civic Department",
     number: "04",
     summary: "Civic learning, institutional responsibilities, public-service conditions and evidence-based participation.",
     introduction: "Civic participation is strongest when people can understand public responsibilities and assess information in context. This department supports non-partisan learning and transparent engagement without endorsing parties, candidates or campaigns.",

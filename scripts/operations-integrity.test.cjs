@@ -520,8 +520,8 @@ test("department workspaces use distinct identity marks and every in-page naviga
   assert.match(styles, /ops-department--health \.ops-department-mark/);
   assert.match(styles, /ops-department--digital \.ops-department-mark/);
   assert.match(styles, /ops-department--civic \.ops-department-mark/);
-  assert.match(definitions, /name: "Digital Systems & Technology"/);
-  assert.match(definitions, /name: "Civic Affairs & Public Accountability"/);
+  assert.match(definitions, /name: "Software and Technology"/);
+  assert.match(definitions, /name: "Civic Department"/);
 });
 
 test("department draft forms are collapsed until requested and clearly explain their status", () => {

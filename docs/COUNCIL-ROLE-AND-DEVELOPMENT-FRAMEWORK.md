@@ -26,10 +26,10 @@ The role guide in the Operations Centre is a learning and operating aid. The aut
 - Chief Financial Officer — budgets, financial records, controls and reporting.
 
 ### Department leadership
-- Head of Education & Capacity Building.
-- Head of Health & Well-being.
-- Head of Digital Systems & Technology.
-- Head of Civic Affairs & Public Accountability.
+- Head of Education and Capacity Building.
+- Head of the Department of Health and Well-being.
+- Head of Software and Technology.
+- Head of the Civic Department.
 
 ### Institution-wide leadership
 - Youth Leadership Coordinator.
@@ -47,12 +47,12 @@ This gives a compact core with clearly defined specialist responsibilities. Spec
 ## Department naming recommendation
 
 Use these names consistently in the Operations Centre and public institutional materials:
-1. **Education & Capacity Building**
-2. **Health & Well-being**
-3. **Digital Systems & Technology**
-4. **Civic Affairs & Public Accountability**
+1. **Education and Capacity Building**
+2. **Department of Health and Well-being**
+3. **Software and Technology**
+4. **Civic Department**
 
-The fourth title better communicates civic education, community concerns, institutional responsibilities and accountability. The technology title includes software and digital inclusion without limiting the department to software production.
+The Civic Department covers civic education, community concerns, institutional responsibilities and accountability. Software and Technology covers software capability, digital inclusion, institutional systems and responsible technology.
 
 Existing Notion display labels such as “Software & Technology” and “Civic Department” must be mapped to stable department identifiers. Do not silently rename or use display text as a security key.
 
