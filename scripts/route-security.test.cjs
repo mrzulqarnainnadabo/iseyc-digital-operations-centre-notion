@@ -205,15 +205,11 @@ test("every Operations Centre API route is private and every mutation is same-or
   assert.ok(routes.length > 0, "Operations Centre API route inventory must not be empty");
 
   for (const route of routes) {
-    const source = fs.readFileSync(path.join(opsApiRoot, route), "utf8");
-    assert.ok(
-      source.includes("requireStaffSession()"),
-      `${route} must require an authenticated staff session`
-    );
-    assert.ok(
-      source.includes("privateJson("),
-      `${route} must use private no-store response handling`
-    );
+    const wrapper = fs.readFileSync(path.join(opsApiRoot, route), "utf8");
+    const delegated = wrapper.includes('from "../../../api/') || wrapper.includes('from "../../../../api/');
+    const source = delegated ? fs.readFileSync(path.join(apiRoot, route), "utf8") : wrapper;
+    assert.ok(source.includes("requireStaffSession()"), `${route} must require an authenticated staff session in its handler`);
+    assert.ok(source.includes("privateJson(") || source.includes("privateResponseHeaders("), `${route} must use private no-store response handling in its handler`);
 
     const methods = [...source.matchAll(/export async function (GET|POST|PUT|PATCH|DELETE)\s*\(/g)]
       .map((match) => match[1]);
@@ -228,12 +224,11 @@ test("every Operations Centre API route is private and every mutation is same-or
   }
 });
 
-test("shared-key action progress cannot approve, complete or close an institutional action", () => {
-  const source = fs.readFileSync(
-    path.join(opsApiRoot, "actions/[id]/route.ts"),
-    "utf8"
-  );
-  assert.match(source, /input\.status !== "In progress" && input\.status !== "Blocked"/);
-  assert.match(source, /Done and closure require a separate authorised review/);
-  assert.doesNotMatch(source, /input\.status === "Done"|input\.status === "Closed"|actions\.close/);
+test("shared-key sessions cannot write unattributed action progress", () => {
+  const source = fs.readFileSync(path.join(opsApiRoot, "actions/[id]/route.ts"), "utf8");
+  assert.match(source, /requireStaffSession\\(\\)/);
+  assert.match(source, /Individual officer identity and verified action assignment are not connected/);
+  assert.match(source, /Shared staff access cannot attribute progress/);
+  assert.match(source, /status: 503/);
+  assert.doesNotMatch(source, /updateActionProgress\\(/);
 });
