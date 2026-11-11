@@ -93,6 +93,7 @@ test("department snapshot adapter validates the Observatory v1 contract and pres
   assert.match(page, /record\.referencePeriod/);
   assert.match(page, /record\.geography\.label/);
   assert.match(page, /record\.publisher/);
+  assert.match(page, /metric\.measurementType/);
   assert.match(page, /record\.limitations/);
   assert.match(page, /No cached or estimated replacement records are shown/);
 });
