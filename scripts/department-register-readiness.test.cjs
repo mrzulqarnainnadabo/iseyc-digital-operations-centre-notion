@@ -45,6 +45,10 @@ test("department register readiness checks the app's own credentials and exact s
   assert.match(page, /read-only check reads no programme or report rows and does not test write permissions or grant staff authority/);
   assert.match(page, /Access not verified/);
   assert.match(page, /Schema incomplete/);
+  assert.match(page, /configFlags\(\)/);
+  assert.match(page, /Shared coordination connections/);
+  assert.match(page, /does not establish individual identity or appointment/);
+  assert.match(page, /do not prove that the Notion API can read or write each register/);
 });
 
 test("department register readiness never exposes records or credentials", () => {
