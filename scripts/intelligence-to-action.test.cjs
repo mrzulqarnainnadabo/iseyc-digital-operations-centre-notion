@@ -164,6 +164,9 @@ test("department programme and work-plan drafts use existing priority, risk and 
   assert.match(workplanRoute, /"contributors"/);
   assert.match(programmePanel, /Supporting teams \/ roles/);
   assert.match(workplanPanel, /Supporting teams \/ roles/);
+  assert.match(workplanPanel, /Copy the work-plan record’s Notion URL into the Action notes/);
+  assert.match(workplanPanel, /The current registers do not create an automatic link/);
+  assert.match(workplanPanel, /Open work-plan record/);
 });
 
 test("department report drafts distinguish completed outputs from planned work", () => {
