@@ -18,6 +18,7 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
   const [deliverable, setDeliverable] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [accountableRole, setAccountableRole] = useState("");
+  const [evidenceUrl, setEvidenceUrl] = useState("");
 
   const refresh = useCallback(
     async (append = false) => {
@@ -75,6 +76,7 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
         objective,
         deliverable,
         accountableRole,
+        evidenceUrl,
       };
       if (dueDate) body.dueDate = dueDate;
       const r = await fetch("/ops/api/department-workplans", {
@@ -89,6 +91,7 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
       setDeliverable("");
       setDueDate("");
       setAccountableRole("");
+      setEvidenceUrl("");
       await refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not save work-plan item.");
@@ -143,6 +146,11 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
             <input maxLength={180} value={accountableRole} onChange={(e) => setAccountableRole(e.target.value)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
           </label>
           
+          <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
+            Evidence / deliverable URL (optional)
+            <input type="url" maxLength={2048} value={evidenceUrl} onChange={(e) => setEvidenceUrl(e.target.value)} placeholder="https://…" className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
+            <span className="mt-1 block text-xs font-normal text-ink-600">Link to the relevant Intelligence Observatory snapshot or source record.</span>
+          </label>
           <div className="flex flex-wrap gap-2 sm:col-span-2">
             <button type="submit" disabled={busy || !title.trim()} className="min-h-11 rounded-control bg-forest-900 px-4 text-sm font-semibold text-white disabled:opacity-50">{busy ? "Saving…" : "Save work-plan item"}</button>
             <button type="button" onClick={() => void refresh()} disabled={busy} className="min-h-11 rounded-control border border-line px-4 text-sm font-semibold disabled:opacity-50">Refresh</button>
@@ -167,6 +175,7 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
             </div>
             {row.objective ? <p className="mt-1 text-sm text-ink-700">{row.objective}</p> : null}
             <p className="mt-1 text-xs text-ink-600">{[row.dueDate && `Due ${row.dueDate}`, row.accountableRole, row.deliverable].filter(Boolean).join(" · ")}</p>
+            {row.evidenceNote ? <a href={row.evidenceNote} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-9 items-center text-sm font-semibold text-forest-800 underline">Open evidence / deliverable ↗</a> : null}
           </li>
         ))}
       </ul>
