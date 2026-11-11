@@ -32,6 +32,8 @@ export default function DepartmentReportPanel({ departmentId, departmentName }: 
   const [challenges, setChallenges] = useState("");
   const [outstandingActions, setOutstandingActions] = useState("");
   const [recommendations, setRecommendations] = useState("");
+  const [evidenceUrl, setEvidenceUrl] = useState("");
+  const [dataLimitations, setDataLimitations] = useState("");
 
   const refresh = useCallback(
     async (append = false) => {
@@ -96,6 +98,8 @@ export default function DepartmentReportPanel({ departmentId, departmentName }: 
           challenges,
           outstandingActions,
           recommendations,
+          evidenceUrl,
+          dataLimitations,
         }),
       });
       const j = await r.json();
@@ -107,6 +111,8 @@ export default function DepartmentReportPanel({ departmentId, departmentName }: 
       setChallenges("");
       setOutstandingActions("");
       setRecommendations("");
+      setEvidenceUrl("");
+      setDataLimitations("");
       setReportType("Monthly");
       await refresh();
     } catch (e) {
@@ -175,6 +181,15 @@ export default function DepartmentReportPanel({ departmentId, departmentName }: 
             Outcomes / evidence
             <textarea maxLength={1800} rows={2} value={recommendations} onChange={(e) => setRecommendations(e.target.value)} className="mt-1 w-full rounded-control border border-line bg-white px-3 py-2 text-sm font-normal" />
           </label>
+          <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
+            Evidence link (optional)
+            <input type="url" maxLength={2048} value={evidenceUrl} onChange={(e) => setEvidenceUrl(e.target.value)} placeholder="https://…" className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
+            <span className="mt-1 block text-xs font-normal text-ink-600">Link to the Observatory snapshot or original source used in this report.</span>
+          </label>
+          <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
+            Data limitations
+            <textarea maxLength={1800} rows={2} value={dataLimitations} onChange={(e) => setDataLimitations(e.target.value)} placeholder="Missing coverage, reference period, uncertainty, or what this report cannot establish." className="mt-1 w-full rounded-control border border-line bg-white px-3 py-2 text-sm font-normal" />
+          </label>
           <div className="flex flex-wrap gap-2 sm:col-span-2">
             <button type="submit" disabled={busy || !title.trim()} className="min-h-11 rounded-control bg-forest-900 px-4 text-sm font-semibold text-white disabled:opacity-50">{busy ? "Saving…" : "Save report draft"}</button>
             <button type="button" onClick={() => void refresh()} disabled={busy} className="min-h-11 rounded-control border border-line px-4 text-sm font-semibold disabled:opacity-50">Refresh</button>
@@ -199,6 +214,8 @@ export default function DepartmentReportPanel({ departmentId, departmentName }: 
             </div>
             <p className="mt-1 text-xs text-ink-600">{row.reportType}{row.periodStart || row.periodEnd ? ` · ${row.periodStart || "—"} to ${row.periodEnd || "—"}` : ""}</p>
             {row.summary ? <p className="mt-1 text-sm text-ink-700">{row.summary}</p> : null}
+            {row.evidenceUrl ? <a href={row.evidenceUrl} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-9 items-center text-sm font-semibold text-forest-800 underline">Open evidence source ↗</a> : null}
+            {row.dataLimitations ? <p className="mt-2 text-xs leading-5 text-ink-600"><span className="font-semibold">Limitations:</span> {row.dataLimitations}</p> : null}
           </li>
         ))}
       </ul>
