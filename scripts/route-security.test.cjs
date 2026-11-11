@@ -84,6 +84,36 @@ for (const [route, contract] of Object.entries(contracts)) {
   });
 }
 
+test("operations API route inventory is explicit and shared-session boundaries are enforced", () => {
+  const opsRoot = path.join(__dirname, "../app/ops/api");
+  const actual = collectRoutes(opsRoot).sort();
+  const expected = [
+    "actions/[id]/route.ts",
+    "auth/oidc/status/route.ts",
+    "department-applications/connection/route.ts",
+    "department-programmes/route.ts",
+    "department-reports/route.ts",
+    "department-workplans/route.ts",
+    "external-engagement/route.ts",
+    "meetings/[id]/route.ts",
+    "meetings/route.ts",
+    "registers/[kind]/route.ts"
+  ].sort();
+  assert.deepEqual(actual, expected, "A new operations API route requires security review");
+
+  for (const route of actual) {
+    const source = fs.readFileSync(path.join(opsRoot, route), "utf8");
+    assert.ok(source.includes("requireStaffSession") || source.includes("from \"../../../../api/") || source.includes("from \"../../../api/"),
+      `${route} must authenticate directly or delegate to an independently guarded API handler`);
+    if (/route\.ts$/.test(route) && !route.includes("connection") && !route.includes("status") && !route.includes("[id]")) {
+      if (source.includes("export async function POST")) {
+        assert.ok(source.includes("isSameOriginRequest"), `${route} POST must enforce same-origin`);
+        assert.ok(source.includes("readBoundedJson"), `${route} POST must use bounded JSON parsing`);
+      }
+    }
+  }
+});
+
 test("no DOC API route is implicitly treated as public", () => {
   const routes = collectRoutes(apiRoot);
   for (const route of routes) {
