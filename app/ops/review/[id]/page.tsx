@@ -224,6 +224,14 @@ export default function ReviewPage() {
         </div> : null}
       </section>
 
+      <section className="rounded-card border border-line bg-white p-4">
+        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Related operational records</p>
+        <h2 className="mt-1 font-serif text-lg text-forest-950">Linked actions</h2>
+        <p className="mt-1 text-sm leading-5 text-ink-700">{meeting.linkedActionIds.length === 0 ? "No linked action records are returned by this meeting record." : `${meeting.linkedActionIds.length} linked action ${meeting.linkedActionIds.length === 1 ? "record" : "records"} returned.`}</p>
+        <p className="mt-1 text-xs leading-5 text-ink-600">A relation records context only. Check each action’s current status and authority separately in the Action register.</p>
+        <Link href="/ops/actions" className="mt-2 inline-flex min-h-9 items-center text-xs font-semibold text-forest-800 underline underline-offset-2">Open Action register →</Link>
+      </section>
+
             {meeting.sensitivity === "Standard" ? <section className="rounded-card border border-line bg-white p-4"><p className="text-xs font-semibold uppercase tracking-widest text-gold-700">Follow-up workflow</p><h2 className="mt-1 font-serif text-xl text-forest-950">Propose a follow-up action</h2><p className="mt-1 text-sm leading-5 text-ink-600">Open a new proposed action with this meeting selected as context. The link does not certify a decision, approve the action or assign an officer.</p><Link href={`/ops/actions?meetingId=${encodeURIComponent(meeting.id)}`} className="mt-3 inline-flex min-h-[44px] items-center rounded-control border border-forest-900 px-4 text-sm font-semibold text-forest-900">Prepare follow-up action →</Link></section> : null}
 
             {meeting.status === "Approved" && meeting.sensitivity === "Standard" ? <section className="rounded-card border border-forest-200 bg-white p-4"><p className="text-xs font-semibold uppercase tracking-widest text-gold-700">External participation</p><h2 className="mt-1 font-serif text-xl text-forest-950">Invite organisations or contributors</h2><p className="mt-1 text-sm leading-5 text-ink-600">Prepare organisation-specific invitations linked to this approved meeting. Each invitation remains a draft until separately approved and dispatched.</p><Link href={`/ops/partners?meetingId=${encodeURIComponent(meeting.id)}`} className="mt-3 inline-flex min-h-[44px] items-center rounded-control bg-forest-900 px-4 text-sm font-semibold text-white">Prepare external invitations</Link></section> : null}
