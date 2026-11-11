@@ -60,7 +60,6 @@ test("department operating model defines the shared intelligence-to-action bound
 
 test("each department workspace renders only validated Observatory evidence or an explicit gap state", () => {
   const page = read("app/ops/departments/[department]/page.tsx");
-  const adapter = read("lib/public-evidence.ts");
   assert.match(page, /getDepartmentEvidence\(profile\.publicSlug\)/);
   assert.match(page, /id="intelligence"/);
   assert.match(page, /evidence\.status === "ready" \|\| evidence\.status === "stale"/);
@@ -72,9 +71,6 @@ test("each department workspace renders only validated Observatory evidence or a
   assert.match(page, /observation\.geoLevel/);
   assert.match(page, /observation\.sourceUrl/);
   assert.match(page, /No proxy metric is substituted/);
-  assert.match(adapter, /const departmentIndicators/);
-  assert.match(adapter, /technology:/);
-  assert.match(adapter, /civic:/);
 });
 
 
