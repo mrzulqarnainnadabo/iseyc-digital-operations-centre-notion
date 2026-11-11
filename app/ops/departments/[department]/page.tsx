@@ -11,6 +11,7 @@ import {
 import DepartmentProgrammePanel from "@/components/DepartmentProgrammePanel";
 import DepartmentWorkPlanPanel from "@/components/DepartmentWorkPlanPanel";
 import DepartmentReportPanel from "@/components/DepartmentReportPanel";
+import { getDepartmentEvidence } from "@/lib/public-evidence";
 
 export const dynamic = "force-dynamic";
 
@@ -111,6 +112,7 @@ export default async function DepartmentDeskPage({
   }
 
   const recent = [...meetings].sort((a, b) => b.meetingDate.localeCompare(a.meetingDate)).slice(0, 5);
+  const evidence = await getDepartmentEvidence(profile.publicSlug);
 
   return (
     <main className={`mx-auto max-w-7xl space-y-6 pb-8 ops-department ops-department--${style.accent}`}>
@@ -201,6 +203,68 @@ export default async function DepartmentDeskPage({
               </details>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section id="intelligence" className="scroll-mt-5 overflow-hidden rounded-2xl border border-[#dce4dc] bg-white shadow-[0_4px_18px_rgba(20,49,38,.04)]">
+        <div className="flex flex-wrap items-end justify-between gap-3 border-b border-[#e8ece6] px-5 py-4 sm:px-6">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">Shared institutional evidence</p>
+            <h2 className="mt-1 font-serif text-2xl text-[#173c30]">Intelligence Observatory</h2>
+            <p className="mt-1 max-w-2xl text-xs leading-5 text-[#68736b]">Published source data for departmental interpretation. Evidence informs decisions; it does not approve programmes or prove local service delivery.</p>
+          </div>
+          <a href="https://iseyc-civic-intelligence-observatory.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center text-xs font-bold text-[#194b3b]">Open Observatory ↗</a>
+        </div>
+        <div className="p-5 sm:p-6">
+          {evidence.status === "ready" || evidence.status === "stale" ? (
+            <>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="text-sm font-semibold text-[#173c30]">{evidence.indicator?.title}</p>
+                  <p className="mt-1 text-[10px] text-[#68736b]">{evidence.indicator?.sourcePublisher} · Nigeria · National estimates</p>
+                </div>
+                <span className={evidence.status === "stale" ? "rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-[10px] font-semibold text-amber-900" : "rounded-full border border-[#dce6dc] bg-[#f0f5ef] px-3 py-1.5 text-[10px] font-semibold text-[#315b45]"}>
+                  {evidence.status === "stale" ? "Feed receipt is stale" : "Source connected"}
+                </span>
+              </div>
+              <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {(evidence.observations || []).slice(-6).reverse().map((observation) => (
+                  <div key={observation.observationId} className="rounded-xl border border-[#e6eae3] bg-[#fafbf8] p-3">
+                    <p className="text-[10px] font-semibold text-[#68736b]">{observation.referencePeriod}</p>
+                    <p className="mt-1 font-serif text-2xl tabular-nums text-[#173c30]">{new Intl.NumberFormat("en-NG", { maximumFractionDigits: 2 }).format(observation.value)}</p>
+                    <p className="mt-0.5 text-[10px] leading-4 text-[#68736b]">{observation.unit}</p>
+                    <p className="mt-2 text-[9px] font-medium uppercase tracking-[.1em] text-[#8a6b34]">Estimated · national</p>
+                  </div>
+                ))}
+              </div>
+              {evidence.indicator?.limitations?.length ? (
+                <details className="mt-4 rounded-xl border border-[#e6eae3] px-3 py-2.5">
+                  <summary className="min-h-8 cursor-pointer text-xs font-semibold text-[#315b45]">Method and limitations <span aria-hidden="true">＋</span></summary>
+                  <ul className="mt-2 list-disc space-y-1 pl-4">
+                    {evidence.indicator.limitations.map((limitation) => <li key={limitation} className="text-[11px] leading-5 text-[#68736b]">{limitation}</li>)}
+                  </ul>
+                  {evidence.indicator.methodologyNotes ? <p className="mt-2 text-[11px] leading-5 text-[#68736b]">{evidence.indicator.methodologyNotes}</p> : null}
+                </details>
+              ) : null}
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[#edf0ea] pt-3">
+                <a href={evidence.indicator?.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-[11px] font-semibold text-[#194b3b]">Original source ↗</a>
+                <p className="text-[10px] text-[#7a837c]">Retrieved {evidence.retrievedAt ? new Date(evidence.retrievedAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }) + " UTC" : "date unavailable"}</p>
+              </div>
+              <p className="mt-3 text-[10px] leading-5 text-[#7a837c]">National estimates are not Kaduna State, LGA, ward or facility measurements. They must not be used as proof of a local condition or ISEYC programme result.</p>
+            </>
+          ) : evidence.status === "empty" ? (
+            <p className="rounded-xl border border-dashed border-[#d8dfd7] bg-[#fafbf8] p-4 text-xs leading-5 text-[#68736b]">The Observatory returned a valid response, but no observations are currently available for this indicator.</p>
+          ) : evidence.status === "not-integrated" ? (
+            <div className="rounded-xl border border-dashed border-[#d8dfd7] bg-[#fafbf8] p-4">
+              <p className="text-sm font-semibold text-[#173c30]">No department-matched indicator in the current pilot</p>
+              <p className="mt-1 text-xs leading-5 text-[#68736b]">The Observatory connection is active, but this department does not yet have a matched indicator in the published pilot catalogue. No proxy metric is substituted.</p>
+            </div>
+          ) : (
+            <div className="rounded-xl border border-dashed border-[#d8dfd7] bg-[#fafbf8] p-4">
+              <p className="text-sm font-semibold text-[#173c30]">Evidence temporarily unavailable</p>
+              <p className="mt-1 text-xs leading-5 text-[#68736b]">{evidence.status === "invalid" ? "The Observatory response did not pass the expected source and provenance checks. Values are withheld." : "The Observatory could not be reached. No cached or estimated replacement values are shown."}</p>
+            </div>
+          )}
         </div>
       </section>
 
