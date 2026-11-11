@@ -216,3 +216,21 @@ test("Operations Centre homepage leads with an institutional visual and keeps de
   assert.doesNotMatch(page, /department\.focus\.map/);
   assert.doesNotMatch(page, /min-h-\[132px\]/);
 });
+
+test("Operations Centre register screens use compact authority guidance and scannable record cards", () => {
+  const register = read("components/OperationalRegister.tsx");
+  assert.match(register, /aria-label="Authority boundary"/);
+  assert.match(register, /New entries begin as proposals/);
+  assert.match(register, /Live register/);
+  assert.match(register, /records on this page/);
+  assert.match(register, /border-l-4 bg-white/);
+  assert.match(register, /View source meeting/);
+  assert.match(register, /No records returned/);
+});
+
+test("Operations Centre home keeps the coordination diagram proportionate on mobile and uses neutral connected-systems language", () => {
+  const page = read("app/ops/page.tsx");
+  assert.match(page, /max-w-\[280px\] sm:max-w-\[340px\]/);
+  assert.match(page, /Connected public systems/);
+  assert.doesNotMatch(page, /Published civic systems/);
+});
