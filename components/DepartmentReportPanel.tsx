@@ -149,7 +149,7 @@ export default function DepartmentReportPanel({ departmentId, departmentName, ev
         </span>
       </div>
 
-      {configured !== false ? (
+      {configured === true ? (
         <details className="rounded-xl border border-[#dfe6df] bg-[#fafbf8] p-3">
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-[#194b3b]">
             <span>Prepare a report draft<span className="mt-1 block text-xs font-normal text-[#68736b]">Draft records are for review; saving does not certify or approve the report.</span></span>
@@ -237,10 +237,12 @@ export default function DepartmentReportPanel({ departmentId, departmentName, ev
         </form>
           </div>
         </details>
-      ) : (
+      ) : configured === false ? (
         <p className="rounded-control border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
           Configure <code className="text-xs">NOTION_DEPARTMENT_REPORTS_DATABASE_ID</code>. No report records are invented while disconnected.
         </p>
+      ) : (
+        <p role="status" className="rounded-xl border border-[#e1e7df] bg-[#f8faf7] p-4 text-xs leading-5 text-[#68736b]">Checking the reports register. Draft entry becomes available only after the connection is confirmed.</p>
       )}
 
       {error ? (<p role="alert" className="rounded-control border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">{error}</p>) : null}
