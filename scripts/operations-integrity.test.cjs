@@ -192,7 +192,8 @@ test("actions, chamber and communications expose authenticated Notion-backed ini
   assert.match(read("app/ops/api/registers/[kind]/route.ts"), /\["X", "WhatsApp", "Website", "Other"\]/);
   assert.match(component, /human-authorised/);
   assert.match(component, /Proposed owner role · required/);
-  assert.match(component, /Proposed action · unassigned · awaiting authorised acceptance/);
+  assert.match(component, /Action proposal/);
+  assert.match(component, /Unassigned · awaiting authorised acceptance/);
   assert.match(component, /Proposed action · unassigned · awaiting authorised acceptance/);
   assert.match(component, /Proposed session · not yet convened/);
   assert.match(component, /kind === "actions" \|\| kind === "chamber" \? "Proposed" : row.status/);
@@ -532,7 +533,7 @@ test("department navigation prioritises core work and groups secondary destinati
   assert.match(department, /href="#intelligence">Evidence/);
   assert.match(department, /href="#programmes">Programmes/);
   assert.match(department, /href="#work-plans">Work plans/);
-  assert.match(department, /More workspace areas/);
+  assert.match(department, /<summary[^>]*>More <span/);
   assert.doesNotMatch(department, /A department task register is Not connected until its Notion register is configured/);
   assert.match(department, /Connection shown below/);
   assert.match(department, /No matching meetings appear on this page\. Other pages may contain more\./);
