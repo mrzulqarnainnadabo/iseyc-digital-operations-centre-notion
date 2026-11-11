@@ -114,3 +114,50 @@ test("department draft forms can attach a source selected from the validated Obs
   assert.match(page, /snapshots\.records\.map\(\(record\)/);
   assert.match(page, /evidenceOptions=\{evidenceOptions\}/);
 });
+
+
+test("department programme and work-plan drafts use existing priority, risk and ownership fields", () => {
+  const types = read("lib/department-operations.ts");
+  const programmes = read("lib/notion-department-programmes.ts");
+  const workplans = read("lib/notion-department-workplans.ts");
+  const programmeRoute = read("app/ops/api/department-programmes/route.ts");
+  const workplanRoute = read("app/ops/api/department-workplans/route.ts");
+  const programmePanel = read("components/DepartmentProgrammePanel.tsx");
+  const workplanPanel = read("components/DepartmentWorkPlanPanel.tsx");
+
+  assert.match(types, /priority: WorkPriority/);
+  assert.match(types, /riskLevel: RiskLevel/);
+  assert.match(types, /contributors: string/);
+  assert.match(programmes, /properties\.Priority = \{ select: \{ name: input\.priority \} \}/);
+  assert.match(programmes, /properties\["Risk Level"\] = \{ select: \{ name: input\.riskLevel \} \}/);
+  assert.match(programmes, /properties\.Contributors = \{ rich_text:/);
+  assert.match(workplans, /startDate: textProp\(props\["Start Date"\]\)/);
+  assert.match(workplans, /properties\["Start Date"\] = \{ date:/);
+  assert.match(workplans, /properties\.Priority = \{ select:/);
+  assert.match(workplans, /properties\["Risk Level"\] = \{ select:/);
+  assert.match(programmeRoute, /"priority"/);
+  assert.match(programmeRoute, /"riskLevel"/);
+  assert.match(workplanRoute, /"startDate"/);
+  assert.match(workplanRoute, /"contributors"/);
+  assert.match(programmePanel, /Supporting teams \/ roles/);
+  assert.match(workplanPanel, /Supporting teams \/ roles/);
+});
+
+test("department report drafts distinguish completed outputs from planned work", () => {
+  const reports = read("lib/notion-department-reports.ts");
+  const route = read("app/ops/api/department-reports/route.ts");
+  const panel = read("components/DepartmentReportPanel.tsx");
+  assert.match(reports, /outputs: textProp\(props\.Outputs\)/);
+  assert.match(reports, /plannedWork: textProp\(props\["Planned Work"\]\)/);
+  assert.match(reports, /preparedByRole: textProp\(props\["Prepared By Role"\]\)/);
+  assert.match(reports, /properties\.Outputs = \{ rich_text:/);
+  assert.match(reports, /properties\["Planned Work"\] = \{ rich_text:/);
+  assert.match(route, /"outputs"/);
+  assert.match(route, /"plannedWork"/);
+  assert.match(route, /"preparedByRole"/);
+  assert.match(panel, /Outputs delivered/);
+  assert.match(panel, /Planned work/);
+  assert.match(panel, /Prepared by role · title only/);
+  assert.doesNotMatch(reports, /Reviewed By Role|Budget Summary/);
+  assert.doesNotMatch(route, /"reviewedByRole"|"budgetSummary"/);
+});
