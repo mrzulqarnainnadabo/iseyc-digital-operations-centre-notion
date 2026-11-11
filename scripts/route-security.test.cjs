@@ -211,7 +211,7 @@ test("every Operations Centre API route is private and every mutation is same-or
 
   for (const route of routes) {
     const wrapper = fs.readFileSync(path.join(opsApiRoot, route), "utf8");
-    const delegated = wrapper.includes('from "../../../api/') || wrapper.includes('from "../../../../api/');
+    const delegated = wrapper.includes('from "../../../api/') || wrapper.includes('from "../../../../api/') || wrapper.includes('from "../../../../../api/');
     const source = delegated ? fs.readFileSync(path.join(apiRoot, route), "utf8") : wrapper;
     const identityOnly = identityOnlyRoutes.has(route);
     if (!identityOnly) {
