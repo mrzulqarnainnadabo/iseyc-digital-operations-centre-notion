@@ -38,9 +38,19 @@ function departmentFilter(departmentId?: OpsDepartmentId) {
     : undefined;
 }
 
-import type { WorkPlanRecord, WorkPlanStatus } from "@/lib/department-operations";
+import type { WorkPlanRecord, WorkPlanStatus, WorkPriority, RiskLevel } from "@/lib/department-operations";
 
 const WORK_TYPE_FILTER = { property: "Work Type", select: { equals: "Operations" } };
+
+function mapPriority(raw: string): WorkPriority {
+  const allowed: WorkPriority[] = ["Critical", "High", "Medium", "Low"];
+  return allowed.includes(raw as WorkPriority) ? raw as WorkPriority : "Unspecified";
+}
+
+function mapRiskLevel(raw: string): RiskLevel {
+  const allowed: RiskLevel[] = ["Low", "Moderate", "High", "Critical"];
+  return allowed.includes(raw as RiskLevel) ? raw as RiskLevel : "Unspecified";
+}
 
 function mapStatus(raw: string): WorkPlanStatus {
   const allowed: WorkPlanStatus[] = [
@@ -58,8 +68,12 @@ function mapRow(page: any): WorkPlanRecord {
     objective: textProp(props["Intended Outcome"]),
     departmentId: departmentIdFromNotionSelect(textProp(props.Department)),
     deliverable: textProp(props["Acceptance Criteria"]),
+    startDate: textProp(props["Start Date"]),
     dueDate: textProp(props["Due Date"]),
     accountableRole: textProp(props["Accountable Role"]),
+    priority: mapPriority(textProp(props.Priority)),
+    riskLevel: mapRiskLevel(textProp(props["Risk Level"])),
+    contributors: textProp(props.Contributors),
     status: mapStatus(textProp(props.Status)),
     evidenceNote: urlProp(props["Evidence / Deliverable"]),
     url: typeof page.url === "string" ? page.url : "",
@@ -89,8 +103,12 @@ export async function createDepartmentWorkPlanDraft(input: {
   departmentId: OpsDepartmentId;
   objective?: string;
   deliverable?: string;
+  startDate?: string;
   dueDate?: string;
   accountableRole?: string;
+  priority?: WorkPriority;
+  riskLevel?: RiskLevel;
+  contributors?: string;
   evidenceUrl?: string;
 }): Promise<{ id: string; url: string; status: string }> {
   const { client, databaseId } = database();
@@ -110,6 +128,10 @@ export async function createDepartmentWorkPlanDraft(input: {
   if (input.accountableRole) {
     properties["Accountable Role"] = { rich_text: [{ text: { content: input.accountableRole.slice(0, 180) } }] };
   }
+  if (input.startDate) properties["Start Date"] = { date: { start: input.startDate } };
+  if (input.priority && input.priority !== "Unspecified") properties.Priority = { select: { name: input.priority } };
+  if (input.riskLevel && input.riskLevel !== "Unspecified") properties["Risk Level"] = { select: { name: input.riskLevel } };
+  if (input.contributors) properties.Contributors = { rich_text: [{ text: { content: input.contributors.slice(0, 1000) } }] };
   if (input.dueDate) properties["Due Date"] = { date: { start: input.dueDate } };
   if (input.evidenceUrl) properties["Evidence / Deliverable"] = { url: input.evidenceUrl };
   const page = await client.pages.create({ parent: { database_id: databaseId }, properties: properties as any });
