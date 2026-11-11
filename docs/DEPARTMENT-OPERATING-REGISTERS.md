@@ -115,6 +115,7 @@ The current register adapters provide basic programme/work-plan and report field
 - The server must continue to allowlist database IDs and fail closed when configuration is missing.
 - Department APIs require a staff session; writes require same-origin requests and bounded input.
 - Shared-key access does not identify an individual officer or prove appointment, membership or delegated authority.
+- The institution-wide Actions register may receive a proposed action record, but a proposed owner role is not an accepted assignment. Progress updates are deliberately disabled until the session identifies an individual officer and a trusted appointment/action assignment can be checked. The shared-key API must not update action status or evidence, and must not certify completion or closure.
 - Do not expose personnel, finance, health, safeguarding or applicant records through public evidence surfaces.
 - No demo programmes, officers, attendance, partner records or performance figures may be generated.
 
