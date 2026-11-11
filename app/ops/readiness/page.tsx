@@ -101,7 +101,7 @@ export default async function ReadinessPage() {
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-700">Live connection check</p>
           <h3 id="live-register-checks" className="font-semibold text-forest-950">Department registers</h3>
-          <p className="text-sm leading-6 text-ink-600">The application checks its own Notion credentials and database schemas. This is a read-only schema check; no programme or report rows are read.</p>
+          <p className="text-sm leading-6 text-ink-600">The application checks its own Notion credentials and database schemas. This read-only check reads no programme or report rows and does not test write permissions or grant staff authority.</p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {registerCards.map(({ key, title, result }) => {
