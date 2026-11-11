@@ -259,8 +259,20 @@ export default async function DepartmentDeskPage({
                         </div>
                         <span className="shrink-0 rounded-full border border-[#e2e7df] bg-white px-2.5 py-1 text-[9px] font-semibold text-[#59665d]">{record.geography.level}</span>
                       </div>
-                      <p className="mt-1 text-[10px] leading-4 text-[#68736b]">{record.publisher} · {record.referencePeriod}</p>
-                      <p className="mt-1 text-[10px] leading-4 text-[#7a837c]">{record.geography.label}</p>
+                      <dl className="mt-3 grid grid-cols-1 gap-2 rounded-lg border border-[#e8ece6] bg-white p-3 sm:grid-cols-3">
+                        <div className="min-w-0">
+                          <dt className="text-[9px] font-bold uppercase tracking-[.12em] text-[#8a6b34]">Publisher</dt>
+                          <dd className="mt-1 break-words text-[11px] font-semibold leading-4 text-[#35483d]">{record.publisher}</dd>
+                        </div>
+                        <div className="min-w-0">
+                          <dt className="text-[9px] font-bold uppercase tracking-[.12em] text-[#8a6b34]">Reference period</dt>
+                          <dd className="mt-1 break-words text-[11px] font-semibold leading-4 text-[#35483d]">{record.referencePeriod}</dd>
+                        </div>
+                        <div className="min-w-0">
+                          <dt className="text-[9px] font-bold uppercase tracking-[.12em] text-[#8a6b34]">Geographic coverage</dt>
+                          <dd className="mt-1 break-words text-[11px] font-semibold leading-4 text-[#35483d]">{record.geography.label}</dd>
+                        </div>
+                      </dl>
                       <div className="mt-3 grid gap-2 sm:grid-cols-2">
                         {record.metrics.slice(0, 2).map((metric) => (
                           <div key={metric.label} className="rounded-lg border border-[#e8ece6] bg-white p-3">
