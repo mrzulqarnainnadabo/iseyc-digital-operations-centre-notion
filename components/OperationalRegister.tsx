@@ -83,7 +83,7 @@ export default function OperationalRegister({ kind, initialMeetingId = "" }: { k
   useEffect(() => {
     void refresh();
     if (kind === "actions") {
-      fetch("/ops/api/meetings", { cache: "no-store" })
+      fetch(`/ops/api/meetings${initialMeetingId ? `?meetingId=${encodeURIComponent(initialMeetingId)}` : ""}`, { cache: "no-store" })
         .then(async (response) => {
           const data = await response.json();
           if (!response.ok || !Array.isArray(data.meetings)) throw new Error("The Meetings source is not available.");
