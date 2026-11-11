@@ -104,6 +104,19 @@ test("department snapshot adapter validates the Observatory v1 contract and pres
 });
 
 
+test("department registers share a clear, restrained empty-state treatment", () => {
+  for (const [componentPath, heading] of [
+    ["components/DepartmentProgrammePanel.tsx", "No programme proposals returned"],
+    ["components/DepartmentWorkPlanPanel.tsx", "No work-plan items returned"],
+    ["components/DepartmentReportPanel.tsx", "No reports returned"],
+  ]) {
+    const component = read(componentPath);
+    assert.match(component, /border-dashed border-\[#d9e1d8\] bg-\[#f8faf7\]/);
+    assert.ok(component.includes(heading), `${componentPath} should explain its empty state`);
+    assert.match(component, /current result page for this department/);
+  }
+});
+
 test("department draft forms can attach a source selected from the validated Observatory feed", () => {
   const page = read("app/ops/departments/[department]/page.tsx");
   for (const componentPath of [
