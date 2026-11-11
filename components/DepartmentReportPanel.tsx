@@ -3,12 +3,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { StatusBadge } from "@/components/StatusBadge";
 import type {
+  DepartmentEvidenceOption,
   DepartmentReportRecord,
   OpsDepartmentId,
   ReportType,
 } from "@/lib/department-operations";
 
-type Props = { departmentId: OpsDepartmentId; departmentName: string };
+type Props = { departmentId: OpsDepartmentId; departmentName: string; evidenceOptions: DepartmentEvidenceOption[] };
 
 const REPORT_TYPES: ReportType[] = [
   "Weekly",
@@ -17,7 +18,7 @@ const REPORT_TYPES: ReportType[] = [
   "Annual",
 ];
 
-export default function DepartmentReportPanel({ departmentId, departmentName }: Props) {
+export default function DepartmentReportPanel({ departmentId, departmentName, evidenceOptions }: Props) {
   const [rows, setRows] = useState<DepartmentReportRecord[]>([]);
   const [error, setError] = useState("");
   const [configured, setConfigured] = useState<boolean | null>(null);
@@ -181,10 +182,28 @@ export default function DepartmentReportPanel({ departmentId, departmentName }: 
             Outcomes / evidence
             <textarea maxLength={1800} rows={2} value={recommendations} onChange={(e) => setRecommendations(e.target.value)} className="mt-1 w-full rounded-control border border-line bg-white px-3 py-2 text-sm font-normal" />
           </label>
+          {evidenceOptions.length > 0 ? (
+            <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
+              Select an Observatory source (optional)
+              <select
+                value={evidenceOptions.some((option) => option.sourceUrl === evidenceUrl) ? evidenceUrl : ""}
+                onChange={(e) => setEvidenceUrl(e.target.value)}
+                className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal"
+              >
+                <option value="">No Observatory source selected</option>
+                {evidenceOptions.map((option) => (
+                  <option key={option.id} value={option.sourceUrl}>
+                    {option.title} · {option.publisher} · {option.referencePeriod} · {option.geographyLabel}
+                  </option>
+                ))}
+              </select>
+              <span className="mt-1 block text-xs font-normal text-ink-600">This copies the original publisher URL. The Observatory record ID is not stored in the current Notion register.</span>
+            </label>
+          ) : null}
           <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
             Evidence link (optional)
             <input type="url" maxLength={2048} value={evidenceUrl} onChange={(e) => setEvidenceUrl(e.target.value)} placeholder="https://…" className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
-            <span className="mt-1 block text-xs font-normal text-ink-600">Link to the Observatory snapshot or original source used in this report.</span>
+            <span className="mt-1 block text-xs font-normal text-ink-600">Link to the source used. A source link does not certify reported outputs or outcomes.</span>
           </label>
           <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
             Data limitations
