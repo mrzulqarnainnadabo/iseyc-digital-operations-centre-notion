@@ -142,8 +142,6 @@ export type DepartmentReportRecord = {
   outputs: string;
   plannedWork: string;
   preparedByRole: string;
-  reviewedByRole: string;
-  budgetSummary: string;
   evidenceUrl: string;
   dataLimitations: string;
   status: "Draft" | "Submitted" | "Under Review" | "Accepted" | "Revision Required" | "Archived" | "Unspecified";
