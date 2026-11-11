@@ -55,6 +55,7 @@ test("Notion adapters use the actual live register titles, property types and se
     assert.match(source, /Status: \{ status: \{ name: "Proposed" \} \}/);
   }
   assert.match(programmes, /"Work Type": \{ select: \{ name: "Programme" \} \}/);
+  assert.match(programmes, /evidenceNote: urlProp\(props\["Evidence \/ Deliverable"\]\)/);
   assert.match(workplans, /"Work Type": \{ select: \{ name: "Operations" \} \}/);
   assert.match(reports, /NOTION_DEPARTMENT_REPORTS_DATABASE_ID/);
   for (const field of ["Report \/ Period", "Reporting Cycle", "Reporting Period Start", "Completed Work", "Risks & Blockers", "Decisions Required", "Outcomes \/ Evidence"]) {
@@ -62,13 +63,13 @@ test("Notion adapters use the actual live register titles, property types and se
   }
   assert.match(reports, /Status: \{ status: \{ name: "Draft" \} \}/);
   for (const source of [programmes, workplans, reports]) {
-    assert.match(source, /"digital-systems": "Software & Technology"/);
-    assert.match(source, /"civic-affairs": "Civic Department"/);
+    assert.match(source, /"digital-systems": "Digital Systems & Technology"/);
+    assert.match(source, /"civic-affairs": "Civic Affairs & Public Accountability"/);
   }
   assert.doesNotMatch(reports, /props\.Name|props\["Report type"\]|Status: \{ select:/);
-  assert.match(reports, /properties\["Reporting Period Start"\] = \{\s*date: \{ start: input\.periodStart, \.\.\.\(input\.periodEnd/);
-  assert.match(reports, /props\["Reporting Period Start"\]\?\.date\?\.end/);
-  assert.doesNotMatch(reports, /Reporting Period End/);
+  assert.match(reports, /properties\["Reporting Period Start"\] = \{ date: \{ start: input\.periodStart \} \}/);
+  assert.match(reports, /properties\["Reporting Period End"\] = \{ date: \{ start: input\.periodEnd \} \}/);
+  assert.match(reports, /periodEnd: textProp\(props\["Reporting Period End"\]\)/);
 
 });
 
@@ -139,10 +140,26 @@ test("department adapters preserve canonical UI labels while writing exact live 
     "lib/notion-department-reports.ts",
   ]) {
     const source = read(file);
-    assert.match(source, /"digital-systems": "Software & Technology"/);
-    assert.match(source, /"civic-affairs": "Civic Department"/);
+    assert.match(source, /"digital-systems": "Digital Systems & Technology"/);
+    assert.match(source, /"civic-affairs": "Civic Affairs & Public Accountability"/);
     assert.match(source, /Department: \{ select: \{ name: DEPARTMENT_SELECT\[input\.departmentId\] \} \}/);
   }
   assert.match(model, /case "software & technology":\s*return "digital-systems"/);
   assert.match(model, /case "civic department":\s*return "civic-affairs"/);
+});
+
+test("department register documentation matches the two-register Notion implementation", () => {
+  const docs = read("docs/DEPARTMENT-OPERATING-REGISTERS.md");
+  const workplans = read("lib/notion-department-workplans.ts");
+  const model = read("lib/department-operations.ts");
+  assert.match(docs, /two shared internal Notion registers/);
+  assert.match(docs, /IDCC — Programmes & Work Register/);
+  assert.match(docs, /IDCC — Department Reports & Scorecards/);
+  assert.match(docs, /Work Type/);
+  assert.match(docs, /NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID/);
+  assert.match(docs, /NOTION_DEPARTMENT_REPORTS_DATABASE_ID/);
+  assert.match(docs, /Do not create or configure `NOTION_DEPARTMENT_WORKPLANS_DATABASE_ID`/);
+  assert.match(workplans, /NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID/);
+  assert.match(model, /WORKPLAN_REGISTER_ENV = PROGRAMME_REGISTER_ENV/);
+  assert.match(docs, /do not yet provide a fully structured evidence-assessment relation/);
 });

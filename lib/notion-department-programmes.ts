@@ -10,8 +10,8 @@ const DEPARTMENT_SELECT: Record<OpsDepartmentId, string> = {
   education: "Education & Capacity Building",
   health: "Health & Well-being",
   // Persist using exact live Notion select options; UI labels remain canonical.
-  "digital-systems": "Software & Technology",
-  "civic-affairs": "Civic Department",
+  "digital-systems": "Digital Systems & Technology",
+  "civic-affairs": "Civic Affairs & Public Accountability",
 };
 
 function database() {
@@ -35,6 +35,12 @@ function departmentFilter(departmentId?: OpsDepartmentId) {
 import type { ProgrammeRecord, ProgrammeStatus } from "@/lib/department-operations";
 
 const PROGRAMME_TYPE_FILTER = { property: "Work Type", select: { equals: "Programme" } };
+
+function urlProp(prop: unknown): string {
+  if (!prop || typeof prop !== "object") return "";
+  const value = prop as Record<string, unknown>;
+  return value.type === "url" && typeof value.url === "string" ? value.url : "";
+}
 
 function mapStatus(raw: string): ProgrammeStatus {
   const allowed: ProgrammeStatus[] = [
@@ -60,7 +66,7 @@ function mapRow(page: any): ProgrammeRecord {
     endDate: textProp(props["Due Date"]),
     accountableRole: textProp(props["Accountable Role"]),
     status: mapStatus(textProp(props.Status)),
-    evidenceNote: textProp(props["Acceptance Criteria"]),
+    evidenceNote: urlProp(props["Evidence / Deliverable"]),
     url: typeof page.url === "string" ? page.url : "",
   };
 }
