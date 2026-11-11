@@ -99,10 +99,10 @@ export default async function CommandBriefPage() {
           <div>
             <div className="flex items-center gap-3">
               <span className="h-px w-8 bg-[#c7a66a]" />
-              <p className="text-[10px] font-bold uppercase tracking-[.24em] text-[#ddc99f]">ISEYC · Digital Operations Centre</p>
+              <p className="text-[10px] font-bold uppercase tracking-[.24em] text-[#ddc99f]">ISEYC · Institutional operations</p>
             </div>
             <h1 className="mt-5 max-w-2xl font-serif text-4xl leading-[1.04] tracking-[-.035em] sm:text-5xl">Four departments.<br /><span className="text-[#d9c59b]">One institution.</span></h1>
-            <p className="mt-4 max-w-xl text-sm leading-6 text-white/75 sm:text-base">Four departments organise the work. Shared coordination connects them; people remain responsible for decisions.</p>
+            <p className="mt-4 max-w-xl text-sm leading-6 text-white/75 sm:text-base">The work of ISEYC is organised through four departments, supported by shared coordination and human review.</p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link href="#departments" className="inline-flex min-h-11 items-center rounded-full bg-[#e8d8b4] px-5 text-sm font-bold text-[#173c30] transition hover:bg-white">Explore departments <span aria-hidden="true" className="ml-2">↗</span></Link>
               <Link href="/ops/readiness" className="inline-flex min-h-11 items-center rounded-full border border-white/25 px-5 text-sm font-semibold text-white transition hover:bg-white/10">System readiness</Link>
@@ -124,16 +124,16 @@ export default async function CommandBriefPage() {
           </div>
         </div>
         <div className="relative grid grid-cols-3 divide-x divide-white/10 border-t border-white/10 bg-black/10">
-          <div className="px-5 py-4 sm:px-8"><p className="text-[10px] uppercase tracking-[.16em] text-white/50">Structure</p><p className="mt-1 text-sm font-semibold">4 departments</p></div>
-          <div className="px-5 py-4 sm:px-8"><p className="text-[10px] uppercase tracking-[.16em] text-white/50">Decision model</p><p className="mt-1 text-sm font-semibold">Human review</p></div>
-          <div className="px-5 py-4 sm:px-8"><p className="text-[10px] uppercase tracking-[.16em] text-white/50">Access level</p><p className="mt-1 text-sm font-semibold">Coordination</p></div>
+          <div className="px-5 py-4 sm:px-8"><p className="text-[10px] uppercase tracking-[.16em] text-white/50">Department structure</p><p className="mt-1 text-sm font-semibold">4 workspaces</p></div>
+          <div className="px-5 py-4 sm:px-8"><p className="text-[10px] uppercase tracking-[.16em] text-white/50">Review model</p><p className="mt-1 text-sm font-semibold">Human-led</p></div>
+          <div className="px-5 py-4 sm:px-8"><p className="text-[10px] uppercase tracking-[.16em] text-white/50">Current access</p><p className="mt-1 text-sm font-semibold">Coordination only</p></div>
         </div>
       </section>
 
       <section id="departments" className="scroll-mt-6 space-y-4">
         <div className="flex flex-wrap items-end justify-between gap-3">
-          <div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">The institution</p><h2 className="mt-1 font-serif text-2xl text-[#173c30] sm:text-3xl">Departments</h2></div>
-          <p className="max-w-sm text-xs leading-5 text-[#68736b]">Choose a department to open its workspace.</p>
+          <div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">The institutional structure</p><h2 className="mt-1 font-serif text-2xl text-[#173c30] sm:text-3xl">Department workspaces</h2></div>
+          <p className="max-w-sm text-xs leading-5 text-[#68736b]">Select a department to enter its dedicated operating desk.</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           {departments.map((department) => (
@@ -156,7 +156,7 @@ export default async function CommandBriefPage() {
       </section>
 
       <section className="rounded-2xl border border-[#e1e5dc] bg-[#f4f3ed] p-5 sm:p-7">
-        <div className="max-w-2xl"><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">How work moves</p><h2 className="mt-1 font-serif text-2xl text-[#173c30]">From planning to review</h2></div>
+        <div className="max-w-2xl"><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">How work moves</p><h2 className="mt-1 font-serif text-2xl text-[#173c30]">From departmental work to institutional review</h2></div>
         <div className="mt-6 grid gap-3 md:grid-cols-4">
           {[
             ["01", "Department", "Programmes and priorities"],
@@ -172,14 +172,14 @@ export default async function CommandBriefPage() {
             </div>
           ))}
         </div>
-        <p className="mt-4 text-[11px] leading-5 text-[#68736b]">Drafts are not approvals. Planned work is not delivered work. Results require evidence.</p>
+        <p className="mt-4 text-[11px] leading-5 text-[#68736b]">A record being drafted or planned does not mean that work has been approved, delivered or verified.</p>
       </section>
 
       <section className="grid gap-4 lg:grid-cols-[1.2fr_.8fr]">
         <div className="rounded-2xl border border-[#dce4dc] bg-white p-5 sm:p-6">
-          <p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">Shared coordination</p>
-          <h2 className="mt-1 font-serif text-xl text-[#173c30]">Work across departments</h2>
-          <p className="mt-2 max-w-xl text-sm leading-5 text-[#68736b]">One set of registers supports meetings, actions and external engagement. Departments remain responsible for their work.</p>
+          <p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">Shared institutional function</p>
+          <h2 className="mt-1 font-serif text-xl text-[#173c30]">Coordination across departments</h2>
+          <p className="mt-2 max-w-xl text-sm leading-5 text-[#68736b]">Common registers support meetings, actions, communications and external engagement. They do not replace departmental ownership.</p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Link href="/ops/actions" className="inline-flex min-h-10 items-center rounded-full border border-[#dce4dc] px-4 text-xs font-semibold text-[#194b3b] hover:bg-[#f3f6f2]">Actions</Link>
             <Link href="/ops/intake" className="inline-flex min-h-10 items-center rounded-full border border-[#dce4dc] px-4 text-xs font-semibold text-[#194b3b] hover:bg-[#f3f6f2]">Meeting intake</Link>
@@ -191,33 +191,52 @@ export default async function CommandBriefPage() {
         <div className="rounded-2xl bg-[#173f32] p-5 text-white sm:p-6">
           <p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#d9c59b]">Review queue</p>
           <p className="mt-3 font-serif text-4xl tabular-nums">{queueConnected ? awaiting.length : "—"}</p>
-          <p className="mt-1 text-xs text-white/65">{queueConnected ? "Open items in the first 25 records" : "Meeting register unavailable"}</p>
+          <p className="mt-1 text-xs text-white/65">{queueConnected ? "Awaiting review in the first 25 loaded records" : "Meeting register not connected"}</p>
           {listError ? <p role="alert" className="mt-2 text-xs text-amber-200">{listError}</p> : null}
           <div className="mt-5 flex flex-wrap gap-2">
             <Link href="/ops/queue" className="inline-flex min-h-10 items-center rounded-full bg-[#e8d8b4] px-4 text-xs font-bold text-[#173c30]">Open review queue ↗</Link>
             <Link href="/ops/readiness" className="inline-flex min-h-10 items-center rounded-full border border-white/25 px-4 text-xs font-semibold text-white">Readiness</Link>
           </div>
-          <p className="mt-4 text-[10px] leading-4 text-white/50">Count appears only when the register responds. No estimates are used.</p>
+          <p className="mt-4 text-[10px] leading-4 text-white/50">Live count is shown only when the connected register responds. No estimated activity is displayed.</p>
         </div>
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2">
         <div className="rounded-xl border border-[#e1e5dc] bg-white p-4">
-          <p className="text-[9px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Shared service</p>
-          <h2 className="mt-1 text-sm font-bold text-[#173c30]">Communications</h2>
+          <p className="text-[9px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Shared function · not a fifth department</p>
+          <h2 className="mt-1 text-sm font-bold text-[#173c30]">Communications coordination</h2>
           <div className="mt-2 flex items-center justify-between gap-3">
-            <p className="text-[11px] text-[#68736b]">Draft and review only. Publishing is disabled.</p>
-            <span className="shrink-0 rounded-full border border-[#e7d9b8] bg-[#fbf8ef] px-2 py-1 text-[9px] font-bold text-[#6e5425]">Draft only</span>
+            <p className="text-[11px] text-[#68736b]">Editorial drafts only · publication remains disabled.</p>
+            <span className="shrink-0 rounded-full border border-[#e7d9b8] bg-[#fbf8ef] px-2 py-1 text-[9px] font-bold text-[#6e5425]">Not operational</span>
           </div>
           <Link href="/ops/media" className="mt-3 inline-flex min-h-9 items-center text-xs font-bold text-[#194b3b]">Open communications →</Link>
         </div>
         <div className="rounded-xl border border-[#e1e5dc] bg-white p-4">
-          <p className="text-[9px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Governance</p>
-          <h2 className="mt-1 text-sm font-bold text-[#173c30]">Council & appointments</h2>
-          <p className="mt-2 text-[11px] text-[#68736b]">Role templates are available. No confirmed appointments are recorded yet.</p>
+          <p className="text-[9px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Governance records</p>
+          <h2 className="mt-1 text-sm font-bold text-[#173c30]">Presidential Council</h2>
+          <p className="mt-2 text-[11px] text-[#68736b]">Seat occupancy not connected. Role and appointment records require approved governance data.</p>
           <Link href="/ops/readiness" className="mt-3 inline-flex min-h-9 items-center text-xs font-bold text-[#194b3b]">View readiness →</Link>
         </div>
       </section>
+
+      <details className="rounded-xl border border-[#e1e5dc] bg-white px-4 py-3">
+        <summary className="min-h-9 cursor-pointer list-none text-xs font-bold text-[#315b45]">Environment configuration <span className="ml-1 text-[#a7833f]">＋</span></summary>
+        <ul className="mt-2 grid gap-2 text-[11px] sm:grid-cols-2 lg:grid-cols-3">
+          {([
+            ["Staff key", flags.staffKey],
+            ["Notion token", flags.token],
+            ["Meetings database", flags.meetings],
+            ["Media database", flags.media],
+            ["Chamber database", flags.chamber],
+            ["Actions database", flags.actions],
+          ] as const).map(([label, configured]) => (
+            <li key={label} className="flex items-center justify-between gap-3 rounded-lg bg-[#f6f7f3] px-3 py-2">
+              <span className="text-[#68736b]">{label}</span>
+              <span className={configured ? "font-bold text-[#28664a]" : "font-medium text-[#8a6b34]"}>{configured ? "Configured" : "Not connected"}</span>
+            </li>
+          ))}
+        </ul>
+      </details>
 
       <section className="rounded-xl border border-[#dce4dc] bg-[#edf2ec] p-4 sm:flex sm:items-center sm:justify-between sm:gap-4">
         <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Published civic systems</p><p className="mt-1 text-xs text-[#68736b]">Separate public platforms connected to ISEYC’s civic work.</p></div>
