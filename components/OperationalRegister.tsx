@@ -52,6 +52,7 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [configured, setConfigured] = useState<boolean | null>(null);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
 
   async function refresh(append = false) {
@@ -62,15 +63,19 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
       const suffix = cursor ? `?cursor=${encodeURIComponent(cursor)}` : "";
       const response = await fetch(`/ops/api/registers/${kind}${suffix}`, { cache: "no-store" });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Could not load register.");
+      if (!response.ok) {
+        setConfigured(false);
+        throw new Error(data.error || "Could not load register.");
+      }
       if (!Array.isArray(data.records) || (data.nextCursor !== null && typeof data.nextCursor !== "string") || typeof data.hasMore !== "boolean") {
         throw new Error("The register returned an invalid response. No records are shown.");
       }
+      setConfigured(true);
       setRows((current) => append ? [...current, ...data.records] : data.records);
       setNextCursor(data.hasMore ? data.nextCursor : null);
       setLoaded(true);
     } catch (cause) {
-      if (!append) { setRows([]); setLoaded(false); setNextCursor(null); }
+      if (!append) { setConfigured(false); setRows([]); setLoaded(false); setNextCursor(null); }
       setError(cause instanceof Error ? cause.message : "Could not load register.");
     } finally { setBusy(false); }
   }
@@ -129,6 +134,7 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
         </section>
       </header>
 
+      {configured === true ? (
       <section className="rounded-2xl border border-line bg-white p-5 shadow-card sm:p-6">
         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Create record</p>
         <h2 className="mt-1 font-serif text-xl text-forest-950">New {KIND_LABEL[kind].toLowerCase()} entry</h2>
@@ -227,6 +233,14 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
           </div>
         </form>
       </section>
+      ) : configured === false ? (
+        <section role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <p className="text-sm font-semibold text-amber-950">Record entry unavailable</p>
+          <p className="mt-1 text-xs leading-5 text-amber-900">The {KIND_LABEL[kind].toLowerCase()} register is not confirmed as connected. Configure its Notion database access and refresh before creating records. No entry has been saved.</p>
+        </section>
+      ) : (
+        <p role="status" className="rounded-xl border border-[#e1e7df] bg-[#f8faf7] p-4 text-sm text-[#68736b]">Checking the register connection. Record entry becomes available only after the connection is confirmed.</p>
+      )}
 
       <section className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Register</p><h2 className="font-semibold text-forest-950">Register records</h2></div><button type="button" onClick={() => void refresh()} disabled={busy} className="min-h-10 rounded-control border border-line px-3 text-sm font-semibold disabled:opacity-50">Refresh</button></div>
