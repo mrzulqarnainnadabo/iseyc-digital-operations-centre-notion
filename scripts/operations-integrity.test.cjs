@@ -683,3 +683,14 @@ test("meeting-to-action deep links can resolve an eligible meeting beyond the fi
   assert.match(register, /ops\/api\/meetings\?cursor=/);
   assert.match(register, /Load more meeting options/);
 });
+
+test("meeting review exposes reverse-linked action records without treating links as decisions", () => {
+  const review = read("app/ops/review/[id]/page.tsx");
+  const adapter = read("lib/notion.ts");
+  assert.match(adapter, /linkedActionIds: Array\.isArray\(props\["Linked actions"\]\?\.relation\)/);
+  assert.match(review, /Related operational records/);
+  assert.match(review, /Linked actions/);
+  assert.match(review, /No linked action records are returned/);
+  assert.match(review, /A relation records context only/);
+  assert.match(review, /href="\/ops\/actions"/);
+});
