@@ -186,6 +186,8 @@ test("Operations Centre homepage leads with an institutional visual and keeps de
   assert.match(page, /role="img" aria-label="Four connected departments arranged around shared ISEYC institutional coordination"/);
   assert.match(page, /One institution/);
   assert.match(page, /Shared coordination/);
+  assert.match(page, /Dedicated department workspaces\. Shared coordination\. Human decisions\./);
+  assert.match(page, /Meetings, actions and external engagement use shared registers\./);
   assert.match(page, /href="#departments"/);
   assert.match(page, /dept-workspace-card--\$\{department\.tone\}/);
   assert.match(page, /min-h-\[220px\]/);
