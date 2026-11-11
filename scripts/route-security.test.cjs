@@ -106,7 +106,7 @@ test("operations API route inventory is explicit and shared-session boundaries a
     assert.ok(source.includes("requireStaffSession") || source.includes("from \"../../../../../api/") || source.includes("from \"../../../../api/") || source.includes("from \"../../../api/"),
       `${route} must authenticate directly or delegate to an independently guarded API handler`);
     if (/route\.ts$/.test(route) && !route.includes("connection") && !route.includes("status") && !route.includes("[id]")) {
-      if (source.includes("export async function POST")) {
+      if (source.includes("export async function POST") || source.includes("export async function PATCH")) {
         assert.ok(source.includes("isSameOriginRequest"), `${route} POST must enforce same-origin`);
         assert.ok(source.includes("readBoundedJson"), `${route} POST must use bounded JSON parsing`);
       }
