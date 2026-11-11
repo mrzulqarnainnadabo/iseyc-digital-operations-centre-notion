@@ -197,7 +197,7 @@ test("actions, chamber and communications expose authenticated Notion-backed ini
   assert.match(component, /Proposed session · not yet convened/);
   assert.match(component, /kind === "actions" \|\| kind === "chamber" \? "Proposed" : row.status/);
   assert.match(component, /required minLength=\{2\} maxLength=\{180\}/);
-  assert.match(component, /does not assign access or imply a named officer/);
+  assert.match(component, /Role labels and meeting links do not assign people or certify decisions/);
 
   const api = fs.readFileSync(path.join(opsRoot, "api/registers/[kind]/route.ts"), "utf8");
   assert.match(api, /isSameOriginRequest/);
