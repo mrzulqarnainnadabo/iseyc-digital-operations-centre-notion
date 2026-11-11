@@ -156,7 +156,7 @@ export default async function DepartmentDeskPage({
         </div>
         <div className="relative grid grid-cols-3 divide-x divide-white/10 border-t border-white/10 bg-black/10">
           <div className="px-4 py-3 sm:px-7"><p className="text-[9px] uppercase tracking-[.16em] text-white/50">Mandate</p><p className="mt-1 text-xs font-semibold text-white">Defined</p></div>
-          <div className="px-4 py-3 sm:px-7"><p className="text-[9px] uppercase tracking-[.16em] text-white/50">Programme register</p><p className="mt-1 text-xs font-semibold text-white">Notion-backed when configured</p></div>
+          <div className="px-4 py-3 sm:px-7"><p className="text-[9px] uppercase tracking-[.16em] text-white/50">Programme register</p><p className="mt-1 text-xs font-semibold text-white">Connection shown below</p></div>
           <div className="px-4 py-3 sm:px-7"><p className="text-[9px] uppercase tracking-[.16em] text-white/50">Authority</p><p className="mt-1 text-xs font-semibold text-white">Human-led</p></div>
         </div>
       </header>
@@ -421,7 +421,7 @@ export default async function DepartmentDeskPage({
 
       <section className="grid scroll-mt-5 gap-4 lg:grid-cols-2">
         <article id="work-plans" className="rounded-2xl border border-[#e1e5dc] bg-white p-4 shadow-[0_4px_18px_rgba(20,49,38,.04)] sm:p-5">
-          <p className="mb-3 text-[10px] leading-4 text-[#7a837c]">A department task register is Not connected until its Notion register is configured. No task records are simulated.</p>
+          
           <div className="mb-3 flex items-center gap-3"><span className="h-8 w-1 rounded-full bg-[#315b45]" /><div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">02 · Execution</p><h2 className="font-serif text-xl text-[#173c30]">Work plans</h2></div></div>
           <DepartmentWorkPlanPanel departmentId={department} departmentName={profile.name} evidenceOptions={evidenceOptions} />
         </article>
@@ -443,7 +443,7 @@ export default async function DepartmentDeskPage({
             <p className="mt-1 text-[10px] text-[#7a837c]">{meeting.meetingDate || "Date not supplied"} · {meeting.conveningBody}</p>
             <Link href={`/ops/review/${encodeURIComponent(meeting.id)}`} className="mt-2 inline-flex min-h-8 items-center text-[11px] font-bold text-[#194b3b]">Open meeting record →</Link>
           </li>
-        ))}</ul> : <p className="mt-4 rounded-xl border border-dashed border-[#d7ddd4] bg-white/70 p-4 text-xs leading-5 text-[#6c786f]">No matching department meetings were found on the loaded page. This does not establish that no department activity exists.</p>}
+        ))}</ul> : <p className="mt-4 rounded-xl border border-dashed border-[#d7ddd4] bg-white/70 p-4 text-xs leading-5 text-[#6c786f]">No matching meetings appear on this page. Other pages may contain more.</p>}
       </section>
 
       <section id="shared-tools" className="scroll-mt-5 rounded-2xl border border-[#dce4dc] bg-white p-5 sm:p-6">
