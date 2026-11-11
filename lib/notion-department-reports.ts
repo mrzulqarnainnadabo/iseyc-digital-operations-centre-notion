@@ -10,8 +10,8 @@ const DEPARTMENT_SELECT: Record<OpsDepartmentId, string> = {
   education: "Education & Capacity Building",
   health: "Health & Well-being",
   // Persist using exact live Notion select options; UI labels remain canonical.
-  "digital-systems": "Software & Technology",
-  "civic-affairs": "Civic Department",
+  "digital-systems": "Digital Systems & Technology",
+  "civic-affairs": "Civic Affairs & Public Accountability",
 };
 
 function database() {
@@ -52,9 +52,7 @@ function mapRow(page: any): DepartmentReportRecord {
     reportType: mapReportType(textProp(props["Reporting Cycle"])),
     departmentId: departmentIdFromNotionSelect(textProp(props.Department)),
     periodStart: textProp(props["Reporting Period Start"]),
-    periodEnd: typeof props["Reporting Period Start"]?.date?.end === "string"
-      ? props["Reporting Period Start"].date.end
-      : "",
+    periodEnd: textProp(props["Reporting Period End"]),
     summary: textProp(props["Completed Work"]),
     challenges: textProp(props["Risks & Blockers"]),
     outstandingActions: textProp(props["Decisions Required"]),
@@ -106,9 +104,10 @@ export async function createDepartmentReportDraft(input: {
     throw new Error("A reporting period end requires a reporting period start.");
   }
   if (input.periodStart) {
-    properties["Reporting Period Start"] = {
-      date: { start: input.periodStart, ...(input.periodEnd ? { end: input.periodEnd } : {}) },
-    };
+    properties["Reporting Period Start"] = { date: { start: input.periodStart } };
+  }
+  if (input.periodEnd) {
+    properties["Reporting Period End"] = { date: { start: input.periodEnd } };
   }
   if (input.summary) properties["Completed Work"] = { rich_text: [{ text: { content: input.summary.slice(0, 1800) } }] };
   if (input.challenges) properties["Risks & Blockers"] = { rich_text: [{ text: { content: input.challenges.slice(0, 1800) } }] };
