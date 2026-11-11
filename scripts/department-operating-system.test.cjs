@@ -157,7 +157,7 @@ test("department register documentation matches the two-register Notion implemen
   assert.match(docs, /Work Type/);
   assert.match(docs, /NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID/);
   assert.match(docs, /NOTION_DEPARTMENT_REPORTS_DATABASE_ID/);
-  assert.doesNotMatch(docs, /NOTION_DEPARTMENT_WORKPLANS_DATABASE_ID/);
+  assert.match(docs, /Do not create or configure `NOTION_DEPARTMENT_WORKPLANS_DATABASE_ID`/);
   assert.match(workplans, /NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID/);
   assert.match(model, /WORKPLAN_REGISTER_ENV = PROGRAMME_REGISTER_ENV/);
   assert.match(docs, /do not yet provide a fully structured evidence-assessment relation/);
