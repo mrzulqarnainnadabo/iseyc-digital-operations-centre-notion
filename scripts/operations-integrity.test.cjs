@@ -655,3 +655,17 @@ test("shared operational register creation stays unavailable until its Notion co
   assert.match(register, /Record entry unavailable/);
   assert.match(register, /Checking the register connection/);
 });
+
+test("standard meeting review can hand off a contextual action proposal without implying a decision or assignment", () => {
+  const review = read("app/ops/review/[id]/page.tsx");
+  const actionsPage = read("app/ops/actions/page.tsx");
+  const register = read("components/OperationalRegister.tsx");
+  assert.match(review, /meeting\.sensitivity === "Standard"/);
+  assert.match(review, /ops\/actions\?meetingId=/);
+  assert.match(review, /does not certify a decision, approve the action or assign an officer/);
+  assert.match(actionsPage, /searchParams/);
+  assert.match(actionsPage, /initialMeetingId={initialMeetingId}/);
+  assert.match(register, /eligibleMeetings\.some/);
+  assert.match(register, /meeting\.sensitivity === "Standard"/);
+  assert.match(register, /setSourceMeetingId\(initialMeetingId\)/);
+});
