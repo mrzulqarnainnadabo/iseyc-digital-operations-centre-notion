@@ -422,7 +422,8 @@ export default async function DepartmentDeskPage({
       <section className="grid scroll-mt-5 gap-4 lg:grid-cols-2">
         <article id="work-plans" className="rounded-2xl border border-[#e1e5dc] bg-white p-4 shadow-[0_4px_18px_rgba(20,49,38,.04)] sm:p-5">
           
-          <div className="mb-3 flex items-center gap-3"><span className="h-8 w-1 rounded-full bg-[#315b45]" /><div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">02 · Execution</p><h2 className="font-serif text-xl text-[#173c30]">Work plans</h2></div></div>
+          <p className="mb-3 text-[10px] leading-4 text-[#7a837c]">Department task register status appears in the work-plan panel. No sample tasks are displayed.</p>
+        <div className="mb-3 flex items-center gap-3"><span className="h-8 w-1 rounded-full bg-[#315b45]" /><div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">02 · Execution</p><h2 className="font-serif text-xl text-[#173c30]">Work plans</h2></div></div>
           <DepartmentWorkPlanPanel departmentId={department} departmentName={profile.name} evidenceOptions={evidenceOptions} />
         </article>
         <article id="reports" className="scroll-mt-5 rounded-2xl border border-[#e1e5dc] bg-white p-4 shadow-[0_4px_18px_rgba(20,49,38,.04)] sm:p-5">
