@@ -549,6 +549,8 @@ test("department draft forms are collapsed until requested and clearly explain t
   assert.match(workplan, /Proposed accountable role · title only/);
   assert.doesNotMatch(programme, /Accountable role · title only/);
   assert.doesNotMatch(workplan, /Accountable role · title only/);
+  assert.match(programme, /Proposed role/);
+  assert.match(workplan, /Proposed role · \$\{row\.accountableRole\}/);
 });
 
 test("department work plans use the existing shared register's Operations work type without fictitious relations", () => {
