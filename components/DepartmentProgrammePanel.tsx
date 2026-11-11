@@ -295,7 +295,7 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName,
               ) : null}
               {row.accountableRole ? (
                 <div>
-                  <dt className="font-semibold text-ink-700">Accountable role</dt>
+                  <dt className="font-semibold text-ink-700">Proposed role</dt>
                   <dd>{row.accountableRole}</dd>
                 </div>
               ) : null}
