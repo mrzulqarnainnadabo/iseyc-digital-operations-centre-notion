@@ -117,8 +117,9 @@ test("department desks mount programme work-plan and report panels with tools", 
   assert.match(desk, /id="shared-tools"/);
   assert.match(desk, /fn\.activities/);
   assert.match(desk, /fn\.outputs/);
-  assert.match(desk, /task register/i);
-  assert.match(desk, /Not connected/);
+  assert.match(desk, /id="work-plans"/);
+  assert.match(desk, /Work plans/);
+  assert.match(desk, /DepartmentWorkPlanPanel/);
 });
 
 test("readiness documents department operating architecture without inventing live data", () => {
