@@ -231,4 +231,8 @@ test("shared-key sessions cannot write unattributed action progress", () => {
   assert.match(source, /Shared staff access cannot attribute progress/);
   assert.match(source, /status: 503/);
   assert.equal(source.includes("updateActionProgress("), false);
+  const panel = fs.readFileSync(path.join(__dirname, "../components/OperationalRegister.tsx"), "utf8");
+  assert.match(panel, /Progress updates are paused/);
+  assert.match(panel, /Shared staff access cannot record accountable progress/);
+  assert.equal(panel.includes("ActionProgressForm"), false);
 });
