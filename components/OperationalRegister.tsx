@@ -217,6 +217,7 @@ export default function OperationalRegister({ kind, initialMeetingId = "", initi
               <span className="mt-1 block text-[10px] font-normal text-ink-600">{meetingSourceError || "Links to a Standard meeting record as context. It does not certify a decision or create an approval."}</span>
             </label>
             {meetingHasMore ? <button type="button" onClick={loadMoreMeetings} disabled={meetingLoadingMore} className="inline-flex min-h-9 items-center text-xs font-semibold text-forest-800 underline underline-offset-2 disabled:opacity-50">{meetingLoadingMore ? "Loading meeting options…" : "Load more meeting options"}</button> : null}
+            {initialNotes ? <p role="status" className="rounded-lg border border-[#dfe6df] bg-[#f7faf6] px-3 py-2 text-xs leading-5 text-[#59665d]">A work-plan reference was prefilled in these notes. Check it before saving; this is a text reference, not a database relation or approval.</p> : null}
             <label className="block text-sm font-semibold text-ink-800">Working notes
               <textarea rows={2} maxLength={1000} value={notes} onChange={(e) => setNotes(e.target.value)} className={area} />
             </label>
