@@ -645,3 +645,13 @@ test("department work plans explain the separate action-register handoff without
   assert.match(workplan, /shared Action register/);
   assert.match(workplan, /does not transfer approval or assign an officer/);
 });
+
+test("shared operational register creation stays unavailable until its Notion connection is confirmed", () => {
+  const register = read("components/OperationalRegister.tsx");
+  assert.match(register, /const \[configured, setConfigured\] = useState<boolean \| null>\(null\)/);
+  assert.match(register, /setConfigured\(true\)/);
+  assert.match(register, /setConfigured\(false\)/);
+  assert.match(register, /\{configured === true \? \(/);
+  assert.match(register, /Record entry unavailable/);
+  assert.match(register, /Checking the register connection/);
+});
