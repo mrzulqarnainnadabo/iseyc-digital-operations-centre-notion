@@ -84,6 +84,8 @@ export type WorkPlanStatus =
   | "Unspecified";
 
 export type ReportType = "Weekly" | "Monthly" | "Quarterly" | "Annual" | "Unspecified";
+export type WorkPriority = "Critical" | "High" | "Medium" | "Low" | "Unspecified";
+export type RiskLevel = "Low" | "Moderate" | "High" | "Critical" | "Unspecified";
 
 /** Canonical programme view model backed by the shared Notion register. */
 export type ProgrammeRecord = {
@@ -99,6 +101,9 @@ export type ProgrammeRecord = {
   startDate: string;
   endDate: string;
   accountableRole: string;
+  priority: WorkPriority;
+  riskLevel: RiskLevel;
+  contributors: string;
   status: ProgrammeStatus;
   evidenceNote: string;
   url: string;
@@ -111,8 +116,12 @@ export type WorkPlanRecord = {
   objective: string;
   departmentId: DepartmentRecordId;
   deliverable: string;
+  startDate: string;
   dueDate: string;
   accountableRole: string;
+  priority: WorkPriority;
+  riskLevel: RiskLevel;
+  contributors: string;
   status: WorkPlanStatus;
   evidenceNote: string;
   url: string;
@@ -130,6 +139,11 @@ export type DepartmentReportRecord = {
   challenges: string;
   outstandingActions: string;
   recommendations: string;
+  outputs: string;
+  plannedWork: string;
+  preparedByRole: string;
+  reviewedByRole: string;
+  budgetSummary: string;
   evidenceUrl: string;
   dataLimitations: string;
   status: "Draft" | "Submitted" | "Under Review" | "Accepted" | "Revision Required" | "Archived" | "Unspecified";
