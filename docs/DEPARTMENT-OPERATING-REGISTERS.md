@@ -98,7 +98,7 @@ Every department follows the same evidence-to-action sequence:
 7. Record implementation evidence and blockers.
 8. Assess outcomes against a suitable baseline and follow-up method; do not equate activity counts with impact.
 
-The current register adapters provide basic programme/work-plan and report fields. They do **not yet provide a fully structured evidence-assessment relation** to Observatory source IDs, a verified appointment-to-user binding, budget authorisation or independent outcome certification. Do not represent those capabilities as live.
+The current register adapters provide basic programme/work-plan and report fields. They do not yet provide a fully structured evidence-assessment relation to Observatory source IDs, a verified appointment-to-user binding, budget authorisation or independent outcome certification. Do not represent those capabilities as live.
 
 ## 4. Access and configuration
 
