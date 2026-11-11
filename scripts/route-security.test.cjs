@@ -235,4 +235,6 @@ test("shared-key sessions cannot write unattributed action progress", () => {
   assert.match(panel, /Progress updates are paused/);
   assert.match(panel, /Shared staff access cannot record accountable progress/);
   assert.equal(panel.includes("ActionProgressForm"), false);
+  assert.match(panel, /Proposed owner role/);
+  assert.doesNotMatch(panel, /Accountable owner role/);
 });
