@@ -63,3 +63,10 @@ These are uneven, dated source records, not four complete departmental datasets.
 The earlier World Bank national indicator pilot remains a separate supplementary series. It is not merged into the curated snapshot bundle, and its estimates are not represented as local measurements.
 
 A department with no matching snapshot, an invalid contract response or an unavailable endpoint receives an explicit state; the application does not fill gaps with proxy metrics, zeroes or invented activity.
+
+
+### Using evidence in a department draft
+
+When the curated snapshot feed is available, the programme, work-plan and report draft forms offer a source selector populated only from the validated records for that department. Selecting an option copies the original publisher URL into the existing Notion evidence-link field. A manual URL can still be entered when a relevant source is not in the current bundle.
+
+The current Notion registers have one URL field for this purpose. The selected source's Observatory record ID, metric values and snapshot payload are not persisted in the register yet. The form states this limitation; a URL is a source pointer, not proof of implementation, delivery or impact. A future schema change can add a dedicated structured evidence-reference property after approval.
