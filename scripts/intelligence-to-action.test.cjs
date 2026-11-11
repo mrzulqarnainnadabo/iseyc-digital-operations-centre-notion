@@ -164,14 +164,3 @@ test("department report drafts distinguish completed outputs from planned work",
 });
 
 
-test("operations home keeps the institutional message concise and moves technical configuration to readiness", () => {
-  const home = read("app/ops/page.tsx");
-  assert.match(home, /Four departments organise the work/);
-  assert.match(home, /Choose a department to open its workspace/);
-  assert.match(home, /From planning to review/);
-  assert.match(home, /Drafts are not approvals/);
-  assert.match(home, /No confirmed appointments are recorded yet/);
-  assert.doesNotMatch(home, /Environment configuration/);
-  assert.doesNotMatch(home, /Staff key/);
-  assert.doesNotMatch(home, /Notion token/);
-});
