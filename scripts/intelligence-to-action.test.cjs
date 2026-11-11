@@ -114,6 +114,10 @@ test("department registers share a clear, restrained empty-state treatment", () 
     assert.match(component, /border-dashed border-\[#d9e1d8\] bg-\[#f8faf7\]/);
     assert.ok(component.includes(heading), `${componentPath} should explain its empty state`);
     assert.match(component, /current result page for this department/);
+    assert.match(component, /configured === true \?/);
+    assert.match(component, /configured === false \?/);
+    assert.match(component, /role="status"/);
+    assert.match(component, /entry becomes available only after the connection is confirmed/);
   }
 });
 
