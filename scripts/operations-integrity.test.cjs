@@ -652,8 +652,8 @@ test("Presidential Council guide links to a bounded operating compact", () => {
 test("department work plans explain the separate action-register handoff without implying automatic approval or assignment", () => {
   const workplan = read("components/DepartmentWorkPlanPanel.tsx");
   assert.match(workplan, /href="\/ops\/actions"/);
-  assert.match(workplan, /shared Action register/);
-  assert.match(workplan, /does not transfer approval or assign an officer/);
+  assert.match(workplan, /Copy the work-plan record’s Notion URL into the Action notes/);
+  assert.match(workplan, /do not create an automatic link, approval or assignment/);
 });
 
 test("shared operational register creation stays unavailable until its Notion connection is confirmed", () => {
