@@ -224,7 +224,7 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName, 
               <StatusBadge status={row.status} />
             </div>
             {row.objective ? <p className="mt-1 text-sm text-ink-700">{row.objective}</p> : null}
-            <p className="mt-1 text-xs text-ink-600">{[row.startDate && `Start ${row.startDate}`, row.dueDate && `Due ${row.dueDate}`, row.accountableRole, row.deliverable].filter(Boolean).join(" · ")}</p>
+            <p className="mt-1 text-xs text-ink-600">{[row.startDate && `Start ${row.startDate}`, row.dueDate && `Due ${row.dueDate}`, row.accountableRole && `Proposed role · ${row.accountableRole}`, row.deliverable].filter(Boolean).join(" · ")}</p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {row.priority !== "Unspecified" ? <span className="rounded-full border border-[#e4e8e1] bg-[#fafbf8] px-2.5 py-1 text-[10px] font-semibold text-[#405b49]">Priority · {row.priority}</span> : null}
               {row.riskLevel !== "Unspecified" ? <span className="rounded-full border border-[#e4e8e1] bg-[#fafbf8] px-2.5 py-1 text-[10px] font-semibold text-[#805b27]">Risk · {row.riskLevel}</span> : null}
