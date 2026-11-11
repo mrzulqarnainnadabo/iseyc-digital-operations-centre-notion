@@ -147,6 +147,7 @@ export default async function DepartmentDeskPage({
         {[
           ["#overview", "Overview"],
           ["#functions", "Functions"],
+          ["#intelligence", "Evidence"],
           ["#programmes", "Programmes"],
           ["#work-plans", "Work plans"],
           ["#reports", "Reports"],
