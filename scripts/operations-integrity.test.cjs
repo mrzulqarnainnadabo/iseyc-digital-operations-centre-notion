@@ -194,7 +194,7 @@ test("actions, chamber and communications expose authenticated Notion-backed ini
   assert.match(component, /Proposed owner role · required/);
   assert.match(component, /Proposed action · unassigned · awaiting authorised acceptance/);
   assert.match(component, /Proposed action · unassigned · awaiting authorised acceptance/);
-  assert.match(component, /Proposed session · not yet convened/);
+  assert.match(component, /Proposed · not yet convened/);
   assert.match(component, /kind === "actions" \|\| kind === "chamber" \? "Proposed" : row.status/);
   assert.match(component, /required minLength=\{2\} maxLength=\{180\}/);
   assert.match(component, /does not assign access or imply a named officer/);
