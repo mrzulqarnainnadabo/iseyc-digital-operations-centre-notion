@@ -19,7 +19,7 @@ const REQUIRED_PROPERTIES = {
       "Programme / Work Item": { type: "title" },
       Department: { type: "select", options: ["Education & Capacity Building", "Health & Well-being", "Digital Systems & Technology", "Civic Affairs & Public Accountability", "Cross-departmental"] },
       "Work Type": { type: "select", options: ["Programme", "Project", "Training", "Research", "Operations", "Community Engagement"] },
-      Status: { type: "status" },
+      Status: { type: "status", options: ["Proposed", "Approved", "In Progress", "Under Review", "Paused", "Completed", "Cancelled"] },
       "Intended Outcome": { type: "rich_text" },
       "Acceptance Criteria": { type: "rich_text" },
       "Accountable Role": { type: "rich_text" },
@@ -36,7 +36,7 @@ const REQUIRED_PROPERTIES = {
       "Report / Period": { type: "title" },
       Department: { type: "select", options: ["Education & Capacity Building", "Health & Well-being", "Digital Systems & Technology", "Civic Affairs & Public Accountability", "Cross-departmental"] },
       "Reporting Cycle": { type: "select", options: ["Weekly", "Monthly", "Quarterly", "Annual"] },
-      Status: { type: "status" },
+      Status: { type: "status", options: ["Draft", "Submitted", "Under Review", "Revision Required", "Accepted", "Archived"] },
       "Reporting Period Start": { type: "date" },
       "Reporting Period End": { type: "date" },
       "Completed Work": { type: "rich_text" },
@@ -93,7 +93,9 @@ async function checkRegister(
         const property = properties[name];
         if (property?.type !== specification.type) return true;
         if (!specification.options) return false;
-        const available = property?.select?.options ?? [];
+        const available = property?.type === "status"
+          ? property?.status?.options ?? []
+          : property?.select?.options ?? [];
         const names = Array.isArray(available) ? available.map((option: any) => option.name) : [];
         return specification.options.some((option) => !names.includes(option));
       })
