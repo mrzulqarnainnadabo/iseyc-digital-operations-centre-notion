@@ -236,7 +236,7 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
         <div className="space-y-3">
           {rows.map((row) => (
             <article key={row.id} className="rounded-card border border-line bg-white p-4 shadow-card">
-              <div className="flex flex-wrap items-start justify-between gap-2"><h3 className="font-semibold text-forest-950">{row.title}</h3><StatusBadge status={row.status} /></div>
+              <div className="flex flex-wrap items-start justify-between gap-2"><div><h3 className="font-semibold text-forest-950">{row.title}</h3>{kind === "actions" ? <p className="mt-1 text-xs font-medium text-ink-600">Proposed · unassigned · awaiting authorised acceptance</p> : null}</div><StatusBadge status={row.status} /></div>
               {row.detail ? (kind === "actions" ? <p className="mt-2 text-sm leading-6 text-ink-700"><strong>Proposed owner role:</strong> {row.detail}</p> : <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-ink-700">{row.detail}</p>) : null}
               {row.date ? <p className="mt-1 text-xs text-ink-600">{row.date}</p> : null}
               {kind === "actions" ? <div className="mt-3 flex flex-wrap gap-2 text-[10px]">
