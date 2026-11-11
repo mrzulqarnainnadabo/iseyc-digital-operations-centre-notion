@@ -196,3 +196,44 @@ test("login throttling documents the distributed enforcement requirement", () =>
   assert.match(limiter, /distributed Vercel Firewall\/WAF limit/);
   assert.match(limiter, /POST \/api\/auth\/login/);
 });
+
+
+const opsApiRoot = path.join(__dirname, "../app/ops/api");
+
+test("every Operations Centre API route is private and every mutation is same-origin and session protected", () => {
+  const routes = collectRoutes(opsApiRoot);
+  assert.ok(routes.length > 0, "Operations Centre API route inventory must not be empty");
+
+  for (const route of routes) {
+    const source = fs.readFileSync(path.join(opsApiRoot, route), "utf8");
+    assert.ok(
+      source.includes("requireStaffSession()"),
+      `${route} must require an authenticated staff session`
+    );
+    assert.ok(
+      source.includes("privateJson("),
+      `${route} must use private no-store response handling`
+    );
+
+    const methods = [...source.matchAll(/export async function (GET|POST|PUT|PATCH|DELETE)\\s*\\(/g)]
+      .map((match) => match[1]);
+    for (const method of methods.filter((item) => item !== "GET")) {
+      const body = source.slice(source.indexOf(`export async function ${method}`));
+      assertInOrder(
+        body,
+        ["isSameOriginRequest(", "requireStaffSession()"],
+        `${route} ${method}`
+      );
+    }
+  }
+});
+
+test("shared-key action progress cannot approve, complete or close an institutional action", () => {
+  const source = fs.readFileSync(
+    path.join(opsApiRoot, "actions/[id]/route.ts"),
+    "utf8"
+  );
+  assert.match(source, /input\.status !== "In progress" && input\.status !== "Blocked"/);
+  assert.match(source, /Done and closure require a separate authorised review/);
+  assert.doesNotMatch(source, /input\.status === "Done"|input\.status === "Closed"|actions\.close/);
+});
