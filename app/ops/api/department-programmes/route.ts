@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { privateJson } from "@/lib/private-response";
 import { requireStaffSession } from "@/lib/auth";
 import { isSameOriginRequest, readBoundedJson } from "@/lib/request-security";
-import { isOpsDepartmentId, type OpsDepartmentId } from "@/lib/department-operations";
+import { isOpsDepartmentId, type OpsDepartmentId, type WorkPriority, type RiskLevel } from "@/lib/department-operations";
 import {
   createDepartmentProgrammeDraft,
   departmentProgrammesConfigured,
@@ -113,6 +113,9 @@ export async function POST(request: NextRequest) {
     "startDate",
     "endDate",
     "accountableRole",
+    "priority",
+    "riskLevel",
+    "contributors",
     "evidenceUrl",
   ];
   if (Object.keys(input).some((key) => !allowed.includes(key))) {
@@ -131,6 +134,17 @@ export async function POST(request: NextRequest) {
   }
   const str = (key: string, max: number) =>
     typeof input[key] === "string" ? (input[key] as string).trim().slice(0, max) : "";
+  const priority = str("priority", 20);
+  const riskLevel = str("riskLevel", 20);
+  const contributors = str("contributors", 1000);
+  const priorities: WorkPriority[] = ["Critical", "High", "Medium", "Low", "Unspecified"];
+  const risks: RiskLevel[] = ["Low", "Moderate", "High", "Critical", "Unspecified"];
+  if (priority && !priorities.includes(priority as WorkPriority)) {
+    return privateJson({ ok: false, error: "Select a valid programme priority." }, { status: 400 });
+  }
+  if (riskLevel && !risks.includes(riskLevel as RiskLevel)) {
+    return privateJson({ ok: false, error: "Select a valid programme risk level." }, { status: 400 });
+  }
   const startDate = str("startDate", 10);
   const endDate = str("endDate", 10);
   const evidenceUrl = str("evidenceUrl", 2048);
@@ -162,6 +176,9 @@ export async function POST(request: NextRequest) {
       startDate: startDate || undefined,
       endDate: endDate || undefined,
       accountableRole: accountableRole || undefined,
+      priority: (priority || "Unspecified") as WorkPriority,
+      riskLevel: (riskLevel || "Unspecified") as RiskLevel,
+      contributors: contributors || undefined,
       evidenceUrl: evidenceUrl || undefined,
     });
     return privateJson(
