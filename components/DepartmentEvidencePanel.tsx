@@ -51,7 +51,9 @@ function isSnapshotRecord(value: unknown): value is SnapshotRecord {
   } catch {
     return false;
   }
-  return record.metrics.every((metric) => {
+  const metrics = [...record.metrics, ...(Array.isArray(record.additionalMetrics) ? record.additionalMetrics : [])];
+  if (record.additionalMetrics !== undefined && !Array.isArray(record.additionalMetrics)) return false;
+  return metrics.every((metric) => {
     if (!metric || typeof metric !== "object") return false;
     const item = metric as Record<string, unknown>;
     return typeof item.label === "string" && typeof item.value === "string" &&
