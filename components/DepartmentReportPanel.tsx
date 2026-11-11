@@ -33,6 +33,9 @@ export default function DepartmentReportPanel({ departmentId, departmentName, ev
   const [challenges, setChallenges] = useState("");
   const [outstandingActions, setOutstandingActions] = useState("");
   const [recommendations, setRecommendations] = useState("");
+  const [outputs, setOutputs] = useState("");
+  const [plannedWork, setPlannedWork] = useState("");
+  const [preparedByRole, setPreparedByRole] = useState("");
   const [evidenceUrl, setEvidenceUrl] = useState("");
   const [dataLimitations, setDataLimitations] = useState("");
 
@@ -99,6 +102,9 @@ export default function DepartmentReportPanel({ departmentId, departmentName, ev
           challenges,
           outstandingActions,
           recommendations,
+          outputs,
+          plannedWork,
+          preparedByRole,
           evidenceUrl,
           dataLimitations,
         }),
@@ -112,6 +118,9 @@ export default function DepartmentReportPanel({ departmentId, departmentName, ev
       setChallenges("");
       setOutstandingActions("");
       setRecommendations("");
+      setOutputs("");
+      setPlannedWork("");
+      setPreparedByRole("");
       setEvidenceUrl("");
       setDataLimitations("");
       setReportType("Monthly");
@@ -170,6 +179,14 @@ export default function DepartmentReportPanel({ departmentId, departmentName, ev
             Completed work
             <textarea maxLength={1800} rows={3} value={summary} onChange={(e) => setSummary(e.target.value)} className="mt-1 w-full rounded-control border border-line bg-white px-3 py-2 text-sm font-normal" />
           </label>
+          <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
+            Outputs delivered
+            <textarea maxLength={1800} rows={2} value={outputs} onChange={(e) => setOutputs(e.target.value)} placeholder="Specific outputs produced in this reporting period." className="mt-1 w-full rounded-control border border-line bg-white px-3 py-2 text-sm font-normal" />
+          </label>
+          <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
+            Planned work
+            <textarea maxLength={1800} rows={2} value={plannedWork} onChange={(e) => setPlannedWork(e.target.value)} placeholder="Next activities; distinguish planned work from work already delivered." className="mt-1 w-full rounded-control border border-line bg-white px-3 py-2 text-sm font-normal" />
+          </label>
           <label className="block text-sm font-semibold text-ink-800">
             Risks & blockers
             <textarea maxLength={1800} rows={2} value={challenges} onChange={(e) => setChallenges(e.target.value)} className="mt-1 w-full rounded-control border border-line bg-white px-3 py-2 text-sm font-normal" />
@@ -177,6 +194,10 @@ export default function DepartmentReportPanel({ departmentId, departmentName, ev
           <label className="block text-sm font-semibold text-ink-800">
             Decisions required
             <textarea maxLength={1800} rows={2} value={outstandingActions} onChange={(e) => setOutstandingActions(e.target.value)} className="mt-1 w-full rounded-control border border-line bg-white px-3 py-2 text-sm font-normal" />
+          </label>
+          <label className="block text-sm font-semibold text-ink-800">
+            Prepared by role · title only
+            <input maxLength={180} value={preparedByRole} onChange={(e) => setPreparedByRole(e.target.value)} placeholder="Declared role title, not verified identity" className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
           </label>
           <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
             Outcomes / evidence
@@ -233,6 +254,11 @@ export default function DepartmentReportPanel({ departmentId, departmentName, ev
             </div>
             <p className="mt-1 text-xs text-ink-600">{row.reportType}{row.periodStart || row.periodEnd ? ` · ${row.periodStart || "—"} to ${row.periodEnd || "—"}` : ""}</p>
             {row.summary ? <p className="mt-1 text-sm text-ink-700">{row.summary}</p> : null}
+            {row.outputs ? <p className="mt-2 text-xs leading-5 text-ink-700"><span className="font-semibold">Outputs:</span> {row.outputs}</p> : null}
+            {row.plannedWork ? <p className="mt-2 text-xs leading-5 text-ink-700"><span className="font-semibold">Planned work:</span> {row.plannedWork}</p> : null}
+            {row.preparedByRole ? <p className="mt-2 text-[10px] text-ink-600">Prepared by role: {row.preparedByRole}</p> : null}
+            {row.reviewedByRole ? <p className="mt-1 text-[10px] text-ink-600">Reviewed by role: {row.reviewedByRole}</p> : null}
+            {row.budgetSummary ? <p className="mt-2 text-xs leading-5 text-ink-700"><span className="font-semibold">Budget summary:</span> {row.budgetSummary}</p> : null}
             {row.evidenceUrl ? <a href={row.evidenceUrl} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-9 items-center text-sm font-semibold text-forest-800 underline">Open evidence source ↗</a> : null}
             {row.dataLimitations ? <p className="mt-2 text-xs leading-5 text-ink-600"><span className="font-semibold">Limitations:</span> {row.dataLimitations}</p> : null}
           </li>
