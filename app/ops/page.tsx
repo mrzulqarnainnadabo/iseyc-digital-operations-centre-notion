@@ -202,8 +202,8 @@ export default async function CommandBriefPage() {
         <div className="rounded-2xl border border-[#e1e5dc] bg-white p-5">
           <p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Governance</p>
           <h2 className="mt-1 font-serif text-xl text-[#173c30]">Presidential Council</h2>
-          <p className="mt-2 text-xs leading-5 text-[#68736b]">Appointments and seat records are not connected. No occupancy is inferred.</p>
-          <Link href="/ops/readiness" className="mt-3 inline-flex min-h-9 items-center text-xs font-bold text-[#194b3b]">Check readiness →</Link>
+          <p className="mt-2 text-xs leading-5 text-[#68736b]">Role guides are available. No named, approved appointments are linked to system access.</p>
+          <Link href="/ops/council" className="mt-3 inline-flex min-h-9 items-center text-xs font-bold text-[#194b3b]">View role framework →</Link>
         </div>
         <div className="rounded-2xl border border-[#e1e5dc] bg-white p-5">
           <p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Communications</p>
