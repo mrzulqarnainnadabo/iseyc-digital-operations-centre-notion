@@ -41,6 +41,9 @@ export default function OperationalRegister({ kind, initialMeetingId = "" }: { k
   const [sourceMeetingId, setSourceMeetingId] = useState(initialMeetingId);
   const [meetings, setMeetings] = useState<MeetingOption[]>([]);
   const [meetingSourceError, setMeetingSourceError] = useState("");
+  const [meetingCursor, setMeetingCursor] = useState<string | null>(null);
+  const [meetingHasMore, setMeetingHasMore] = useState(false);
+  const [meetingLoadingMore, setMeetingLoadingMore] = useState(false);
   const [purpose, setPurpose] = useState("");
   const [chairRole, setChairRole] = useState("");
   const [secretaryRole, setSecretaryRole] = useState("");
@@ -89,6 +92,8 @@ export default function OperationalRegister({ kind, initialMeetingId = "" }: { k
           if (!response.ok || !Array.isArray(data.meetings)) throw new Error("The Meetings source is not available.");
           const eligibleMeetings = data.meetings.filter((meeting: MeetingOption) => meeting.sensitivity === "Standard");
           setMeetings(eligibleMeetings);
+          setMeetingCursor(typeof data.nextCursor === "string" ? data.nextCursor : null);
+          setMeetingHasMore(typeof data.nextCursor === "string");
           if (initialMeetingId) {
             if (eligibleMeetings.some((meeting: MeetingOption) => meeting.id === initialMeetingId)) {
               setSourceMeetingId(initialMeetingId);
@@ -101,6 +106,28 @@ export default function OperationalRegister({ kind, initialMeetingId = "" }: { k
         .catch(() => setMeetingSourceError("Meeting references are unavailable. You can still create an action without linking a meeting."));
     }
   }, [kind, initialMeetingId]);
+
+  async function loadMoreMeetings() {
+    if (!meetingCursor || meetingLoadingMore) return;
+    setMeetingLoadingMore(true);
+    setMeetingSourceError("");
+    try {
+      const response = await fetch(`/ops/api/meetings?cursor=${encodeURIComponent(meetingCursor)}`, { cache: "no-store" });
+      const data = await response.json();
+      if (!response.ok || !Array.isArray(data.meetings)) throw new Error("The next Meetings page is not available.");
+      const eligible = data.meetings.filter((meeting: MeetingOption) => meeting.sensitivity === "Standard");
+      setMeetings((current) => {
+        const known = new Set(current.map((meeting) => meeting.id));
+        return [...current, ...eligible.filter((meeting: MeetingOption) => !known.has(meeting.id))];
+      });
+      setMeetingCursor(typeof data.nextCursor === "string" ? data.nextCursor : null);
+      setMeetingHasMore(typeof data.nextCursor === "string");
+    } catch {
+      setMeetingSourceError("More meeting references could not be loaded. Existing options remain available.");
+    } finally {
+      setMeetingLoadingMore(false);
+    }
+  }
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -186,6 +213,7 @@ export default function OperationalRegister({ kind, initialMeetingId = "" }: { k
               </select>
               <span className="mt-1 block text-[10px] font-normal text-ink-600">{meetingSourceError || "Links to a Standard meeting record as context. It does not certify a decision or create an approval."}</span>
             </label>
+            {meetingHasMore ? <button type="button" onClick={loadMoreMeetings} disabled={meetingLoadingMore} className="inline-flex min-h-9 items-center text-xs font-semibold text-forest-800 underline underline-offset-2 disabled:opacity-50">{meetingLoadingMore ? "Loading meeting options…" : "Load more meeting options"}</button> : null}
             <label className="block text-sm font-semibold text-ink-800">Working notes
               <textarea rows={2} maxLength={1000} value={notes} onChange={(e) => setNotes(e.target.value)} className={area} />
             </label>
