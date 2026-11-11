@@ -62,7 +62,8 @@ test("command home defines exactly four departments and keeps Communications as 
   ]) assert.ok(source.includes(name), `Missing department: ${name}`);
   assert.match(source, /Communications/);
   assert.match(source, /Drafts only/);
-  assert.match(source, /Appointments and seat records are not connected/);
+  assert.match(source, /View role framework/);
+  assert.match(source, /href="\/ops\/council"/);
   assert.doesNotMatch(source, /National coverage|members nationwide|appointed department head/i);
 });
 
