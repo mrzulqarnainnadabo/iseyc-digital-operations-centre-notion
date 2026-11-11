@@ -36,7 +36,7 @@ test("department register readiness checks the app's own credentials and exact s
   assert.match(adapter, /assertInternalDb\(databaseId, envName\)/);
   assert.match(adapter, /schemaReady: missingProperties\.length === 0/);
   assert.match(page, /verifyDepartmentRegisterReadiness\(\)/);
-  assert.match(page, /read-only schema check; no programme or report rows are read/);
+  assert.match(page, /read-only check reads no programme or report rows and does not test write permissions or grant staff authority/);
   assert.match(page, /Access not verified/);
   assert.match(page, /Schema incomplete/);
 });
