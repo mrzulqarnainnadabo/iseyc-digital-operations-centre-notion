@@ -226,9 +226,9 @@ test("every Operations Centre API route is private and every mutation is same-or
 
 test("shared-key sessions cannot write unattributed action progress", () => {
   const source = fs.readFileSync(path.join(opsApiRoot, "actions/[id]/route.ts"), "utf8");
-  assert.match(source, /requireStaffSession\\(\\)/);
+  assert.ok(source.includes("requireStaffSession()"));
   assert.match(source, /Individual officer identity and verified action assignment are not connected/);
   assert.match(source, /Shared staff access cannot attribute progress/);
   assert.match(source, /status: 503/);
-  assert.doesNotMatch(source, /updateActionProgress\\(/);
+  assert.equal(source.includes("updateActionProgress("), false);
 });
