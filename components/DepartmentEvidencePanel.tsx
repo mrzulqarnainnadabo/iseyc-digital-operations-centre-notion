@@ -1,4 +1,4 @@
-"type SnapshotMetric = { label: string; value: string; unit: string; period: string; interval?: string; measurementType?: string };
+type SnapshotMetric = { label: string; value: string; unit: string; period: string; interval?: string; measurementType?: string };
 type SnapshotRecord = {
   id: string;
   title: string;
