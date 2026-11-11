@@ -161,18 +161,21 @@ export default async function DepartmentDeskPage({
         </div>
       </header>
 
-      <nav aria-label="Department workspace navigation" className="ops-department-nav flex gap-2 overflow-x-auto pb-1">
-        {[
-          ["#overview", "Overview"],
-          ["#functions", "Functions"],
-          ["#intelligence", "Evidence"],
-          ["#indicators", "Indicator pilot"],
-          ["#programmes", "Programmes"],
-          ["#work-plans", "Work plans"],
-          ["#reports", "Reports"],
-          ["#meetings", "Meetings"],
-          ["#shared-tools", "Shared tools"],
-        ].map(([href, label]) => <a key={href} href={href}>{label}</a>)}
+      <nav aria-label="Department workspace navigation" className="ops-department-nav flex flex-wrap items-center gap-2 pb-1">
+        <a href="#overview">Overview</a>
+        <a href="#intelligence">Evidence</a>
+        <a href="#programmes">Programmes</a>
+        <a href="#work-plans">Work plans</a>
+        <details className="ops-department-nav-more relative">
+          <summary className="inline-flex min-h-[2.65rem] cursor-pointer list-none items-center rounded-full border border-[#e1e5dc] bg-[#f3f4ee] px-4 text-xs font-bold text-[#315b45] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a7833f]">More workspace areas <span aria-hidden="true" className="ml-2">＋</span></summary>
+          <div className="mt-2 flex flex-wrap gap-2 sm:absolute sm:left-0 sm:top-full sm:z-20 sm:min-w-56 sm:rounded-xl sm:border sm:border-[#e1e5dc] sm:bg-white sm:p-3 sm:shadow-lg">
+            <a href="#functions">Functions</a>
+            <a href="#indicators">Indicator pilot</a>
+            <a href="#reports">Reports</a>
+            <a href="#meetings">Meetings</a>
+            <a href="#shared-tools">Shared tools</a>
+          </div>
+        </details>
       </nav>
 
       <section id="overview" className="grid gap-4 lg:grid-cols-[1.2fr_.8fr]">
