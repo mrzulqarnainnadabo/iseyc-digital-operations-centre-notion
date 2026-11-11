@@ -153,6 +153,16 @@ test("actions can be linked to an existing Standard meeting without granting dec
   assert.match(component, /does not certify a decision/);
 });
 
+test("action progress endpoint fails closed without individual identity and verified assignment", () => {
+  const route = read("app/ops/api/actions/[id]/route.ts");
+  assert.match(route, /requireStaffSession/);
+  assert.match(route, /ACTION_AUTHORITY_UNAVAILABLE/);
+  assert.match(route, /status: 503/);
+  assert.match(route, /No action record was changed/);
+  assert.doesNotMatch(route, /updateActionProgress/);
+  assert.doesNotMatch(route, /pages\.update/);
+});
+
 test("operations errors recover without exposing exception details", () => {
   const errorBoundary = fs.readFileSync(path.join(opsRoot, "error.tsx"), "utf8");
   assert.match(errorBoundary, /^"use client";/);
