@@ -111,7 +111,7 @@ test("action progress is blocked until an individual officer and assignment can 
   assert.match(api, /Individual officer identity and verified action assignment are not connected/);
   assert.match(api, /Shared staff access cannot attribute progress/);
   assert.match(api, /status: 503/);
-  assert.doesNotMatch(api, /updateActionProgress\\(/);
+  assert.equal(api.includes("updateActionProgress("), false);
   assert.match(adapter, /updateActionProgress/);
   assert.match(ui, /Progress updates are paused/);
   assert.match(ui, /Shared staff access cannot record accountable progress/);
