@@ -83,8 +83,8 @@ function validMetric(value: unknown): value is DepartmentSnapshotMetric {
 function validRecord(value: unknown, departmentId: OpsDepartmentId): value is DepartmentSnapshot {
   if (!isRecord(value)) return false;
   const geography = value.geography;
-  const departmentIdValid = value.departmentId === undefined || value.departmentId === null || nonEmpty(value.departmentId);
-  const departmentIdsValid = value.departmentIds === undefined || (Array.isArray(value.departmentIds) && value.departmentIds.length <= 4 && value.departmentIds.every(nonEmpty));
+  const departmentIdValid = value.departmentId === undefined || value.departmentId === null || (nonEmpty(value.departmentId) && DEPARTMENTS.includes(value.departmentId as OpsDepartmentId));
+  const departmentIdsValid = value.departmentIds === undefined || (Array.isArray(value.departmentIds) && value.departmentIds.length <= 4 && value.departmentIds.every((id) => nonEmpty(id) && DEPARTMENTS.includes(id as OpsDepartmentId)));
   const departments = [
     ...(nonEmpty(value.departmentId) ? [value.departmentId] : []),
     ...(Array.isArray(value.departmentIds) ? value.departmentIds : []),
