@@ -1,6 +1,6 @@
 # Department operating registers
 
-**Status:** Current application/schema contract; live Notion access and records are not verified by this document.
+**Status:** Reconciled against the current GitHub adapters and the live Notion database schemas inspected on 11 November 2026. This confirms schema visibility, not production app connectivity or row-level readiness.
 
 ## Purpose
 
@@ -15,62 +15,73 @@ Meetings, Actions, Media and External Engagement remain institution-wide registe
 
 ## 1. Programmes & Work Register
 
-**Environment:** `NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID`
+**Notion database:** IDCC — Programmes & Work Register  
+**Environment:** `NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID`  
+**Data source:** `collection://b3fe5a7d-ffda-4da1-a6f3-c03c5a81b3b8`
 
-This single database stores both programmes and work-plan items. The `Work Type` select distinguishes the two record types:
+One database stores both programmes and work-plan items. The `Work Type` select distinguishes the two record types:
 
 - `Programme` — a department programme proposal.
 - `Operations` — a department work-plan item or operational task.
 
-Do not create or configure `NOTION_DEPARTMENT_WORKPLANS_DATABASE_ID`. The application deliberately aliases the work-plan adapter to the Programmes & Work Register so both record types share one controlled register.
+Other existing Work Type options include Project, Training, Research and Community Engagement. Do not create or configure `NOTION_DEPARTMENT_WORKPLANS_DATABASE_ID`; the application deliberately aliases the work-plan adapter to this shared register.
 
-### Required properties used by the application
+### Live Notion schema
 
-| Notion property | Type | Application use |
+| Notion property | Type | Current application use |
 |---|---|---|
 | Programme / Work Item | Title | Record title |
 | Department | Select | Department filter and stable-ID mapping |
-| Work Type | Select | `Programme` or `Operations` |
+| Work Type | Select | `Programme` or `Operations` filter |
 | Status | Status | Proposed, Approved, In Progress, Under Review, Completed, Paused, Cancelled |
-| Intended Outcome | Rich text | Programme objective or work-plan objective |
-| Acceptance Criteria | Rich text | Programme deliverables or work-plan deliverable |
-| Accountable Role | Rich text | Role title only; does not appoint a person |
+| Intended Outcome | Text | Programme objective or work-plan objective |
+| Acceptance Criteria | Text | Programme deliverables or work-plan deliverable |
+| Accountable Role | Text | Role title only; does not appoint a person |
 | Start Date | Date | Programme start date |
 | Due Date | Date | Programme end date or work-plan due date |
-| Evidence / Deliverable | URL | Optional evidence or deliverable link read by the work-plan adapter |
+| Evidence / Deliverable | URL | Evidence link read by the programme adapter |
 
-The current application creates programme and work-plan records in **Proposed** status. It does not accept a status supplied by the browser and does not provide an approval action. A proposed record is not an approved programme, budget, commitment or instruction to begin delivery.
+The live database also contains Priority, Risk Level, Budget Requested, Budget Approved, Actual Spend, Approval Reference, Contributors and Last Reviewed. These properties exist in Notion but are **not yet fully surfaced or governed by the current application adapters**. Do not assume that the app validates budgets, approvals or risk decisions.
 
 ### Department select compatibility
 
-The live Notion select options may retain historical labels. The application maps them to stable internal department IDs:
+The application uses stable internal IDs while writing the exact options that currently exist in Notion:
 
-| Stable ID | Current display name | Existing Notion option |
+| Stable ID | Canonical display name | Existing Notion option |
 |---|---|---|
 | `education` | Education and Capacity Building | Education & Capacity Building |
 | `health` | Department of Health and Well-being | Health & Well-being |
-| `digital-systems` | Software and Technology | Software & Technology |
-| `civic-affairs` | Civic Department | Civic Department |
+| `digital-systems` | Software and Technology | Digital Systems & Technology |
+| `civic-affairs` | Civic Department | Civic Affairs & Public Accountability |
 
-Do not use display labels as security identifiers. Unknown Notion values remain `Unspecified` and require review; they must not silently default to a department.
+The application must write the existing Notion option exactly. Do not use display labels as security identifiers. Unknown Notion values remain `Unspecified` and require review; they must not silently default to a department.
+
+### Application write boundary
+
+The application creates programme and work-plan records in **Proposed** status. It does not accept a status supplied by the browser and does not provide an approval action. A proposed record is not an approved programme, budget, commitment or instruction to begin delivery.
 
 ## 2. Department Reports & Scorecards
 
-**Environment:** `NOTION_DEPARTMENT_REPORTS_DATABASE_ID`
+**Notion database:** IDCC — Department Reports & Scorecards  
+**Environment:** `NOTION_DEPARTMENT_REPORTS_DATABASE_ID`  
+**Data source:** `collection://2cd472ec-1eba-4425-bb51-c714dc8bc4a2`
 
-### Required properties used by the application
+### Live Notion schema and current adapter mapping
 
-| Notion property | Type | Application use |
+| Notion property | Type | Current application use |
 |---|---|---|
 | Report / Period | Title | Report title and period label |
 | Department | Select | Department filter and stable-ID mapping |
 | Reporting Cycle | Select | Weekly, Monthly, Quarterly or Annual |
-| Reporting Period Start | Date (range supported) | Start and optional end of reporting period |
+| Reporting Period Start | Date | Start of reporting period |
+| Reporting Period End | Date | End of reporting period |
 | Status | Status | Draft, Submitted, Under Review, Accepted, Revision Required or Archived |
-| Completed Work | Rich text | Reported activities and outputs |
-| Risks & Blockers | Rich text | Challenges, constraints and unresolved risks |
-| Decisions Required | Rich text | Outstanding decisions and actions |
-| Outcomes / Evidence | Rich text | Outcome narrative and evidence references |
+| Completed Work | Text | Reported activities and outputs |
+| Risks & Blockers | Text | Challenges, constraints and unresolved risks |
+| Decisions Required | Text | Outstanding decisions and actions |
+| Outcomes / Evidence | Text | Outcome narrative and evidence summary |
+
+The live database also contains Evidence Links (URL), Outputs, Planned Work, Budget Summary, Data Limitations, Prepared By Role and Reviewed By Role. These fields are present in Notion but are **not yet all mapped into the current API and UI**. The current adapter reads/writes the two period dates as separate properties; it must not treat the start field as a date range.
 
 The application creates reports as **Draft**. A draft report is not accepted, certified or published. Submission, acceptance and outcome verification remain separate human-controlled decisions.
 
@@ -104,9 +115,11 @@ The current register adapters provide basic programme/work-plan and report field
 Before enabling department operations, verify each register independently:
 
 - Correct Notion database ID and integration access.
-- Required property names and types match the contract above.
-- Each department filter returns only the intended department's records.
+- Required property names and types match the live schema.
+- Exact department select values are written for all four departments.
 - Programme and Operations work types remain distinct within the shared work register.
+- Programme and report period dates map to the correct Notion properties.
+- Department filters return only the intended department's records.
 - Pagination, empty states and upstream failures behave honestly.
 - Create flows produce Proposed or Draft records only.
 - No approval, publication, external dispatch or completion certification occurs under shared-key access.
