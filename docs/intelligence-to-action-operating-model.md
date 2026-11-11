@@ -17,7 +17,7 @@ The **Civic Department** is the institutional steward for Civic Mandate and Civi
 | Component | Institutional responsibility | Must not be represented as |
 |---|---|---|
 | Intelligence Observatory | Source registry, evidence gateway, indicator and snapshot provenance, geographic and temporal context, limitations, and evidence-quality state | A live feed when a record is a dated snapshot; a complete national or local census |
-| Civic Mandate | Intake and human review of community submissions; authoritative public record of items explicitly approved for publication | A prevalence survey, a poll, an automatic statement of community consensus, or proof of government action |
+| Civic Mandate | Intake and human review of community submissions; authoritative public record containing only records explicitly approved for publication | A prevalence survey, a poll, an automatic statement of community consensus, or proof of government action |
 | Civic Brain | Evidence interpretation, structured briefs, source-linked findings, uncertainty and evidence-gap explanation for all departments | An authority that approves programmes, verifies implementation by itself, contacts institutions, or resolves public issues |
 | Digital Operations Centre (DOC) | Internal programme, work-plan, decision, action, meeting, report and outcome records; accountable ownership and institutional follow-through | A public evidence source or a substitute for verified identity, appointment or delegated authority |
 
