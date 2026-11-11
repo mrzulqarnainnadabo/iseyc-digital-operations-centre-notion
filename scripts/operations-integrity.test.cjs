@@ -649,11 +649,20 @@ test("Presidential Council guide links to a bounded operating compact", () => {
   assert.match(compact, /Automation must not approve/);
 });
 
-test("department work plans explain the separate action-register handoff without implying automatic approval or assignment", () => {
+test("department work-plan records can carry a validated source URL into a proposed action note", () => {
   const workplan = read("components/DepartmentWorkPlanPanel.tsx");
-  assert.match(workplan, /href="\/ops\/actions"/);
-  assert.match(workplan, /Copy the work-plan record’s Notion URL into the Action notes/);
-  assert.match(workplan, /do not create an automatic link, approval or assignment/);
+  const actionsPage = read("app/ops/actions/page.tsx");
+  const register = read("components/OperationalRegister.tsx");
+  assert.match(workplan, /workPlanTitle=/);
+  assert.match(workplan, /workPlanUrl=/);
+  assert.match(workplan, /Prepare action/);
+  assert.match(workplan, /not an automatic relation, approval or assignment/);
+  assert.match(actionsPage, /function trustedNotionUrl/);
+  assert.match(actionsPage, /host === "notion\.so"/);
+  assert.match(actionsPage, /host\.endsWith\("\.notion\.site"\)/);
+  assert.match(actionsPage, /initialNotes/);
+  assert.match(register, /initialNotes\?: string/);
+  assert.match(register, /useState\(initialNotes\)/);
 });
 
 test("shared operational register creation stays unavailable until its Notion connection is confirmed", () => {
