@@ -98,7 +98,7 @@ export default async function CommandBriefPage() {
               <p className="text-[10px] font-bold uppercase tracking-[.24em] text-[#ddc99f]">ISEYC · Digital Operations Centre</p>
             </div>
             <h1 className="mt-5 max-w-2xl font-serif text-4xl leading-[1.04] tracking-[-.035em] sm:text-5xl">Four departments.<br /><span className="text-[#d9c59b]">One institution.</span></h1>
-            <p className="mt-4 max-w-xl text-sm leading-6 text-white/75 sm:text-base">Four departments organise the work. Shared coordination connects them; people remain responsible for decisions.</p>
+            <p className="mt-4 max-w-xl text-sm leading-6 text-white/75 sm:text-base">Dedicated department workspaces. Shared coordination. Human decisions.</p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link href="#departments" className="inline-flex min-h-11 items-center rounded-full bg-[#e8d8b4] px-5 text-sm font-bold text-[#173c30] transition hover:bg-white">Explore departments <span aria-hidden="true" className="ml-2">↗</span></Link>
               <Link href="/ops/readiness" className="inline-flex min-h-11 items-center rounded-full border border-white/25 px-5 text-sm font-semibold text-white transition hover:bg-white/10">System readiness</Link>
@@ -141,7 +141,7 @@ export default async function CommandBriefPage() {
       <section id="departments" className="scroll-mt-6 space-y-4">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">The institution</p><h2 className="mt-1 font-serif text-2xl text-[#173c30] sm:text-3xl">Departments</h2></div>
-          <p className="max-w-sm text-xs leading-5 text-[#68736b]">Choose a department to open its workspace.</p>
+          <p className="max-w-sm text-xs leading-5 text-[#68736b]">Select a department to open its workspace.</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           {departments.map((department) => (
@@ -184,7 +184,7 @@ export default async function CommandBriefPage() {
         <div className="rounded-2xl border border-[#dce4dc] bg-white p-5 sm:p-6">
           <p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">Shared coordination</p>
           <h2 className="mt-1 font-serif text-xl text-[#173c30]">Work across departments</h2>
-          <p className="mt-2 max-w-xl text-sm leading-5 text-[#68736b]">One set of registers supports meetings, actions and external engagement. Departments remain responsible for their work.</p>
+          <p className="mt-2 max-w-xl text-sm leading-5 text-[#68736b]">Meetings, actions and external engagement use shared registers.</p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Link href="/ops/actions" className="inline-flex min-h-10 items-center rounded-full border border-[#dce4dc] px-4 text-xs font-semibold text-[#194b3b] hover:bg-[#f3f6f2]">Actions</Link>
             <Link href="/ops/intake" className="inline-flex min-h-10 items-center rounded-full border border-[#dce4dc] px-4 text-xs font-semibold text-[#194b3b] hover:bg-[#f3f6f2]">Meeting intake</Link>
@@ -225,7 +225,7 @@ export default async function CommandBriefPage() {
       </section>
 
       <section className="rounded-xl border border-[#dce4dc] bg-[#edf2ec] p-4 sm:flex sm:items-center sm:justify-between sm:gap-4">
-        <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Published civic systems</p><p className="mt-1 text-xs text-[#68736b]">Separate public platforms connected to ISEYC’s civic work.</p></div>
+        <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Published civic systems</p><p className="mt-1 text-xs text-[#68736b]">Connected public platforms.</p></div>
         <div className="mt-3 flex flex-wrap gap-2 sm:mt-0">
           <a href="https://2027-street-mandate.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center rounded-full border border-[#cdd8ce] bg-white px-3 text-[11px] font-bold text-[#194b3b]">Civic Mandate ↗</a>
           <a href="https://iseyc-civic-brain.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center rounded-full border border-[#cdd8ce] bg-white px-3 text-[11px] font-bold text-[#194b3b]">Civic Brain ↗</a>
