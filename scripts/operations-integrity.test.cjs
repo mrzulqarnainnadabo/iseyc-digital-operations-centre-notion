@@ -192,8 +192,8 @@ test("actions, chamber and communications expose authenticated Notion-backed ini
   assert.match(read("app/ops/api/registers/[kind]/route.ts"), /\["X", "WhatsApp", "Website", "Other"\]/);
   assert.match(component, /human-authorised/);
   assert.match(component, /Proposed owner role · required/);
-  assert.match(component, /Proposed action · unassigned · awaiting authorised acceptance/);
-  assert.match(component, /Proposed action · unassigned · awaiting authorised acceptance/);
+  assert.match(component, /Action proposal/);
+  assert.match(component, /Unassigned · awaiting authorised acceptance/);
   assert.match(component, /Proposed session · not yet convened/);
   assert.match(component, /kind === "actions" \|\| kind === "chamber" \? "Proposed" : row.status/);
   assert.match(component, /required minLength=\{2\} maxLength=\{180\}/);
