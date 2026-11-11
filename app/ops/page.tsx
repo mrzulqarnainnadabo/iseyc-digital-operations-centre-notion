@@ -108,19 +108,31 @@ export default async function CommandBriefPage() {
               <Link href="/ops/readiness" className="inline-flex min-h-11 items-center rounded-full border border-white/25 px-5 text-sm font-semibold text-white transition hover:bg-white/10">System readiness</Link>
             </div>
           </div>
-          <div className="relative mx-auto w-full max-w-md">
-            <div className="grid grid-cols-2 gap-3">
-              {departments.map((department) => (
-                <Link key={department.id} href={`/ops/departments/${department.id}`} className="group flex min-h-[132px] flex-col justify-between rounded-2xl border border-white/15 bg-white/[.07] p-4 backdrop-blur-sm transition hover:-translate-y-1 hover:bg-white/[.12]">
-                  <span className="text-[10px] font-semibold tracking-[.18em] text-[#d9c59b]">{department.number} / DEPARTMENT</span>
-                  <span className="flex items-end justify-between gap-2">
-                    <span className="max-w-[130px] text-sm font-semibold leading-5 text-white">{department.name.split(" & ")[0]}</span>
-                    <span className="text-xl text-[#d9c59b]" aria-hidden="true">↗</span>
-                  </span>
-                </Link>
-              ))}
+          <div className="relative mx-auto flex w-full max-w-md items-center justify-center py-2 sm:py-4">
+            <div role="img" aria-label="Four connected departments arranged around shared ISEYC institutional coordination" className="relative aspect-square w-full max-w-[340px]">
+              <div className="absolute inset-[7%] rounded-full border border-white/10" />
+              <div className="absolute inset-[19%] rounded-full border border-[#d9c59b]/30" />
+              <div className="absolute inset-[31%] rounded-full border border-white/15" />
+              <svg viewBox="0 0 340 340" className="absolute inset-0 h-full w-full" fill="none" aria-hidden="true">
+                <path d="M170 38V302M38 170H302M77 77L263 263M263 77L77 263" stroke="white" strokeOpacity=".18" strokeWidth="1.2" />
+                <circle cx="170" cy="38" r="5" fill="#d9c59b" />
+                <circle cx="302" cy="170" r="5" fill="#d9c59b" />
+                <circle cx="170" cy="302" r="5" fill="#d9c59b" />
+                <circle cx="38" cy="170" r="5" fill="#d9c59b" />
+                <circle cx="170" cy="170" r="59" fill="#174638" stroke="#d9c59b" strokeOpacity=".7" />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="mt-1 text-center">
+                  <span className="block text-[9px] font-bold uppercase tracking-[.28em] text-[#d9c59b]">ISEYC</span>
+                  <span className="mt-1 block font-serif text-xl tracking-wide text-white sm:text-2xl">One institution</span>
+                  <span className="mt-1 block text-[9px] uppercase tracking-[.16em] text-white/55">Shared coordination</span>
+                </div>
+              </div>
+              <span className="absolute left-1/2 top-[1%] -translate-x-1/2 rounded-full border border-white/15 bg-[#174638] px-3 py-1 text-[9px] font-semibold tracking-[.14em] text-[#e8d8b4]">01</span>
+              <span className="absolute right-[1%] top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-[#174638] px-3 py-1 text-[9px] font-semibold tracking-[.14em] text-[#e8d8b4]">02</span>
+              <span className="absolute bottom-[1%] left-1/2 -translate-x-1/2 rounded-full border border-white/15 bg-[#174638] px-3 py-1 text-[9px] font-semibold tracking-[.14em] text-[#e8d8b4]">03</span>
+              <span className="absolute left-[1%] top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-[#174638] px-3 py-1 text-[9px] font-semibold tracking-[.14em] text-[#e8d8b4]">04</span>
             </div>
-            <div className="mt-3 flex items-center justify-center gap-2 text-[10px] uppercase tracking-[.2em] text-white/45"><span className="h-px w-8 bg-white/20" />Shared institutional coordination<span className="h-px w-8 bg-white/20" /></div>
           </div>
         </div>
         <div className="relative grid grid-cols-3 divide-x divide-white/10 border-t border-white/10 bg-black/10">
@@ -137,7 +149,7 @@ export default async function CommandBriefPage() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           {departments.map((department) => (
-            <Link key={department.id} href={`/ops/departments/${department.id}`} className={`group relative isolate flex min-h-[248px] flex-col overflow-hidden rounded-2xl border border-[#e1e5dc] bg-white p-5 shadow-[0_4px_18px_rgba(20,49,38,.045)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_16px_34px_rgba(20,49,38,.09)] sm:p-6 dept-workspace-card dept-workspace-card--${department.tone}`}>
+            <Link key={department.id} href={`/ops/departments/${department.id}`} className={`group relative isolate flex min-h-[220px] flex-col overflow-hidden rounded-2xl border border-[#e1e5dc] bg-white p-5 shadow-[0_4px_18px_rgba(20,49,38,.045)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_16px_34px_rgba(20,49,38,.09)] sm:p-6 dept-workspace-card dept-workspace-card--${department.tone}`}>
               <div className="flex items-start justify-between gap-3">
                 <span className="text-xs font-semibold tracking-[.16em] text-[#7b6a4b]">{department.number}</span>
                 <span className="dept-workspace-glyph"><DepartmentGlyph tone={department.tone} /></span>
@@ -145,10 +157,7 @@ export default async function CommandBriefPage() {
               <div className="mt-auto">
                 <h3 className="max-w-sm font-serif text-2xl leading-tight text-[#173c30]">{department.name}</h3>
                 <p className="mt-2 max-w-md text-sm leading-5 text-[#68736b]">{department.short}</p>
-                <div className="mt-4 flex flex-wrap gap-1.5">
-                  {department.focus.map((item) => <span key={item} className="rounded-full border border-[#e5e8e1] bg-[#fafaf7] px-2.5 py-1 text-[10px] font-medium text-[#59665d]">{item}</span>)}
-                </div>
-                <div className="mt-5 flex items-center justify-between border-t border-[#edf0ea] pt-3 text-xs font-bold text-[#194b3b]"><span>Enter department workspace</span><span className="text-base transition group-hover:translate-x-1" aria-hidden="true">→</span></div>
+                <div className="mt-4 flex items-center justify-between border-t border-[#edf0ea] pt-3 text-xs font-bold text-[#194b3b]"><span>Open workspace</span><span className="text-base transition group-hover:translate-x-1" aria-hidden="true">→</span></div>
               </div>
             </Link>
           ))}
