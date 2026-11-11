@@ -546,7 +546,7 @@ test("department workspaces use distinct identity marks and every in-page naviga
     assert.ok(page.includes(`department === "${discipline}"`) || discipline === "civic-affairs", `Missing visual identity for ${discipline}`);
   }
   assert.match(page, /id="shared-tools"/);
-  assert.match(page, /\["#shared-tools", "Shared tools"\]/);
+  assert.match(page, /href="#shared-tools">Shared tools/);
   assert.doesNotMatch(page, /id="tools"/);
   assert.match(page, /ops-department-mark--education/);
   assert.match(page, /ops-department-mark--health/);
