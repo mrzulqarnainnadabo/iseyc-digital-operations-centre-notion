@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { StatusBadge } from "@/components/StatusBadge";
 import DepartmentArchitectureDiagram from "@/components/DepartmentArchitectureDiagram";
+import { verifyDepartmentRegisterReadiness } from "@/lib/department-register-readiness";
+
+export const dynamic = "force-dynamic";
 
 const modules = [
   {
@@ -68,7 +71,13 @@ const modules = [
   },
 ] as const;
 
-export default function ReadinessPage() {
+export default async function ReadinessPage() {
+  const registerReadiness = await verifyDepartmentRegisterReadiness();
+  const registerCards = [
+    { key: "programmes", title: "Programmes & Work Register", result: registerReadiness.programmes },
+    { key: "reports", title: "Department Reports & Scorecards", result: registerReadiness.reports },
+  ];
+
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <header className="space-y-2">
@@ -86,6 +95,45 @@ export default function ReadinessPage() {
           The current sign-in is a transitional shared-key gate, not verified individual identity.
           Do not enter real membership, personnel, finance, safeguarding or disciplinary information.
         </p>
+      </section>
+
+      <section className="space-y-3" aria-labelledby="live-register-checks">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-700">Live connection check</p>
+          <h3 id="live-register-checks" className="font-semibold text-forest-950">Department registers</h3>
+          <p className="text-sm leading-6 text-ink-600">The application checks its own Notion credentials and database schemas. This is a read-only schema check; no programme or report rows are read.</p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {registerCards.map(({ key, title, result }) => {
+            const state = !result.configured
+              ? "Not connected"
+              : !result.accessible
+                ? "Access not verified"
+                : result.schemaReady
+                  ? "Schema ready"
+                  : "Schema incomplete";
+            const tone = result.schemaReady
+              ? "rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-900"
+              : "rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-950";
+            const detail = !result.configured
+              ? "The app's Notion token or this database ID is not configured."
+              : !result.accessible
+                ? "The app has configuration values but could not retrieve this database. Check integration sharing and the database ID."
+                : result.schemaReady
+                  ? "The app can retrieve the database and all required fields are present. No rows were read."
+                  : "The database is reachable, but these required fields are missing or have the wrong type: " + result.missingProperties.join(", ") + ".";
+            return (
+              <article key={key} className="rounded-card border border-line bg-white p-4">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <h4 className="font-semibold text-forest-950">{title}</h4>
+                  <span className={tone}>{state}</span>
+                </div>
+                <p className="mt-2 text-sm leading-6 text-ink-700">{detail}</p>
+              </article>
+            );
+          })}
+        </div>
+        <p className="text-[10px] text-ink-500">Checked {registerReadiness.checkedAt} · UTC</p>
       </section>
 
       <div className="grid gap-3">
