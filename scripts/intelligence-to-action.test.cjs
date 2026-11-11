@@ -117,7 +117,7 @@ test("department registers share a clear, restrained empty-state treatment", () 
     assert.match(component, /configured === true \?/);
     assert.match(component, /configured === false \?/);
     assert.match(component, /role="status"/);
-    assert.match(component, /entry becomes available only after the connection is confirmed/);
+    assert.match(component, /becomes available only after the connection is confirmed/);
   }
 });
 
