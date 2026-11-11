@@ -525,6 +525,18 @@ test("meeting review queue does not imply it handles every institutional approva
   assert.match(nav, /label: "Meeting review queue"/);
 });
 
+test("department navigation prioritises core work and groups secondary destinations", () => {
+  const department = fs.readFileSync(path.join(opsRoot, "departments/[department]/page.tsx"), "utf8");
+  assert.match(department, /aria-label="Department workspace navigation"/);
+  assert.match(department, /href="#overview">Overview/);
+  assert.match(department, /href="#intelligence">Evidence/);
+  assert.match(department, /href="#programmes">Programmes/);
+  assert.match(department, /href="#work-plans">Work plans/);
+  assert.match(department, /More workspace areas/);
+  assert.match(department, /href="#reports">Reports/);
+  assert.match(department, /href="#meetings">Meetings/);
+});
+
 test("department workspaces use distinct identity marks and every in-page navigation target resolves", () => {
   const page = read("app/ops/departments/[department]/page.tsx");
   const styles = read("app/globals.css");
