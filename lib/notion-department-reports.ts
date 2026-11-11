@@ -66,8 +66,6 @@ function mapRow(page: any): DepartmentReportRecord {
     outputs: textProp(props.Outputs),
     plannedWork: textProp(props["Planned Work"]),
     preparedByRole: textProp(props["Prepared By Role"]),
-    reviewedByRole: textProp(props["Reviewed By Role"]),
-    budgetSummary: textProp(props["Budget Summary"]),
     evidenceUrl: urlProp(props["Evidence Links"]),
     dataLimitations: textProp(props["Data Limitations"]),
     status,
