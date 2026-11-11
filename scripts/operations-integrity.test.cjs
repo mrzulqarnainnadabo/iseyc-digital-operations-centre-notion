@@ -194,7 +194,8 @@ test("actions, chamber and communications expose authenticated Notion-backed ini
   assert.match(component, /Proposed owner role · required/);
   assert.match(component, /Action proposal/);
   assert.match(component, /Unassigned · awaiting authorised acceptance/);
-  assert.match(component, /Proposed action · unassigned · awaiting authorised acceptance/);
+  assert.match(component, /Action proposal/);
+  assert.match(component, /Unassigned · awaiting authorised acceptance/);
   assert.match(component, /Proposed session · not yet convened/);
   assert.match(component, /kind === "actions" \|\| kind === "chamber" \? "Proposed" : row.status/);
   assert.match(component, /required minLength=\{2\} maxLength=\{180\}/);
@@ -251,11 +252,12 @@ test("department desks show sourced meeting activity without implying staffing o
   const calendar = fs.readFileSync(path.join(opsRoot, "calendar/page.tsx"), "utf8");
   const board = fs.readFileSync(path.join(opsRoot, "calendar/CalendarBoard.tsx"), "utf8");
   const seat = fs.readFileSync(path.join(opsRoot, "seat/page.tsx"), "utf8");
-  assert.match(department, /task register/i);
-  assert.match(department, /Not connected/);
+  assert.match(department, /id="work-plans"/);
+  assert.match(department, /Work plans/);
+  assert.match(department, /DepartmentWorkPlanPanel/);
   assert.match(department, /listMeetings/);
   assert.match(department, /filterLegacyVisibleMeetings/);
-  assert.match(department, /No matching department meetings/);
+  assert.match(department, /No matching meetings appear on this page/);
   assert.match(department, /not inferred from login identity/);
   assert.match(calendar, /requireStaffSession/);
   assert.match(calendar, /listMeetings/);
