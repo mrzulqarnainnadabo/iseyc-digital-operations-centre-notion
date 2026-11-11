@@ -164,9 +164,12 @@ export default function OperationalRegister({ kind, initialMeetingId = "" }: { k
           </div>
           <Link href="/ops/executive" className="inline-flex min-h-10 items-center text-sm font-semibold text-forest-800 hover:underline">Executive desk →</Link>
         </div>
-        <section className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-          <p className="text-sm font-semibold text-amber-950">Authority and record boundary</p>
-          <p className="mt-1 text-xs leading-5 text-amber-900">A role label is not an appointment or an accepted action assignment. The proposed owner role field does not assign access or imply a named officer. A meeting reference is context, not proof of a decision. Records created here remain initial states. Approval, publication, closure and formal decisions remain human-authorised and require verified individual authority and audit.</p>
+        <section aria-label="Authority boundary" className="flex gap-3 rounded-xl border border-[#e5e3d8] border-l-4 border-l-[#b99a61] bg-[#f7f6f0] p-4">
+          <span aria-hidden="true" className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border border-[#e5ddc9] bg-white text-sm font-semibold text-[#8a6b34]">i</span>
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#5b513d]">Authority boundary</p>
+            <p className="mt-1 text-xs leading-5 text-[#5d625a]">New entries begin as proposals. Role labels and meeting links do not assign people or certify decisions. Approval, publication and closure require separately verified human authority.</p>
+          </div>
         </section>
       </header>
 
@@ -279,15 +282,29 @@ export default function OperationalRegister({ kind, initialMeetingId = "" }: { k
         <p role="status" className="rounded-xl border border-[#e1e7df] bg-[#f8faf7] p-4 text-sm text-[#68736b]">Checking the register connection. Record entry becomes available only after the connection is confirmed.</p>
       )}
 
-      <section className="space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Register</p><h2 className="font-semibold text-forest-950">Register records</h2></div><button type="button" onClick={() => void refresh()} disabled={busy} className="min-h-10 rounded-control border border-line px-3 text-sm font-semibold disabled:opacity-50">Refresh</button></div>
+      <section className="space-y-4">
+        <div className="flex flex-wrap items-end justify-between gap-3 border-b border-line pb-3">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Live register</p>
+            <h2 className="font-serif text-xl text-forest-950">Records</h2>
+            <p className="mt-1 text-xs text-ink-600">{loaded ? `${rows.length} record${rows.length === 1 ? "" : "s"} on this page` : "Current register entries"}</p>
+          </div>
+          <button type="button" onClick={() => void refresh()} disabled={busy} className="inline-flex min-h-10 items-center gap-2 rounded-control border border-line bg-white px-3 text-sm font-semibold text-forest-950 transition hover:bg-cream-50 disabled:opacity-50"><span aria-hidden="true">↻</span> Refresh</button>
+        </div>
         {error ? <p role="alert" className="rounded-control border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">{error}</p> : null}
-        {!loaded && !error ? <p className="text-sm text-ink-600">Loading records…</p> : null}
-        {loaded && rows.length === 0 ? <p className="rounded-card border border-line bg-white p-4 text-sm text-ink-600">The connected register contains no records on the returned page.</p> : null}
+        {!loaded && !error ? <div role="status" className="space-y-2 rounded-xl border border-dashed border-line bg-white p-4"><span className="block h-3 w-2/5 animate-pulse rounded bg-cream-100" /><span className="block h-3 w-4/5 animate-pulse rounded bg-cream-100" /><span className="block h-3 w-1/3 animate-pulse rounded bg-cream-100" /><span className="sr-only">Loading records…</span></div> : null}
+        {loaded && rows.length === 0 ? <div className="rounded-xl border border-dashed border-[#d9e1d8] bg-[#f8faf7] p-5"><p className="text-sm font-semibold text-forest-950">No records returned</p><p className="mt-1 text-xs leading-5 text-ink-600">The connected register contains no records on the returned page.</p></div> : null}
         <div className="space-y-3">
           {rows.map((row) => (
-            <article key={row.id} className="rounded-card border border-line bg-white p-4 shadow-card">
-              <div className="flex flex-wrap items-start justify-between gap-2"><div><h3 className="font-semibold text-forest-950">{row.title}</h3>{kind === "actions" ? <p className="mt-1 text-xs font-medium text-ink-600">Proposed action · unassigned · awaiting authorised acceptance</p> : kind === "chamber" ? <p className="mt-1 text-xs font-medium text-ink-600">Proposed session · not yet convened</p> : null}</div><StatusBadge status={kind === "actions" || kind === "chamber" ? "Proposed" : row.status} /></div>
+            <article key={row.id} className={`overflow-hidden rounded-xl border border-line border-l-4 bg-white p-4 shadow-card transition-shadow hover:shadow-md sm:p-5 ${kind === "actions" ? "border-l-[#b99a61]" : kind === "chamber" ? "border-l-[#315b45]" : "border-l-[#668b91]"}`}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-gold-700">{kind === "actions" ? "Action proposal" : kind === "chamber" ? "Council session" : "Communication draft"}</p>
+                  <h3 className="mt-1 font-serif text-lg leading-snug text-forest-950">{row.title}</h3>
+                  {kind === "actions" ? <p className="mt-1 text-xs font-medium text-ink-600">Unassigned · awaiting authorised acceptance</p> : kind === "chamber" ? <p className="mt-1 text-xs font-medium text-ink-600">Proposed · not yet convened</p> : null}
+                </div>
+                <StatusBadge status={kind === "actions" || kind === "chamber" ? "Proposed" : row.status} />
+              </div>
               {row.detail ? (kind === "actions" ? <p className="mt-2 text-sm leading-6 text-ink-700"><strong>Proposed owner role:</strong> {row.detail}</p> : <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-ink-700">{row.detail}</p>) : null}
               {row.date ? <p className="mt-1 text-xs text-ink-600">{row.date}</p> : null}
               {kind === "actions" ? <div className="mt-3 flex flex-wrap gap-2 text-[10px]">
@@ -300,7 +317,7 @@ export default function OperationalRegister({ kind, initialMeetingId = "" }: { k
               {row.blocker ? <p className="mt-2 text-xs leading-5 text-amber-900"><strong>Blocker:</strong> {row.blocker}</p> : null}
               {kind === "actions" && !["Done", "Archived"].includes(row.status) ? <p className="mt-3 rounded-control border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-950">Progress updates are paused. The system must first verify the individual officer and their assignment to this action. Shared staff access cannot record accountable progress.</p> : null}
               {row.purpose || row.agenda ? <div className="mt-3 space-y-2 border-t border-line pt-3 text-xs leading-5 text-ink-700">{row.purpose ? <p><strong>Purpose:</strong> {row.purpose}</p> : null}{row.chairRole ? <p><strong>Chair role:</strong> {row.chairRole}</p> : null}{row.secretaryRole ? <p><strong>Secretary role:</strong> {row.secretaryRole}</p> : null}{row.agenda ? <p className="whitespace-pre-wrap"><strong>Agenda:</strong> {row.agenda}</p> : null}{row.decisionItems ? <p className="whitespace-pre-wrap"><strong>Decision items:</strong> {row.decisionItems}</p> : null}{row.draftMinutes ? <p className="whitespace-pre-wrap"><strong>Draft minutes:</strong> {row.draftMinutes}</p> : null}{row.decisionOutcome ? <p className="whitespace-pre-wrap"><strong>Decision outcome · draft:</strong> {row.decisionOutcome}</p> : null}</div> : null}
-              {row.sourceMeetingId ? <Link href={`/ops/review/${encodeURIComponent(row.sourceMeetingId)}`} className="mt-2 inline-flex min-h-9 items-center text-xs font-semibold text-forest-800 hover:underline">Open source meeting →</Link> : null}
+              {row.sourceMeetingId ? <Link href={`/ops/review/${encodeURIComponent(row.sourceMeetingId)}`} className="mt-3 inline-flex min-h-9 items-center rounded-full border border-[#dfe6df] bg-[#f7faf6] px-3 text-xs font-semibold text-forest-800 hover:bg-[#edf3ec]">View source meeting →</Link> : null}
               {row.url ? <a href={row.url} target="_blank" rel="noreferrer" className="mt-2 ml-3 inline-flex min-h-9 items-center text-xs font-semibold text-forest-800 underline">Open Notion record ↗</a> : null}
             </article>
           ))}
