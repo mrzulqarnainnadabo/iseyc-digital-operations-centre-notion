@@ -91,6 +91,11 @@ test("department snapshot adapter validates the Observatory v1 contract and pres
   assert.match(page, /getDepartmentSnapshots\(department\)/);
   assert.match(page, /Snapshot · not a live publisher feed/);
   assert.match(page, /record\.referencePeriod/);
+  assert.match(page, /<dl className="mt-3 grid grid-cols-1 gap-2 rounded-lg border/);
+  assert.match(page, /Publisher/);
+  assert.match(page, /Reference period/);
+  assert.match(page, /Geographic coverage/);
+  assert.match(page, /record\.publisher/);
   assert.match(page, /record\.geography\.label/);
   assert.match(page, /record\.publisher/);
   assert.match(page, /metric\.measurementType/);
