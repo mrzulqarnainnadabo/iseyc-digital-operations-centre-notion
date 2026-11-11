@@ -160,7 +160,7 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName,
               />
             </label>
                         <label className="block text-sm font-semibold text-ink-800">
-              Accountable role · title only
+              Proposed accountable role · title only
               <input maxLength={180} value={accountableRole} onChange={(e) => setAccountableRole(e.target.value)} placeholder="Role title — not a personal appointment" className="mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal" />
             </label>
             <label className="block text-sm font-semibold text-ink-800">
