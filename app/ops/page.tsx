@@ -105,7 +105,7 @@ export default async function CommandBriefPage() {
             </div>
           </div>
           <div className="relative mx-auto flex w-full max-w-md items-center justify-center py-2 sm:py-4">
-            <div role="img" aria-label="Four connected departments arranged around shared ISEYC institutional coordination" className="relative aspect-square w-full max-w-[340px]">
+            <div role="img" aria-label="Four connected departments arranged around shared ISEYC institutional coordination" className="relative aspect-square w-full max-w-[280px] sm:max-w-[340px]">
               <div className="absolute inset-[7%] rounded-full border border-white/10" />
               <div className="absolute inset-[19%] rounded-full border border-[#d9c59b]/30" />
               <div className="absolute inset-[31%] rounded-full border border-white/15" />
@@ -225,7 +225,7 @@ export default async function CommandBriefPage() {
       </section>
 
       <section className="rounded-xl border border-[#dce4dc] bg-[#edf2ec] p-4 sm:flex sm:items-center sm:justify-between sm:gap-4">
-        <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Published civic systems</p><p className="mt-1 text-xs text-[#68736b]">Connected public platforms.</p></div>
+        <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Connected public systems</p><p className="mt-1 text-xs text-[#68736b]">Connected public platforms.</p></div>
         <div className="mt-3 flex flex-wrap gap-2 sm:mt-0">
           <a href="https://2027-street-mandate.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center rounded-full border border-[#cdd8ce] bg-white px-3 text-[11px] font-bold text-[#194b3b]">Civic Mandate ↗</a>
           <a href="https://iseyc-civic-brain.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center rounded-full border border-[#cdd8ce] bg-white px-3 text-[11px] font-bold text-[#194b3b]">Civic Brain ↗</a>
