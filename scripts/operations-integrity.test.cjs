@@ -101,19 +101,21 @@ test("meeting intake stores structured preparation in the canonical Meetings dat
   assert.match(form, /Standard-sensitivity intake only/);
 });
 
-test("action progress can be self-reported without enabling completion or closure", () => {
+test("action progress is blocked until an individual officer and assignment can be verified", () => {
   const api = read("app/ops/api/actions/[id]/route.ts");
   const adapter = read("lib/notion-registers.ts");
   const ui = read("components/OperationalRegister.tsx");
   assert.match(api, /isSameOriginRequest/);
   assert.match(api, /requireStaffSession/);
-  assert.match(api, /input\.status !== "In progress" && input\.status !== "Blocked"/);
-  assert.match(api, /Done and closure require a separate authorised review/);
+  assert.match(api, /ACTION_AUTHORITY_UNAVAILABLE/);
+  assert.match(api, /Individual officer identity and verified action assignment are not connected/);
+  assert.match(api, /Shared staff access cannot attribute progress/);
+  assert.match(api, /status: 503/);
+  assert.doesNotMatch(api, /updateActionProgress\\(/);
   assert.match(adapter, /updateActionProgress/);
-  assert.match(adapter, /\["Open", "In progress", "Blocked"\]/);
-  assert.match(ui, /Update working progress/);
-  assert.match(ui, /Self-reported working status only/);
-  assert.match(ui, /does not mark an action Done or close it/);
+  assert.match(ui, /Progress updates are paused/);
+  assert.match(ui, /Shared staff access cannot record accountable progress/);
+  assert.equal(ui.includes("ActionProgressForm"), false);
 });
 
 test("meeting collaboration is limited to draft notes on Standard records", () => {
@@ -171,9 +173,9 @@ test("actions, chamber and communications expose authenticated Notion-backed ini
   const component = fs.readFileSync(path.join(root, "components/OperationalRegister.tsx"), "utf8");
   assert.match(component, /Save to Notion/);
   assert.match(component, /human-authorised/);
-  assert.match(component, /Accountable owner role · required/);
+  assert.match(component, /Proposed owner role · required/);
   assert.match(component, /required minLength=\{2\} maxLength=\{180\}/);
-  assert.match(component, /does not assign access or imply a named appointment/);
+  assert.match(component, /does not assign access or imply a named officer/);
 
   const api = fs.readFileSync(path.join(opsRoot, "api/registers/[kind]/route.ts"), "utf8");
   assert.match(api, /isSameOriginRequest/);
