@@ -638,3 +638,10 @@ test("Presidential Council guide links to a bounded operating compact", () => {
   assert.match(compact, /shared staff key cannot prove who attended/);
   assert.match(compact, /Automation must not approve/);
 });
+
+test("department work plans explain the separate action-register handoff without implying automatic approval or assignment", () => {
+  const workplan = read("components/DepartmentWorkPlanPanel.tsx");
+  assert.match(workplan, /href="\/ops\/actions"/);
+  assert.match(workplan, /shared Action register/);
+  assert.match(workplan, /does not transfer approval or assign an officer/);
+});
