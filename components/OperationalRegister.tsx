@@ -19,64 +19,13 @@ const TITLES: Record<Kind, string> = {
   chamber: "Council and Chamber sessions",
 };
 const DETAILS: Record<Kind, string> = {
-  actions: "Turn meeting outcomes and departmental priorities into owned, dated follow-up work. Every action starts Open; evidence review and formal closure remain separate human steps.",
+  actions: "Record proposed follow-up work from meetings and departmental priorities. An initial register entry is not an accepted assignment; progress reporting waits for verified officer identity and assignment.",
   media: "Prepare institutional communications for factual and editorial review. Draft creation does not approve, publish or dispatch content.",
   chamber: "Prepare formal institutional sessions with an agenda, chair and secretary roles, attendance basis and draft decision notes. These records do not certify quorum or decisions.",
 };
 const KIND_LABEL: Record<Kind, string> = { actions: "Actions", media: "Communications", chamber: "Chamber" };
 const field = "mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal text-ink-950";
 const area = "mt-1 w-full rounded-control border border-line bg-cream-50 px-3 py-2 text-sm font-normal leading-5 text-ink-950";
-
-function ActionProgressForm({ row, onSaved }: { row: RecordRow; onSaved: () => void }) {
-  const [status, setStatus] = useState<"In progress" | "Blocked">(row.status === "Blocked" ? "Blocked" : "In progress");
-  const [progressUpdate, setProgressUpdate] = useState(row.progressUpdate || "");
-  const [blocker, setBlocker] = useState(row.blocker || "");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-
-  async function submit(event: React.FormEvent) {
-    event.preventDefault();
-    if (busy || !progressUpdate.trim() || (status === "Blocked" && !blocker.trim())) return;
-    setBusy(true);
-    setError("");
-    try {
-      const response = await fetch(`/ops/api/actions/${encodeURIComponent(row.id)}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status, progressUpdate, blocker }),
-      });
-      const data = await response.json();
-      if (!response.ok || data.updated !== true) throw new Error(data.error || "Progress update was not confirmed.");
-      onSaved();
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Progress update was not confirmed.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <details className="mt-4 border-t border-line pt-3">
-      <summary className="min-h-10 cursor-pointer list-none text-xs font-bold text-forest-800">Update working progress <span aria-hidden="true">＋</span></summary>
-      <form onSubmit={submit} className="mt-3 space-y-3">
-        <p className="text-[10px] leading-4 text-ink-600">Self-reported working status only. This update does not mark an action Done or close it.</p>
-        <label className="block text-xs font-semibold text-ink-800">Working status
-          <select value={status} onChange={(event) => setStatus(event.target.value as "In progress" | "Blocked")} className={field}>
-            <option>In progress</option><option>Blocked</option>
-          </select>
-        </label>
-        <label className="block text-xs font-semibold text-ink-800">Progress update · required
-          <textarea required rows={2} maxLength={1000} value={progressUpdate} onChange={(event) => setProgressUpdate(event.target.value)} className={area} placeholder="What has changed since the last update?" />
-        </label>
-        <label className="block text-xs font-semibold text-ink-800">Blocker / support required {status === "Blocked" ? "· required" : ""}
-          <textarea rows={2} maxLength={500} required={status === "Blocked"} value={blocker} onChange={(event) => setBlocker(event.target.value)} className={area} placeholder="Describe the blocker or leave blank if none." />
-        </label>
-        {error ? <p role="alert" className="text-xs text-red-800">{error}</p> : null}
-        <button type="submit" disabled={busy || !progressUpdate.trim() || (status === "Blocked" && !blocker.trim())} className="inline-flex min-h-10 items-center rounded-control bg-forest-900 px-4 text-xs font-semibold text-white disabled:opacity-50">{busy ? "Saving update…" : "Save progress update"}</button>
-      </form>
-    </details>
-  );
-}
 
 export default function OperationalRegister({ kind }: { kind: Kind }) {
   const [rows, setRows] = useState<RecordRow[]>([]);
@@ -298,7 +247,7 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
               {row.expectedEvidence ? <p className="mt-3 text-xs leading-5 text-ink-700"><strong>Expected evidence:</strong> {row.expectedEvidence}</p> : null}
               {row.progressUpdate ? <p className="mt-2 whitespace-pre-wrap text-xs leading-5 text-ink-700"><strong>Latest self-reported progress:</strong> {row.progressUpdate}</p> : null}
               {row.blocker ? <p className="mt-2 text-xs leading-5 text-amber-900"><strong>Blocker:</strong> {row.blocker}</p> : null}
-              {kind === "actions" && !["Done", "Archived"].includes(row.status) ? <ActionProgressForm row={row} onSaved={() => void refresh()} /> : null}
+              {kind === "actions" && !["Done", "Archived"].includes(row.status) ? <p className="mt-3 rounded-control border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-950">Progress updates are paused. The system must first verify the individual officer and their assignment to this action. Shared staff access cannot record accountable progress.</p> : null}
               {row.purpose || row.agenda ? <div className="mt-3 space-y-2 border-t border-line pt-3 text-xs leading-5 text-ink-700">{row.purpose ? <p><strong>Purpose:</strong> {row.purpose}</p> : null}{row.chairRole ? <p><strong>Chair role:</strong> {row.chairRole}</p> : null}{row.secretaryRole ? <p><strong>Secretary role:</strong> {row.secretaryRole}</p> : null}{row.agenda ? <p className="whitespace-pre-wrap"><strong>Agenda:</strong> {row.agenda}</p> : null}{row.decisionItems ? <p className="whitespace-pre-wrap"><strong>Decision items:</strong> {row.decisionItems}</p> : null}{row.draftMinutes ? <p className="whitespace-pre-wrap"><strong>Draft minutes:</strong> {row.draftMinutes}</p> : null}{row.decisionOutcome ? <p className="whitespace-pre-wrap"><strong>Decision outcome · draft:</strong> {row.decisionOutcome}</p> : null}</div> : null}
               {row.sourceMeetingId ? <Link href={`/ops/review/${encodeURIComponent(row.sourceMeetingId)}`} className="mt-2 inline-flex min-h-9 items-center text-xs font-semibold text-forest-800 hover:underline">Open source meeting →</Link> : null}
               {row.url ? <a href={row.url} target="_blank" rel="noreferrer" className="mt-2 ml-3 inline-flex min-h-9 items-center text-xs font-semibold text-forest-800 underline">Open Notion record ↗</a> : null}
