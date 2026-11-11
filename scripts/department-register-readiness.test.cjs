@@ -37,6 +37,7 @@ test("department register readiness checks the app's own credentials and exact s
     "Data Limitations",
   ]) assert.ok(adapter.includes(property), "required schema field missing: " + property);
 
+  assert.match(adapter, /try \{\s*const client = notion\(\)/);
   assert.match(adapter, /client\.databases\.retrieve/);
   assert.doesNotMatch(adapter, /client\.databases\.query|client\.pages\.(create|update)/);
   assert.match(adapter, /assertInternalDb\(databaseId, envName\)/);
