@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { StatusBadge } from "@/components/StatusBadge";
-import type { OpsDepartmentId, WorkPlanRecord } from "@/lib/department-operations";
+import type { DepartmentEvidenceOption, OpsDepartmentId, WorkPlanRecord } from "@/lib/department-operations";
 
-type Props = { departmentId: OpsDepartmentId; departmentName: string };
+type Props = { departmentId: OpsDepartmentId; departmentName: string; evidenceOptions: DepartmentEvidenceOption[] };
 
-export default function DepartmentWorkPlanPanel({ departmentId, departmentName }: Props) {
+export default function DepartmentWorkPlanPanel({ departmentId, departmentName, evidenceOptions }: Props) {
   const [rows, setRows] = useState<WorkPlanRecord[]>([]);
   const [error, setError] = useState("");
   const [configured, setConfigured] = useState<boolean | null>(null);
@@ -146,10 +146,28 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
             <input maxLength={180} value={accountableRole} onChange={(e) => setAccountableRole(e.target.value)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
           </label>
           
+          {evidenceOptions.length > 0 ? (
+            <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
+              Select an Observatory source (optional)
+              <select
+                value={evidenceOptions.some((option) => option.sourceUrl === evidenceUrl) ? evidenceUrl : ""}
+                onChange={(e) => setEvidenceUrl(e.target.value)}
+                className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal"
+              >
+                <option value="">No Observatory source selected</option>
+                {evidenceOptions.map((option) => (
+                  <option key={option.id} value={option.sourceUrl}>
+                    {option.title} · {option.publisher} · {option.referencePeriod} · {option.geographyLabel}
+                  </option>
+                ))}
+              </select>
+              <span className="mt-1 block text-xs font-normal text-ink-600">This copies the original publisher URL. The Observatory record ID is not stored in the current Notion register.</span>
+            </label>
+          ) : null}
           <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
             Evidence / deliverable URL (optional)
             <input type="url" maxLength={2048} value={evidenceUrl} onChange={(e) => setEvidenceUrl(e.target.value)} placeholder="https://…" className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
-            <span className="mt-1 block text-xs font-normal text-ink-600">Link to the relevant Intelligence Observatory snapshot or source record.</span>
+            <span className="mt-1 block text-xs font-normal text-ink-600">Link to the source used. A source link does not prove work completion or impact.</span>
           </label>
           <div className="flex flex-wrap gap-2 sm:col-span-2">
             <button type="submit" disabled={busy || !title.trim()} className="min-h-11 rounded-control bg-forest-900 px-4 text-sm font-semibold text-white disabled:opacity-50">{busy ? "Saving…" : "Save work-plan item"}</button>
