@@ -131,7 +131,7 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName, 
       </div>
 
       <p className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border border-[#e1e7df] bg-[#f8faf7] px-3 py-2 text-xs leading-5 text-[#59665d]">
-        <span>Need a discrete follow-up after review? Record it separately in the shared Action register; this does not transfer approval or assign an officer.</span>
+        <span>Need a follow-up? Copy the work-plan record’s Notion URL into the Action notes. The current registers do not create an automatic link, approval or assignment.</span>
         <Link href="/ops/actions" className="inline-flex min-h-8 items-center font-semibold text-[#194b3b] underline underline-offset-2">Open Action register →</Link>
       </p>
 
@@ -241,7 +241,10 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName, 
               {row.riskLevel !== "Unspecified" ? <span className="rounded-full border border-[#e4e8e1] bg-[#fafbf8] px-2.5 py-1 text-[10px] font-semibold text-[#805b27]">Risk · {row.riskLevel}</span> : null}
             </div>
             {row.contributors ? <p className="mt-2 text-xs text-ink-600"><span className="font-semibold">Supporting teams / roles:</span> {row.contributors}</p> : null}
-            {row.evidenceNote ? <a href={row.evidenceNote} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-9 items-center text-sm font-semibold text-forest-800 underline">Open evidence / deliverable ↗</a> : null}
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+              {row.url ? <a href={row.url} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center text-xs font-semibold text-forest-800 underline underline-offset-2">Open work-plan record ↗</a> : null}
+              {row.evidenceNote ? <a href={row.evidenceNote} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center text-xs font-semibold text-forest-800 underline underline-offset-2">Open evidence / deliverable ↗</a> : null}
+            </div>
           </li>
         ))}
       </ul>
