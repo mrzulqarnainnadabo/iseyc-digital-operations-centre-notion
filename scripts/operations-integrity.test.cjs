@@ -116,6 +116,8 @@ test("action progress is blocked until an individual officer and assignment can 
   assert.match(ui, /Progress updates are paused/);
   assert.match(ui, /Shared staff access cannot record accountable progress/);
   assert.equal(ui.includes("ActionProgressForm"), false);
+  assert.ok(ui.includes('{row.detail ? (kind === "actions" ?'));
+  assert.equal(ui.includes('{row.detail ? {kind === "actions" ?'), false);
 });
 
 test("meeting collaboration is limited to draft notes on Standard records", () => {
