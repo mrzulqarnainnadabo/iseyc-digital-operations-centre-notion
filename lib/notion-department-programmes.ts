@@ -32,7 +32,7 @@ function departmentFilter(departmentId?: OpsDepartmentId) {
     : undefined;
 }
 
-import type { ProgrammeRecord, ProgrammeStatus } from "@/lib/department-operations";
+import type { ProgrammeRecord, ProgrammeStatus, WorkPriority, RiskLevel } from "@/lib/department-operations";
 
 const PROGRAMME_TYPE_FILTER = { property: "Work Type", select: { equals: "Programme" } };
 
@@ -40,6 +40,16 @@ function urlProp(prop: unknown): string {
   if (!prop || typeof prop !== "object") return "";
   const value = prop as Record<string, unknown>;
   return value.type === "url" && typeof value.url === "string" ? value.url : "";
+}
+
+function mapPriority(raw: string): WorkPriority {
+  const allowed: WorkPriority[] = ["Critical", "High", "Medium", "Low"];
+  return allowed.includes(raw as WorkPriority) ? raw as WorkPriority : "Unspecified";
+}
+
+function mapRiskLevel(raw: string): RiskLevel {
+  const allowed: RiskLevel[] = ["Low", "Moderate", "High", "Critical"];
+  return allowed.includes(raw as RiskLevel) ? raw as RiskLevel : "Unspecified";
 }
 
 function mapStatus(raw: string): ProgrammeStatus {
@@ -65,6 +75,9 @@ function mapRow(page: any): ProgrammeRecord {
     startDate: textProp(props["Start Date"]),
     endDate: textProp(props["Due Date"]),
     accountableRole: textProp(props["Accountable Role"]),
+    priority: mapPriority(textProp(props.Priority)),
+    riskLevel: mapRiskLevel(textProp(props["Risk Level"])),
+    contributors: textProp(props.Contributors),
     status: mapStatus(textProp(props.Status)),
     evidenceNote: urlProp(props["Evidence / Deliverable"]),
     url: typeof page.url === "string" ? page.url : "",
@@ -99,6 +112,9 @@ export async function createDepartmentProgrammeDraft(input: {
   startDate?: string;
   endDate?: string;
   accountableRole?: string;
+  priority?: WorkPriority;
+  riskLevel?: RiskLevel;
+  contributors?: string;
   evidenceUrl?: string;
 }): Promise<{ id: string; url: string; status: string }> {
   const { client, databaseId } = database();
@@ -118,6 +134,9 @@ export async function createDepartmentProgrammeDraft(input: {
   if (input.accountableRole) {
     properties["Accountable Role"] = { rich_text: [{ text: { content: input.accountableRole.slice(0, 180) } }] };
   }
+  if (input.priority && input.priority !== "Unspecified") properties.Priority = { select: { name: input.priority } };
+  if (input.riskLevel && input.riskLevel !== "Unspecified") properties["Risk Level"] = { select: { name: input.riskLevel } };
+  if (input.contributors) properties.Contributors = { rich_text: [{ text: { content: input.contributors.slice(0, 1000) } }] };
   if (input.startDate) properties["Start Date"] = { date: { start: input.startDate } };
   if (input.endDate) properties["Due Date"] = { date: { start: input.endDate } };
   if (input.evidenceUrl) properties["Evidence / Deliverable"] = { url: input.evidenceUrl };
