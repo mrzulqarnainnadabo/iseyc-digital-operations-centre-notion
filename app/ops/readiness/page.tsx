@@ -2,6 +2,7 @@ import Link from "next/link";
 import { StatusBadge } from "@/components/StatusBadge";
 import DepartmentArchitectureDiagram from "@/components/DepartmentArchitectureDiagram";
 import { verifyDepartmentRegisterReadiness } from "@/lib/department-register-readiness";
+import { configFlags } from "@/lib/notion";
 
 export const dynamic = "force-dynamic";
 
@@ -73,6 +74,15 @@ const modules = [
 
 export default async function ReadinessPage() {
   const registerReadiness = await verifyDepartmentRegisterReadiness();
+  const flags = configFlags();
+  const sharedConnections = [
+    { title: "Shared staff key", configured: flags.staffKey, detail: "Coordination session secret only; it does not establish individual identity or appointment." },
+    { title: "Notion API token", configured: flags.token, detail: "Server credential presence only; it does not prove database access." },
+    { title: "Meeting register", configured: flags.meetings, detail: "Database configuration present; read and write access are not tested here." },
+    { title: "Action register", configured: flags.actions, detail: "Database configuration present; read and write access are not tested here." },
+    { title: "Communications register", configured: flags.media, detail: "Database configuration present; publication remains separately disabled." },
+    { title: "Digital Chamber register", configured: flags.chamber, detail: "Database configuration present; room access and membership are not verified here." },
+  ];
   const registerCards = [
     { key: "programmes", title: "Programmes & Work Register", result: registerReadiness.programmes },
     { key: "reports", title: "Department Reports & Scorecards", result: registerReadiness.reports },
@@ -134,6 +144,25 @@ export default async function ReadinessPage() {
           })}
         </div>
         <p className="text-[10px] text-ink-500">Checked {registerReadiness.checkedAt} · UTC</p>
+      </section>
+
+      <section className="space-y-3" aria-labelledby="shared-configuration-checks">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-700">Configuration presence</p>
+          <h3 id="shared-configuration-checks" className="font-semibold text-forest-950">Shared coordination connections</h3>
+          <p className="text-sm leading-6 text-ink-600">These checks show whether the required environment values are present. They do not prove that the Notion API can read or write each register.</p>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {sharedConnections.map((connection) => (
+            <article key={connection.title} className="rounded-card border border-line bg-white p-3">
+              <div className="flex items-start justify-between gap-2">
+                <h4 className="text-sm font-semibold text-forest-950">{connection.title}</h4>
+                <span className={connection.configured ? "shrink-0 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-900" : "shrink-0 rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-950"}>{connection.configured ? "Present" : "Missing"}</span>
+              </div>
+              <p className="mt-2 text-xs leading-5 text-ink-600">{connection.detail}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
       <div className="grid gap-3">
