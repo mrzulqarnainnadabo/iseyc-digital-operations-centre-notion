@@ -96,3 +96,21 @@ test("department snapshot adapter validates the Observatory v1 contract and pres
   assert.match(page, /record\.limitations/);
   assert.match(page, /No cached or estimated replacement records are shown/);
 });
+
+
+test("department draft forms can attach a source selected from the validated Observatory feed", () => {
+  const page = read("app/ops/departments/[department]/page.tsx");
+  for (const componentPath of [
+    "components/DepartmentProgrammePanel.tsx",
+    "components/DepartmentWorkPlanPanel.tsx",
+    "components/DepartmentReportPanel.tsx",
+  ]) {
+    const component = read(componentPath);
+    assert.match(component, /DepartmentEvidenceOption/);
+    assert.match(component, /evidenceOptions\.map\(\(option\)/);
+    assert.match(component, /option\.sourceUrl/);
+    assert.match(component, /The Observatory record ID is not stored/);
+  }
+  assert.match(page, /snapshots\.records\.map\(\(record\)/);
+  assert.match(page, /evidenceOptions=\{evidenceOptions\}/);
+});
