@@ -533,6 +533,9 @@ test("department navigation prioritises core work and groups secondary destinati
   assert.match(department, /href="#programmes">Programmes/);
   assert.match(department, /href="#work-plans">Work plans/);
   assert.match(department, /More workspace areas/);
+  assert.doesNotMatch(department, /A department task register is Not connected until its Notion register is configured/);
+  assert.match(department, /Connection shown below/);
+  assert.match(department, /No matching meetings appear on this page\. Other pages may contain more\./);
   assert.match(department, /ops-department-nav flex min-w-0 flex-nowrap items-center gap-2 overflow-x-auto/);
   assert.match(department, /ops-department-nav-more relative shrink-0/);
   assert.match(department, /w-\[min\(18rem,calc\(100vw-2rem\)\)\]/);
