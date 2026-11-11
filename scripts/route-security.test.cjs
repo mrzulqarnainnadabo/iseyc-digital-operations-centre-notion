@@ -71,10 +71,10 @@ for (const [route, contract] of Object.entries(contracts)) {
   test(`${route} preserves its reviewed method and security contract`, () => {
     const absolute = path.join(apiRoot, route);
     const source = fs.readFileSync(absolute, "utf8");
-    const exportedMethods = [...source.matchAll(/export async function (GET|POST|PUT|PATCH|DELETE)\s*\(/g)]
+    const methods = [...source.matchAll(/export async function (GET|POST|PUT|PATCH|DELETE)\s*\(/g)]
       .map((match) => match[1])
       .sort();
-    assert.deepEqual(exportedMethods, [...contract.methods].sort(), "HTTP method surface changed");
+    assert.deepEqual(methods, [...contract.methods].sort(), "HTTP method surface changed");
     for (const marker of contract.required) {
       assert.ok(source.includes(marker), `Missing required security marker: ${marker}`);
     }
@@ -83,6 +83,41 @@ for (const [route, contract] of Object.entries(contracts)) {
     }
   });
 }
+
+test("operations API route inventory is explicit and shared-session boundaries are enforced", () => {
+  const opsRoot = path.join(__dirname, "../app/ops/api");
+  const actual = collectRoutes(opsRoot).sort();
+  const expected = [
+    "actions/[id]/route.ts",
+    "auth/oidc/status/route.ts",
+    "department-applications/connection/route.ts",
+    "department-programmes/route.ts",
+    "department-reports/route.ts",
+    "department-workplans/route.ts",
+    "external-engagement/route.ts",
+    "meetings/[id]/route.ts",
+    "meetings/route.ts",
+    "registers/[kind]/route.ts"
+  ].sort();
+  assert.deepEqual(actual, expected, "A new operations API route requires security review");
+
+  for (const route of actual) {
+    const source = fs.readFileSync(path.join(opsRoot, route), "utf8");
+    assert.ok(source.includes("requireStaffSession") || source.includes("from \"../../../../../api/") || source.includes("from \"../../../../api/") || source.includes("from \"../../../api/"),
+      `${route} must authenticate directly or delegate to an independently guarded API handler`);
+    if (/route\.ts$/.test(route) && !route.includes("connection") && !route.includes("status") && !route.includes("[id]")) {
+      if (source.includes("export async function POST") || source.includes("export async function PATCH")) {
+        // Operations aliases delegate to the canonical /api handler. Verify
+        // the actual handler guards rather than requiring duplicated checks.
+        const guardSource = route === "meetings/route.ts"
+          ? fs.readFileSync(path.join(__dirname, "../app/api/meetings/route.ts"), "utf8")
+          : source;
+        assert.ok(guardSource.includes("isSameOriginRequest"), `${route} POST must enforce same-origin in its handler`);
+        assert.ok(guardSource.includes("readBoundedJson"), `${route} POST must use bounded JSON parsing in its handler`);
+      }
+    }
+  }
+});
 
 test("no DOC API route is implicitly treated as public", () => {
   const routes = collectRoutes(apiRoot);
@@ -195,4 +230,54 @@ test("login throttling documents the distributed enforcement requirement", () =>
   assert.match(limiter, /Serverless instances do not share memory/);
   assert.match(limiter, /distributed Vercel Firewall\/WAF limit/);
   assert.match(limiter, /POST \/api\/auth\/login/);
+});
+
+
+const opsApiRoot = path.join(__dirname, "../app/ops/api");
+
+test("every Operations Centre API route is private and every mutation is same-origin and session protected", () => {
+  const routes = collectRoutes(opsApiRoot);
+  assert.ok(routes.length > 0, "Operations Centre API route inventory must not be empty");
+  const identityOnlyRoutes = new Set([
+    "auth/oidc/start/route.ts",
+    "auth/oidc/callback/route.ts",
+    "auth/oidc/status/route.ts",
+  ]);
+
+  for (const route of routes) {
+    const wrapper = fs.readFileSync(path.join(opsApiRoot, route), "utf8");
+    const delegated = wrapper.includes('from "../../../api/') || wrapper.includes('from "../../../../api/') || wrapper.includes('from "../../../../../api/');
+    const source = delegated ? fs.readFileSync(path.join(apiRoot, route), "utf8") : wrapper;
+    const identityOnly = identityOnlyRoutes.has(route);
+    if (!identityOnly) {
+      assert.ok(source.includes("requireStaffSession()"), `${route} must require an authenticated staff session in its handler`);
+    }
+    assert.ok(source.includes("privateJson(") || source.includes("privateResponseHeaders("), `${route} must use private no-store response handling in its handler`);
+
+    const methods = [...source.matchAll(/export async function (GET|POST|PUT|PATCH|DELETE)\s*\(/g)]
+      .map((match) => match[1]);
+    for (const method of methods.filter((item) => item !== "GET")) {
+      const body = source.slice(source.indexOf(`export async function ${method}`));
+      assertInOrder(
+        body,
+        ["isSameOriginRequest(", "requireStaffSession()"],
+        `${route} ${method}`
+      );
+    }
+  }
+});
+
+test("shared-key sessions cannot write unattributed action progress", () => {
+  const source = fs.readFileSync(path.join(opsApiRoot, "actions/[id]/route.ts"), "utf8");
+  assert.ok(source.includes("requireStaffSession()"));
+  assert.match(source, /Individual officer identity and verified action assignment are not connected/);
+  assert.match(source, /Shared staff access cannot attribute progress/);
+  assert.match(source, /status: 503/);
+  assert.equal(source.includes("updateActionProgress("), false);
+  const panel = fs.readFileSync(path.join(__dirname, "../components/OperationalRegister.tsx"), "utf8");
+  assert.match(panel, /Progress updates are paused/);
+  assert.match(panel, /Shared staff access cannot record accountable progress/);
+  assert.equal(panel.includes("ActionProgressForm"), false);
+  assert.match(panel, /Proposed owner role/);
+  assert.doesNotMatch(panel, /Accountable owner role/);
 });

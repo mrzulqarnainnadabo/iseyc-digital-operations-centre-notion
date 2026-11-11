@@ -152,3 +152,40 @@ Still outstanding: trusted membership/appointment source, account-linking and re
 The feature branch now includes `lib/pin-crypto.ts` with asynchronous scrypt hashing for exactly six-digit PINs, a per-record random salt, a separate server-side HMAC pepper (`DOC_PIN_PEPPER`), fixed verification parameters, malformed-record rejection and timing-safe derived-key comparison. Unit tests cover successful verification, wrong PIN, malformed values, and missing pepper configuration.
 
 This is a cryptographic primitive only. There is no PIN enrollment/challenge/recovery route, no PIN hash store, no distributed attempt limiter/lockout, no PIN audit events and no step-up integration. Do not enable PIN entry or onboard users until a restricted durable store and distributed rate-limit provider are selected, configured and tested. Never put the pepper or PIN hashes in Git, browser code, ordinary Notion pages or public responses.
+
+## Department and shared-register route audit (2026-11-11)
+
+The operations API inventory was reviewed alongside the base meeting API. The following routes currently use the transitional shared staff session for read access and/or proposal intake:
+
+- `/ops/api/department-programmes`: department-filtered reads and Proposed programme drafts.
+- `/ops/api/department-workplans`: department-filtered reads and Proposed work-plan drafts.
+- `/ops/api/department-reports`: department-filtered reads and Draft reports.
+- `/ops/api/registers/[kind]`: shared action, communications and Chamber registers; creates initial records only.
+- `/ops/api/external-engagement`: organisation/contact register intake and invitation drafts. Organisation/contact entries are returned as unverified; invitation drafts are not sent.
+- `/ops/api/meetings` and `/ops/api/meetings/[id]`: delegate to the independently guarded base meeting handlers.
+- `/ops/api/actions/[id]`: progress mutation remains disabled with `ACTION_AUTHORITY_UNAVAILABLE`.
+- `/ops/api/department-applications/connection` and `/ops/api/auth/oidc/status`: read-only diagnostics/status delegated to guarded base handlers.
+
+### What this means operationally
+
+The shared staff session does not identify which person submitted a department proposal, report, organisation, contact, invitation or action draft. It also does not prove that the person belongs to the selected department. These endpoints therefore support controlled internal intake only; they do not establish department ownership, approval, appointment, external representation or authority to commit ISEYC.
+
+Until a trusted person-to-membership-to-appointment adapter is implemented and exercised in route integration tests:
+
+- Treat all shared-session submissions as unattributed drafts or proposals.
+- Do not use them as evidence that a named department officer accepted responsibility.
+- Do not dispatch external invitations or represent an organisation/contact record as verified.
+- Do not expose privileged status transitions, action progress, approval, publication, financial or safeguarding mutations through the shared key.
+- Keep cross-department reads under review; department query filters are data filters, not authorization boundaries.
+
+A route inventory regression test now covers the `app/ops/api` surface and checks that each route either authenticates directly or delegates to a guarded base handler. State-changing POST/PATCH routes are checked for same-origin and bounded-body handling. This source-level inventory is a guard against accidental route drift; it is not a substitute for runtime integration tests.
+
+### Remaining release blockers
+
+1. No trusted adapter connects Google OIDC subject to an approved membership record and a current appointment.
+2. No verified department scope is attached to the authenticated person.
+3. No durable, actor-attributed audit record is written for shared-session submissions.
+4. No per-person session revocation or distributed abuse limiter is active.
+5. No complete authenticated browser QA or fresh successful CI/build result has been established for the latest PR head.
+
+Do not describe the operations centre as nationally ready or institutionally access-controlled until these blockers are resolved and tested.

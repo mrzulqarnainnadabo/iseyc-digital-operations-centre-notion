@@ -37,11 +37,14 @@ Other existing Work Type options include Project, Training, Research and Communi
 | Intended Outcome | Text | Programme objective or work-plan objective |
 | Acceptance Criteria | Text | Programme deliverables or work-plan deliverable |
 | Accountable Role | Text | Role title only; does not appoint a person |
-| Start Date | Date | Programme start date |
+| Start Date | Date | Programme and work-plan start date |
 | Due Date | Date | Programme end date or work-plan due date |
+| Priority | Select | Optional Critical, High, Medium or Low priority on programme and work-plan drafts |
+| Risk Level | Select | Optional Low, Moderate, High or Critical risk classification on programme and work-plan drafts |
+| Contributors | Text | Supporting teams / role titles only; not personal identity or appointment proof |
 | Evidence / Deliverable | URL | Optional HTTPS source/deliverable link read and written by programme and operations adapters |
 
-The live database also contains Priority, Risk Level, Budget Requested, Budget Approved, Actual Spend, Approval Reference, Contributors and Last Reviewed. These properties exist in Notion but are **not yet fully surfaced or governed by the current application adapters**. Do not assume that the app validates budgets, approvals or risk decisions.
+The application now maps Priority, Risk Level and Contributors for programme and work-plan records. Contributors are labelled for teams and role titles only. Budget Requested, Budget Approved and Actual Spend are number fields formatted as dollars in the current Notion schema; the application deliberately does not expose them until the institution confirms the currency convention and financial permissions. Approval Reference and Last Reviewed also remain outside the shared-key workflow.
 
 ### Department select compatibility
 
@@ -80,10 +83,13 @@ The application creates programme and work-plan records in **Proposed** status. 
 | Risks & Blockers | Text | Challenges, constraints and unresolved risks |
 | Decisions Required | Text | Outstanding decisions and actions |
 | Outcomes / Evidence | Text | Outcome narrative and evidence summary |
+| Outputs | Text | Specific outputs recorded separately from the general completed-work narrative |
+| Planned Work | Text | Next work, distinct from completed activity |
+| Prepared By Role | Text | Declared role title only; not verified identity |
 | Evidence Links | URL | Optional HTTPS source link read and written by the report adapter |
 | Data Limitations | Text | Limitations read and written by the report adapter |
 
-The live database also contains Outputs, Planned Work, Budget Summary, Prepared By Role and Reviewed By Role. These fields exist in Notion but are not yet mapped into the current API and UI. Evidence Links and Data Limitations are mapped; evidence URLs must use HTTPS. The current adapter reads/writes the two period dates as separate properties; it must not treat the start field as a date range.
+Outputs, Planned Work and Prepared By Role are now mapped. Prepared By Role is a declared title, not a verified user identity. Reviewed By Role and Budget Summary remain intentionally excluded from the shared-key API until individual reviewer authority and finance access controls are implemented. Evidence Links and Data Limitations are mapped; evidence URLs must use HTTPS. The current adapter reads/writes the two period dates as separate properties; it must not treat the start field as a date range.
 
 The application creates reports as **Draft**. A draft report is not accepted, certified or published. Submission, acceptance and outcome verification remain separate human-controlled decisions.
 
@@ -109,6 +115,7 @@ The current register adapters provide basic programme/work-plan and report field
 - The server must continue to allowlist database IDs and fail closed when configuration is missing.
 - Department APIs require a staff session; writes require same-origin requests and bounded input.
 - Shared-key access does not identify an individual officer or prove appointment, membership or delegated authority.
+- The institution-wide Actions register may receive a proposed action record, but a proposed owner role is not an accepted assignment. Progress updates are deliberately disabled until the session identifies an individual officer and a trusted appointment/action assignment can be checked. The shared-key API must not update action status or evidence, and must not certify completion or closure.
 - Do not expose personnel, finance, health, safeguarding or applicant records through public evidence surfaces.
 - No demo programmes, officers, attendance, partner records or performance figures may be generated.
 

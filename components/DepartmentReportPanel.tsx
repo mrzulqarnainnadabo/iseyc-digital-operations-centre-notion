@@ -3,12 +3,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { StatusBadge } from "@/components/StatusBadge";
 import type {
+  DepartmentEvidenceOption,
   DepartmentReportRecord,
   OpsDepartmentId,
   ReportType,
 } from "@/lib/department-operations";
 
-type Props = { departmentId: OpsDepartmentId; departmentName: string };
+type Props = { departmentId: OpsDepartmentId; departmentName: string; evidenceOptions: DepartmentEvidenceOption[] };
 
 const REPORT_TYPES: ReportType[] = [
   "Weekly",
@@ -17,7 +18,7 @@ const REPORT_TYPES: ReportType[] = [
   "Annual",
 ];
 
-export default function DepartmentReportPanel({ departmentId, departmentName }: Props) {
+export default function DepartmentReportPanel({ departmentId, departmentName, evidenceOptions }: Props) {
   const [rows, setRows] = useState<DepartmentReportRecord[]>([]);
   const [error, setError] = useState("");
   const [configured, setConfigured] = useState<boolean | null>(null);
@@ -32,6 +33,9 @@ export default function DepartmentReportPanel({ departmentId, departmentName }: 
   const [challenges, setChallenges] = useState("");
   const [outstandingActions, setOutstandingActions] = useState("");
   const [recommendations, setRecommendations] = useState("");
+  const [outputs, setOutputs] = useState("");
+  const [plannedWork, setPlannedWork] = useState("");
+  const [preparedByRole, setPreparedByRole] = useState("");
   const [evidenceUrl, setEvidenceUrl] = useState("");
   const [dataLimitations, setDataLimitations] = useState("");
 
@@ -98,6 +102,9 @@ export default function DepartmentReportPanel({ departmentId, departmentName }: 
           challenges,
           outstandingActions,
           recommendations,
+          outputs,
+          plannedWork,
+          preparedByRole,
           evidenceUrl,
           dataLimitations,
         }),
@@ -111,6 +118,9 @@ export default function DepartmentReportPanel({ departmentId, departmentName }: 
       setChallenges("");
       setOutstandingActions("");
       setRecommendations("");
+      setOutputs("");
+      setPlannedWork("");
+      setPreparedByRole("");
       setEvidenceUrl("");
       setDataLimitations("");
       setReportType("Monthly");
@@ -169,6 +179,14 @@ export default function DepartmentReportPanel({ departmentId, departmentName }: 
             Completed work
             <textarea maxLength={1800} rows={3} value={summary} onChange={(e) => setSummary(e.target.value)} className="mt-1 w-full rounded-control border border-line bg-white px-3 py-2 text-sm font-normal" />
           </label>
+          <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
+            Outputs delivered
+            <textarea maxLength={1800} rows={2} value={outputs} onChange={(e) => setOutputs(e.target.value)} placeholder="Specific outputs produced in this reporting period." className="mt-1 w-full rounded-control border border-line bg-white px-3 py-2 text-sm font-normal" />
+          </label>
+          <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
+            Planned work
+            <textarea maxLength={1800} rows={2} value={plannedWork} onChange={(e) => setPlannedWork(e.target.value)} placeholder="Next activities; distinguish planned work from work already delivered." className="mt-1 w-full rounded-control border border-line bg-white px-3 py-2 text-sm font-normal" />
+          </label>
           <label className="block text-sm font-semibold text-ink-800">
             Risks & blockers
             <textarea maxLength={1800} rows={2} value={challenges} onChange={(e) => setChallenges(e.target.value)} className="mt-1 w-full rounded-control border border-line bg-white px-3 py-2 text-sm font-normal" />
@@ -177,14 +195,36 @@ export default function DepartmentReportPanel({ departmentId, departmentName }: 
             Decisions required
             <textarea maxLength={1800} rows={2} value={outstandingActions} onChange={(e) => setOutstandingActions(e.target.value)} className="mt-1 w-full rounded-control border border-line bg-white px-3 py-2 text-sm font-normal" />
           </label>
+          <label className="block text-sm font-semibold text-ink-800">
+            Prepared by role · title only
+            <input maxLength={180} value={preparedByRole} onChange={(e) => setPreparedByRole(e.target.value)} placeholder="Declared role title, not verified identity" className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
+          </label>
           <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
             Outcomes / evidence
             <textarea maxLength={1800} rows={2} value={recommendations} onChange={(e) => setRecommendations(e.target.value)} className="mt-1 w-full rounded-control border border-line bg-white px-3 py-2 text-sm font-normal" />
           </label>
+          {evidenceOptions.length > 0 ? (
+            <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
+              Select an Observatory source (optional)
+              <select
+                value={evidenceOptions.some((option) => option.sourceUrl === evidenceUrl) ? evidenceUrl : ""}
+                onChange={(e) => setEvidenceUrl(e.target.value)}
+                className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal"
+              >
+                <option value="">No Observatory source selected</option>
+                {evidenceOptions.map((option) => (
+                  <option key={option.id} value={option.sourceUrl}>
+                    {option.title} · {option.publisher} · {option.referencePeriod} · {option.geographyLabel}
+                  </option>
+                ))}
+              </select>
+              <span className="mt-1 block text-xs font-normal text-ink-600">This copies the original publisher URL. The Observatory record ID is not stored in the current Notion register.</span>
+            </label>
+          ) : null}
           <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
             Evidence link (optional)
             <input type="url" maxLength={2048} value={evidenceUrl} onChange={(e) => setEvidenceUrl(e.target.value)} placeholder="https://…" className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
-            <span className="mt-1 block text-xs font-normal text-ink-600">Link to the Observatory snapshot or original source used in this report.</span>
+            <span className="mt-1 block text-xs font-normal text-ink-600">Link to the source used. A source link does not certify reported outputs or outcomes.</span>
           </label>
           <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
             Data limitations
@@ -214,6 +254,9 @@ export default function DepartmentReportPanel({ departmentId, departmentName }: 
             </div>
             <p className="mt-1 text-xs text-ink-600">{row.reportType}{row.periodStart || row.periodEnd ? ` · ${row.periodStart || "—"} to ${row.periodEnd || "—"}` : ""}</p>
             {row.summary ? <p className="mt-1 text-sm text-ink-700">{row.summary}</p> : null}
+            {row.outputs ? <p className="mt-2 text-xs leading-5 text-ink-700"><span className="font-semibold">Outputs:</span> {row.outputs}</p> : null}
+            {row.plannedWork ? <p className="mt-2 text-xs leading-5 text-ink-700"><span className="font-semibold">Planned work:</span> {row.plannedWork}</p> : null}
+            {row.preparedByRole ? <p className="mt-2 text-[10px] text-ink-600">Prepared by role: {row.preparedByRole}</p> : null}
             {row.evidenceUrl ? <a href={row.evidenceUrl} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-9 items-center text-sm font-semibold text-forest-800 underline">Open evidence source ↗</a> : null}
             {row.dataLimitations ? <p className="mt-2 text-xs leading-5 text-ink-600"><span className="font-semibold">Limitations:</span> {row.dataLimitations}</p> : null}
           </li>

@@ -15,6 +15,17 @@ export type OpsDepartmentId =
 
 export type DepartmentRecordId = OpsDepartmentId | "Cross-departmental" | "Unspecified";
 
+/** A published Observatory source offered for explicit attachment to a draft record. */
+export type DepartmentEvidenceOption = {
+  id: string;
+  title: string;
+  publisher: string;
+  referencePeriod: string;
+  geographyLabel: string;
+  sourceUrl: string;
+};
+
+
 /** Map known Notion select values without silently assigning unknown records to Education. */
 export function departmentIdFromNotionSelect(value: string): DepartmentRecordId {
   switch (value.trim().toLowerCase()) {
@@ -73,6 +84,8 @@ export type WorkPlanStatus =
   | "Unspecified";
 
 export type ReportType = "Weekly" | "Monthly" | "Quarterly" | "Annual" | "Unspecified";
+export type WorkPriority = "Critical" | "High" | "Medium" | "Low" | "Unspecified";
+export type RiskLevel = "Low" | "Moderate" | "High" | "Critical" | "Unspecified";
 
 /** Canonical programme view model backed by the shared Notion register. */
 export type ProgrammeRecord = {
@@ -88,6 +101,9 @@ export type ProgrammeRecord = {
   startDate: string;
   endDate: string;
   accountableRole: string;
+  priority: WorkPriority;
+  riskLevel: RiskLevel;
+  contributors: string;
   status: ProgrammeStatus;
   evidenceNote: string;
   url: string;
@@ -100,8 +116,12 @@ export type WorkPlanRecord = {
   objective: string;
   departmentId: DepartmentRecordId;
   deliverable: string;
+  startDate: string;
   dueDate: string;
   accountableRole: string;
+  priority: WorkPriority;
+  riskLevel: RiskLevel;
+  contributors: string;
   status: WorkPlanStatus;
   evidenceNote: string;
   url: string;
@@ -119,6 +139,9 @@ export type DepartmentReportRecord = {
   challenges: string;
   outstandingActions: string;
   recommendations: string;
+  outputs: string;
+  plannedWork: string;
+  preparedByRole: string;
   evidenceUrl: string;
   dataLimitations: string;
   status: "Draft" | "Submitted" | "Under Review" | "Accepted" | "Revision Required" | "Archived" | "Unspecified";

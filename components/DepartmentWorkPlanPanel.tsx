@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { StatusBadge } from "@/components/StatusBadge";
-import type { OpsDepartmentId, WorkPlanRecord } from "@/lib/department-operations";
+import type { DepartmentEvidenceOption, OpsDepartmentId, WorkPlanRecord, WorkPriority, RiskLevel } from "@/lib/department-operations";
 
-type Props = { departmentId: OpsDepartmentId; departmentName: string };
+type Props = { departmentId: OpsDepartmentId; departmentName: string; evidenceOptions: DepartmentEvidenceOption[] };
 
-export default function DepartmentWorkPlanPanel({ departmentId, departmentName }: Props) {
+export default function DepartmentWorkPlanPanel({ departmentId, departmentName, evidenceOptions }: Props) {
   const [rows, setRows] = useState<WorkPlanRecord[]>([]);
   const [error, setError] = useState("");
   const [configured, setConfigured] = useState<boolean | null>(null);
@@ -16,7 +16,11 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
   const [title, setTitle] = useState("");
   const [objective, setObjective] = useState("");
   const [deliverable, setDeliverable] = useState("");
+  const [startDate, setStartDate] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [priority, setPriority] = useState<WorkPriority>("Unspecified");
+  const [riskLevel, setRiskLevel] = useState<RiskLevel>("Unspecified");
+  const [contributors, setContributors] = useState("");
   const [accountableRole, setAccountableRole] = useState("");
   const [evidenceUrl, setEvidenceUrl] = useState("");
 
@@ -75,10 +79,14 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
         departmentId,
         objective,
         deliverable,
+        startDate,
+        dueDate,
+        priority,
+        riskLevel,
+        contributors,
         accountableRole,
         evidenceUrl,
       };
-      if (dueDate) body.dueDate = dueDate;
       const r = await fetch("/ops/api/department-workplans", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -89,7 +97,11 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
       setTitle("");
       setObjective("");
       setDeliverable("");
+      setStartDate("");
       setDueDate("");
+      setPriority("Unspecified");
+      setRiskLevel("Unspecified");
+      setContributors("");
       setAccountableRole("");
       setEvidenceUrl("");
       await refresh();
@@ -138,18 +150,56 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
             <input maxLength={1800} value={deliverable} onChange={(e) => setDeliverable(e.target.value)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
           </label>
           <label className="block text-sm font-semibold text-ink-800">
+            Start date
+            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
+          </label>
+          <label className="block text-sm font-semibold text-ink-800">
             Due date
             <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
           </label>
           <label className="block text-sm font-semibold text-ink-800">
-            Accountable role · title only
+            Priority
+            <select value={priority} onChange={(e) => setPriority(e.target.value as WorkPriority)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal">
+              <option value="Unspecified">Not set</option><option value="Critical">Critical</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option>
+            </select>
+          </label>
+          <label className="block text-sm font-semibold text-ink-800">
+            Risk level
+            <select value={riskLevel} onChange={(e) => setRiskLevel(e.target.value as RiskLevel)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal">
+              <option value="Unspecified">Not assessed</option><option value="Low">Low</option><option value="Moderate">Moderate</option><option value="High">High</option><option value="Critical">Critical</option>
+            </select>
+          </label>
+          <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
+            Supporting teams / roles
+            <input maxLength={1000} value={contributors} onChange={(e) => setContributors(e.target.value)} placeholder="Departments or role titles only — no personal or sensitive details" className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
+          </label>
+          <label className="block text-sm font-semibold text-ink-800">
+            Proposed accountable role · title only
             <input maxLength={180} value={accountableRole} onChange={(e) => setAccountableRole(e.target.value)} className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
           </label>
           
+          {evidenceOptions.length > 0 ? (
+            <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
+              Select an Observatory source (optional)
+              <select
+                value={evidenceOptions.some((option) => option.sourceUrl === evidenceUrl) ? evidenceUrl : ""}
+                onChange={(e) => setEvidenceUrl(e.target.value)}
+                className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal"
+              >
+                <option value="">No Observatory source selected</option>
+                {evidenceOptions.map((option) => (
+                  <option key={option.id} value={option.sourceUrl}>
+                    {option.title} · {option.publisher} · {option.referencePeriod} · {option.geographyLabel}
+                  </option>
+                ))}
+              </select>
+              <span className="mt-1 block text-xs font-normal text-ink-600">This copies the original publisher URL. The Observatory record ID is not stored in the current Notion register.</span>
+            </label>
+          ) : null}
           <label className="block text-sm font-semibold text-ink-800 sm:col-span-2">
             Evidence / deliverable URL (optional)
             <input type="url" maxLength={2048} value={evidenceUrl} onChange={(e) => setEvidenceUrl(e.target.value)} placeholder="https://…" className="mt-1 min-h-11 w-full rounded-control border border-line bg-white px-3 text-sm font-normal" />
-            <span className="mt-1 block text-xs font-normal text-ink-600">Link to the relevant Intelligence Observatory snapshot or source record.</span>
+            <span className="mt-1 block text-xs font-normal text-ink-600">Link to the source used. A source link does not prove work completion or impact.</span>
           </label>
           <div className="flex flex-wrap gap-2 sm:col-span-2">
             <button type="submit" disabled={busy || !title.trim()} className="min-h-11 rounded-control bg-forest-900 px-4 text-sm font-semibold text-white disabled:opacity-50">{busy ? "Saving…" : "Save work-plan item"}</button>
@@ -174,7 +224,12 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName }
               <StatusBadge status={row.status} />
             </div>
             {row.objective ? <p className="mt-1 text-sm text-ink-700">{row.objective}</p> : null}
-            <p className="mt-1 text-xs text-ink-600">{[row.dueDate && `Due ${row.dueDate}`, row.accountableRole, row.deliverable].filter(Boolean).join(" · ")}</p>
+            <p className="mt-1 text-xs text-ink-600">{[row.startDate && `Start ${row.startDate}`, row.dueDate && `Due ${row.dueDate}`, row.accountableRole && `Proposed role · ${row.accountableRole}`, row.deliverable].filter(Boolean).join(" · ")}</p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {row.priority !== "Unspecified" ? <span className="rounded-full border border-[#e4e8e1] bg-[#fafbf8] px-2.5 py-1 text-[10px] font-semibold text-[#405b49]">Priority · {row.priority}</span> : null}
+              {row.riskLevel !== "Unspecified" ? <span className="rounded-full border border-[#e4e8e1] bg-[#fafbf8] px-2.5 py-1 text-[10px] font-semibold text-[#805b27]">Risk · {row.riskLevel}</span> : null}
+            </div>
+            {row.contributors ? <p className="mt-2 text-xs text-ink-600"><span className="font-semibold">Supporting teams / roles:</span> {row.contributors}</p> : null}
             {row.evidenceNote ? <a href={row.evidenceNote} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-9 items-center text-sm font-semibold text-forest-800 underline">Open evidence / deliverable ↗</a> : null}
           </li>
         ))}

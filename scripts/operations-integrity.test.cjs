@@ -52,7 +52,7 @@ test("external navigation points only to published ISEYC civic intelligence prod
   assert.ok(external.every((item) => !/operators|admin|submission|member/i.test(item.href)));
 });
 
-test("command home defines exactly four departments and keeps Communications as a shared function", () => {
+test("command home defines exactly four departments and keeps shared coordination separate", () => {
   const source = fs.readFileSync(path.join(opsRoot, "page.tsx"), "utf8");
   for (const name of [
     "Education & Capacity Building",
@@ -60,9 +60,8 @@ test("command home defines exactly four departments and keeps Communications as 
     "Digital Systems & Technology",
     "Civic Affairs"
   ]) assert.ok(source.includes(name), `Missing department: ${name}`);
-  assert.match(source, /Shared function · not a fifth department/);
-  assert.match(source, /Communications coordination/);
-  assert.match(source, /Seat occupancy not connected/);
+  assert.match(source, /Shared coordination/);
+  assert.match(source, /No confirmed appointments are recorded yet/);
   assert.doesNotMatch(source, /National coverage|members nationwide|appointed department head/i);
 });
 
@@ -102,19 +101,24 @@ test("meeting intake stores structured preparation in the canonical Meetings dat
   assert.match(form, /Standard-sensitivity intake only/);
 });
 
-test("action progress can be self-reported without enabling completion or closure", () => {
+test("action progress is blocked until an individual officer and assignment can be verified", () => {
   const api = read("app/ops/api/actions/[id]/route.ts");
   const adapter = read("lib/notion-registers.ts");
   const ui = read("components/OperationalRegister.tsx");
   assert.match(api, /isSameOriginRequest/);
   assert.match(api, /requireStaffSession/);
-  assert.match(api, /input\.status !== "In progress" && input\.status !== "Blocked"/);
-  assert.match(api, /Done and closure require a separate authorised review/);
+  assert.match(api, /ACTION_AUTHORITY_UNAVAILABLE/);
+  assert.match(api, /Individual officer identity and verified action assignment are not connected/);
+  assert.match(api, /Shared staff access cannot attribute progress/);
+  assert.match(api, /status: 503/);
+  assert.equal(api.includes("updateActionProgress("), false);
   assert.match(adapter, /updateActionProgress/);
-  assert.match(adapter, /\["Open", "In progress", "Blocked"\]/);
-  assert.match(ui, /Update working progress/);
-  assert.match(ui, /Self-reported working status only/);
-  assert.match(ui, /does not mark an action Done or close it/);
+  assert.match(ui, /Progress updates are paused/);
+  assert.match(ui, /Shared staff access cannot record accountable progress/);
+  assert.equal(ui.includes("ActionProgressForm"), false);
+  assert.ok(ui.includes("Previously recorded progress:"));
+  assert.ok(ui.includes('{row.detail ? (kind === "actions" ?'));
+  assert.equal(ui.includes('{row.detail ? {kind === "actions" ?'), false);
 });
 
 test("meeting collaboration is limited to draft notes on Standard records", () => {
@@ -143,7 +147,20 @@ test("actions can be linked to an existing Standard meeting without granting dec
   assert.match(adapter, /properties\["Source meeting"\]/);
   assert.match(api, /sourceMeetingId/);
   assert.match(component, /Related meeting · optional/);
+  assert.match(api, /A proposed owner role and due date are required/);
+  assert.match(api, /This does not assign an officer/);
+  assert.doesNotMatch(api, /An accountable owner and due date are required/);
   assert.match(component, /does not certify a decision/);
+});
+
+test("action progress endpoint fails closed without individual identity and verified assignment", () => {
+  const route = read("app/ops/api/actions/[id]/route.ts");
+  assert.match(route, /requireStaffSession/);
+  assert.match(route, /ACTION_AUTHORITY_UNAVAILABLE/);
+  assert.match(route, /status: 503/);
+  assert.match(route, /No action record was changed/);
+  assert.doesNotMatch(route, /updateActionProgress/);
+  assert.doesNotMatch(route, /pages\.update/);
 });
 
 test("operations errors recover without exposing exception details", () => {
@@ -171,10 +188,16 @@ test("actions, chamber and communications expose authenticated Notion-backed ini
   }
   const component = fs.readFileSync(path.join(root, "components/OperationalRegister.tsx"), "utf8");
   assert.match(component, /Save to Notion/);
+  assert.match(component, /<option>Website<\/option><option>X<\/option><option>WhatsApp<\/option><option>Other<\/option>/);
+  assert.match(read("app/ops/api/registers/[kind]/route.ts"), /\["X", "WhatsApp", "Website", "Other"\]/);
   assert.match(component, /human-authorised/);
-  assert.match(component, /Accountable owner role · required/);
+  assert.match(component, /Proposed owner role · required/);
+  assert.match(component, /Proposed action · unassigned · awaiting authorised acceptance/);
+  assert.match(component, /Proposed action · unassigned · awaiting authorised acceptance/);
+  assert.match(component, /Proposed session · not yet convened/);
+  assert.match(component, /kind === "actions" \|\| kind === "chamber" \? "Proposed" : row.status/);
   assert.match(component, /required minLength=\{2\} maxLength=\{180\}/);
-  assert.match(component, /does not assign access or imply a named appointment/);
+  assert.match(component, /does not assign access or imply a named officer/);
 
   const api = fs.readFileSync(path.join(opsRoot, "api/registers/[kind]/route.ts"), "utf8");
   assert.match(api, /isSameOriginRequest/);
@@ -216,8 +239,9 @@ test("institutional design tokens and reduced-motion accessibility are present",
   assert.match(shell, /fixed inset-x-0 bottom-0/);
   assert.match(shell, /aria-label="Primary navigation"/);
   assert.match(shell, /min-h-\[44px\]/);
-  assert.match(dashboard, /Not operational/);
-  assert.match(dashboard, /Published civic systems/);
+  assert.match(dashboard, /Four departments organise the work/);
+  assert.match(dashboard, /Drafts are not approvals/);
+  assert.match(dashboard, /No confirmed appointments are recorded yet/);
 });
 
 
@@ -537,6 +561,12 @@ test("department draft forms are collapsed until requested and clearly explain t
   assert.match(report, /Save report draft/);
   assert.match(programme, /Creation is limited to Proposed/);
   assert.match(report, /Draft only/);
+  assert.match(programme, /Proposed accountable role · title only/);
+  assert.match(workplan, /Proposed accountable role · title only/);
+  assert.doesNotMatch(programme, /Accountable role · title only/);
+  assert.doesNotMatch(workplan, /Accountable role · title only/);
+  assert.match(programme, /Proposed role/);
+  assert.match(workplan, /Proposed role · \$\{row\.accountableRole\}/);
 });
 
 test("department work plans use the existing shared register's Operations work type without fictitious relations", () => {
