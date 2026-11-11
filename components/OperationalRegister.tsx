@@ -181,7 +181,7 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
               <textarea maxLength={1800} value={detail} onChange={(e) => setDetail(e.target.value)} rows={4} className={area} />
             </label>
             <label className="block text-sm font-semibold text-ink-800">Channel
-              <select value={channel} onChange={(e) => setChannel(e.target.value)} className={field}><option>Website</option><option>Social</option><option>Email</option><option>Press</option><option>Internal</option></select>
+              <select value={channel} onChange={(e) => setChannel(e.target.value)} className={field}><option>Website</option><option>X</option><option>WhatsApp</option><option>Other</option></select>
             </label>
           </> : null}
 
