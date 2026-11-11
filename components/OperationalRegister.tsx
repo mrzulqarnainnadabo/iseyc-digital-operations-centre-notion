@@ -27,7 +27,7 @@ const KIND_LABEL: Record<Kind, string> = { actions: "Actions", media: "Communica
 const field = "mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal text-ink-950";
 const area = "mt-1 w-full rounded-control border border-line bg-cream-50 px-3 py-2 text-sm font-normal leading-5 text-ink-950";
 
-export default function OperationalRegister({ kind }: { kind: Kind }) {
+export default function OperationalRegister({ kind, initialMeetingId = "" }: { kind: Kind; initialMeetingId?: string }) {
   const [rows, setRows] = useState<RecordRow[]>([]);
   const [title, setTitle] = useState("");
   const [detail, setDetail] = useState("");
@@ -38,7 +38,7 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
   const [expectedEvidence, setExpectedEvidence] = useState("");
   const [blocker, setBlocker] = useState("");
   const [notes, setNotes] = useState("");
-  const [sourceMeetingId, setSourceMeetingId] = useState("");
+  const [sourceMeetingId, setSourceMeetingId] = useState(initialMeetingId);
   const [meetings, setMeetings] = useState<MeetingOption[]>([]);
   const [meetingSourceError, setMeetingSourceError] = useState("");
   const [purpose, setPurpose] = useState("");
@@ -87,11 +87,20 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
         .then(async (response) => {
           const data = await response.json();
           if (!response.ok || !Array.isArray(data.meetings)) throw new Error("The Meetings source is not available.");
-          setMeetings(data.meetings.filter((meeting: MeetingOption) => meeting.sensitivity === "Standard"));
+          const eligibleMeetings = data.meetings.filter((meeting: MeetingOption) => meeting.sensitivity === "Standard");
+          setMeetings(eligibleMeetings);
+          if (initialMeetingId) {
+            if (eligibleMeetings.some((meeting: MeetingOption) => meeting.id === initialMeetingId)) {
+              setSourceMeetingId(initialMeetingId);
+            } else {
+              setSourceMeetingId("");
+              setMeetingSourceError("The requested meeting is unavailable or not eligible for action linking.");
+            }
+          }
         })
         .catch(() => setMeetingSourceError("Meeting references are unavailable. You can still create an action without linking a meeting."));
     }
-  }, [kind]);
+  }, [kind, initialMeetingId]);
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
