@@ -15,6 +15,17 @@ export type OpsDepartmentId =
 
 export type DepartmentRecordId = OpsDepartmentId | "Cross-departmental" | "Unspecified";
 
+/** A published Observatory source offered for explicit attachment to a draft record. */
+export type DepartmentEvidenceOption = {
+  id: string;
+  title: string;
+  publisher: string;
+  referencePeriod: string;
+  geographyLabel: string;
+  sourceUrl: string;
+};
+
+
 /** Map known Notion select values without silently assigning unknown records to Education. */
 export function departmentIdFromNotionSelect(value: string): DepartmentRecordId {
   switch (value.trim().toLowerCase()) {
