@@ -14,6 +14,7 @@ import DepartmentWorkPlanPanel from "@/components/DepartmentWorkPlanPanel";
 import DepartmentReportPanel from "@/components/DepartmentReportPanel";
 import { getDepartmentEvidence } from "@/lib/public-evidence";
 import { getDepartmentSnapshots } from "@/lib/department-snapshots";
+import { DEPARTMENT_EVIDENCE_BRIEFS } from "@/lib/department-evidence-briefs";
 
 export const dynamic = "force-dynamic";
 
@@ -129,6 +130,7 @@ export default async function DepartmentDeskPage({
           sourceUrl: record.sourceUrl,
         }))
       : [];
+  const evidenceBrief = DEPARTMENT_EVIDENCE_BRIEFS[department];
 
   return (
     <main className={`mx-auto max-w-7xl space-y-6 pb-8 ops-department ops-department--${style.accent}`}>
@@ -308,6 +310,28 @@ export default async function DepartmentDeskPage({
               <p className="mt-1 text-xs leading-5 text-[#68736b]">{snapshots.status === "invalid" ? "The snapshot response did not pass contract, department-scope or provenance checks. No records are shown." : "The Observatory snapshot endpoint could not be reached. No cached or estimated replacement records are shown."}</p>
             </div>
           )}
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-[#dce4dc] bg-[#f4f5ef] p-5 sm:p-6">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a6b34]">Evidence interpretation</p>
+          <h2 className="mt-1 font-serif text-xl text-[#173c30] sm:text-2xl">Turn evidence into better questions</h2>
+          <p className="mt-2 max-w-2xl text-xs leading-5 text-[#68736b]">Use published evidence to frame investigation and programme design. Do not treat a national snapshot as a local needs assessment or proof of impact.</p>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <article className="rounded-xl border border-[#e1e6de] bg-white p-4">
+            <p className="text-[9px] font-bold uppercase tracking-[.15em] text-[#8a6b34]">What it can inform</p>
+            <p className="mt-2 text-xs leading-5 text-[#405047]">{evidenceBrief.whatItCanInform}</p>
+          </article>
+          <article className="rounded-xl border border-[#e1e6de] bg-white p-4">
+            <p className="text-[9px] font-bold uppercase tracking-[.15em] text-[#8a6b34]">What it cannot establish</p>
+            <p className="mt-2 text-xs leading-5 text-[#405047]">{evidenceBrief.cannotEstablish}</p>
+          </article>
+          <article className="rounded-xl border border-[#e1e6de] bg-white p-4">
+            <p className="text-[9px] font-bold uppercase tracking-[.15em] text-[#8a6b34]">Next evidence step</p>
+            <p className="mt-2 text-xs leading-5 text-[#405047]">{evidenceBrief.nextEvidenceStep}</p>
+          </article>
         </div>
       </section>
 
