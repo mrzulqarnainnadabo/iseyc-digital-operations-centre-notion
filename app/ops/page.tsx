@@ -12,7 +12,6 @@ const departments = [
     number: "01",
     name: "Education & Capacity Building",
     short: "Learning access, skills and stronger learning environments.",
-    focus: ["Learning access", "Skills development", "Education partnerships"],
     tone: "education",
   },
   {
@@ -20,7 +19,6 @@ const departments = [
     number: "02",
     name: "Health & Well-being",
     short: "Community health, prevention and access to essential services.",
-    focus: ["Health awareness", "Primary care access", "Facility conditions"],
     tone: "health",
   },
   {
@@ -28,7 +26,6 @@ const departments = [
     number: "03",
     name: "Digital Systems & Technology",
     short: "Digital inclusion, institutional systems and responsible innovation.",
-    focus: ["Digital inclusion", "Institutional systems", "Technology capacity"],
     tone: "digital",
   },
   {
@@ -36,7 +33,6 @@ const departments = [
     number: "04",
     name: "Civic Affairs & Public Accountability",
     short: "Civic participation, community concerns and accountability.",
-    focus: ["Civic participation", "Community engagement", "Accountability"],
     tone: "civic",
   },
 ] as const;
