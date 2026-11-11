@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { StatusBadge } from "@/components/StatusBadge";
 import type { DepartmentEvidenceOption, OpsDepartmentId, WorkPlanRecord, WorkPriority, RiskLevel } from "@/lib/department-operations";
@@ -128,6 +129,11 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName, 
           {configured === false ? "Not connected" : configured ? "Connected · Proposed only" : "Checking…"}
         </span>
       </div>
+
+      <p className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border border-[#e1e7df] bg-[#f8faf7] px-3 py-2 text-xs leading-5 text-[#59665d]">
+        <span>Need a discrete follow-up after review? Record it separately in the shared Action register; this does not transfer approval or assign an officer.</span>
+        <Link href="/ops/actions" className="inline-flex min-h-8 items-center font-semibold text-[#194b3b] underline underline-offset-2">Open Action register →</Link>
+      </p>
 
       {configured === true ? (
         <details className="rounded-xl border border-[#dfe6df] bg-[#fafbf8] p-3">
