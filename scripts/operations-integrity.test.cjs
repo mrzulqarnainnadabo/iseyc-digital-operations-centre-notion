@@ -669,3 +669,13 @@ test("standard meeting review can hand off a contextual action proposal without 
   assert.match(register, /meeting\.sensitivity === "Standard"/);
   assert.match(register, /setSourceMeetingId\(initialMeetingId\)/);
 });
+
+test("meeting-to-action deep links can resolve an eligible meeting beyond the first paginated page", () => {
+  const meetingsApi = read("app/api/meetings/route.ts");
+  const register = read("components/OperationalRegister.tsx");
+  assert.match(meetingsApi, /requestedMeetingId = requestUrl\.searchParams\.get\("meetingId"\)/);
+  assert.match(meetingsApi, /const requestedMeeting = await getMeeting\(requestedMeetingId\)/);
+  assert.match(meetingsApi, /legacySessionCanReadMeeting\(requestedMeeting\.sensitivity\)/);
+  assert.match(meetingsApi, /meetings\.push\(requestedMeeting\)/);
+  assert.match(register, /initialMeetingId \? `\?meetingId=/);
+});
