@@ -60,9 +60,11 @@ test("command home defines exactly four departments and keeps Communications as 
     "Digital Systems & Technology",
     "Civic Affairs"
   ]) assert.ok(source.includes(name), `Missing department: ${name}`);
-  assert.match(source, /Shared function · not a fifth department/);
-  assert.match(source, /Communications coordination/);
-  assert.match(source, /Seat occupancy not connected/);
+  assert.match(source, /Communications/);
+  assert.match(source, /Drafts only/);
+  assert.match(source, /View role framework/);
+  assert.match(source, /Coordination only/);
+  assert.match(source, /href="\/ops\/council"/);
   assert.doesNotMatch(source, /National coverage|members nationwide|appointed department head/i);
 });
 
@@ -216,8 +218,8 @@ test("institutional design tokens and reduced-motion accessibility are present",
   assert.match(shell, /fixed inset-x-0 bottom-0/);
   assert.match(shell, /aria-label="Primary navigation"/);
   assert.match(shell, /min-h-\[44px\]/);
-  assert.match(dashboard, /Not operational/);
-  assert.match(dashboard, /Published civic systems/);
+  assert.match(dashboard, /Drafts only/);
+  assert.match(dashboard, /Public evidence systems/);
 });
 
 
@@ -596,3 +598,5 @@ test("Presidential Council guide links to a bounded operating compact", () => {
   assert.match(compact, /shared staff key cannot prove who attended/);
   assert.match(compact, /Automation must not approve/);
 });
+
+

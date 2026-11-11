@@ -25,6 +25,13 @@ const modules = [
     dependency: "Verified appointments, explicit scope, trusted server-side adapter and object-level route guards.",
   },
   {
+    name: "Council roles & appointment framework",
+    route: "/ops/council",
+    state: "Partial",
+    detail: "Role guides and office templates are available. The appointment register currently contains role templates only; no named, approved appointment is linked to an individual system identity.",
+    dependency: "Formally approved appointment instrument, named appointee, active dates and status, verified identity mapping, department scope and any written delegation.",
+  },
+  {
     name: "Digital Chamber",
     route: "/ops/chamber",
     state: "Partial",
