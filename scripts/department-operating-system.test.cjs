@@ -146,3 +146,19 @@ test("department adapters preserve canonical UI labels while writing exact live 
   assert.match(model, /case "software & technology":\s*return "digital-systems"/);
   assert.match(model, /case "civic department":\s*return "civic-affairs"/);
 });
+
+test("department register documentation matches the two-register Notion implementation", () => {
+  const docs = read("docs/DEPARTMENT-OPERATING-REGISTERS.md");
+  const workplans = read("lib/notion-department-workplans.ts");
+  const model = read("lib/department-operations.ts");
+  assert.match(docs, /two shared internal Notion registers/);
+  assert.match(docs, /IDCC — Programmes & Work Register/);
+  assert.match(docs, /IDCC — Department Reports & Scorecards/);
+  assert.match(docs, /Work Type/);
+  assert.match(docs, /NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID/);
+  assert.match(docs, /NOTION_DEPARTMENT_REPORTS_DATABASE_ID/);
+  assert.doesNotMatch(docs, /NOTION_DEPARTMENT_WORKPLANS_DATABASE_ID/);
+  assert.match(workplans, /NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID/);
+  assert.match(model, /WORKPLAN_REGISTER_ENV = PROGRAMME_REGISTER_ENV/);
+  assert.match(docs, /do not yet provide a fully structured evidence-assessment relation/);
+});
