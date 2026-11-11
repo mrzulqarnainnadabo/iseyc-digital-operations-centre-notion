@@ -191,6 +191,9 @@ test("actions, chamber and communications expose authenticated Notion-backed ini
   assert.match(component, /<option>Website<\/option><option>X<\/option><option>WhatsApp<\/option><option>Other<\/option>/);
   assert.match(read("app/ops/api/registers/[kind]/route.ts"), /\["X", "WhatsApp", "Website", "Other"\]/);
   assert.match(component, /human-authorised/);
+  assert.match(component, /Propose follow-up work from meetings or department priorities/);
+  assert.match(component, /Saving a draft does not approve or publish it/);
+  assert.match(component, /Records do not certify attendance, quorum or decisions/);
   assert.match(component, /Proposed owner role · required/);
   assert.match(component, /Action proposal/);
   assert.match(component, /Unassigned · awaiting authorised acceptance/);
