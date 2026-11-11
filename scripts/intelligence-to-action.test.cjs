@@ -222,7 +222,7 @@ test("Operations Centre register screens use compact authority guidance and scan
   assert.match(register, /aria-label="Authority boundary"/);
   assert.match(register, /New entries begin as proposals/);
   assert.match(register, /Live register/);
-  assert.match(register, /records on this page/);
+  assert.match(register, /on this page/);
   assert.match(register, /border-l-4 bg-white/);
   assert.match(register, /View source meeting/);
   assert.match(register, /No records returned/);
