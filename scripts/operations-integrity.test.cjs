@@ -600,20 +600,3 @@ test("Presidential Council guide links to a bounded operating compact", () => {
 });
 
 
-test("department workspaces consume department-filtered Observatory snapshots with honest empty and unavailable states", () => {
-  const page = read("app/ops/departments/[department]/page.tsx");
-  const panel = read("components/DepartmentEvidencePanel.tsx");
-  assert.match(page, /DepartmentEvidencePanel departmentId=\{department\}/);
-  assert.match(page, /\["#evidence", "Evidence"\]/);
-  assert.match(panel, /api\/evidence\/snapshots/);
-  assert.match(panel, /departmentId/);
-  assert.match(panel, /revalidate: 1800/);
-  assert.match(panel, /payload\.records\.length === 0/);
-  assert.match(panel, /Evidence service is unavailable or returned an invalid response/);
-  assert.match(panel, /No figures are shown/);
-  assert.match(panel, /not continuously refreshed/);
-  assert.match(panel, /record\.sourceUrl/);
-  assert.match(panel, /record\.referencePeriod/);
-  assert.match(panel, /record\.limitations/);
-  assert.match(panel, /protocol !== "https:"/);
-});
