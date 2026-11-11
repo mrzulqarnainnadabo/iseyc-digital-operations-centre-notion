@@ -234,7 +234,9 @@ export default async function DepartmentDeskPage({
                     <p className="text-[10px] font-semibold text-[#68736b]">{observation.referencePeriod}</p>
                     <p className="mt-1 font-serif text-2xl tabular-nums text-[#173c30]">{new Intl.NumberFormat("en-NG", { maximumFractionDigits: 2 }).format(observation.value)}</p>
                     <p className="mt-0.5 text-[10px] leading-4 text-[#68736b]">{observation.unit}</p>
-                    <p className="mt-2 text-[9px] font-medium uppercase tracking-[.1em] text-[#8a6b34]">Estimated · national</p>
+                    <p className="mt-2 text-[9px] font-medium uppercase tracking-[.1em] text-[#8a6b34]">Estimated · {observation.geoLevel}</p>
+                    <p className="mt-1 text-[9px] leading-4 text-[#7a837c]">{observation.sourceAttribution}</p>
+                    <a href={observation.sourceUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex min-h-7 items-center text-[10px] font-semibold text-[#194b3b]">Source ↗</a>
                   </div>
                 ))}
               </div>
