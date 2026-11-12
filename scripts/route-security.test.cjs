@@ -230,7 +230,7 @@ test("legacy shared-key sessions are explicitly limited to standard meeting reco
 test("login throttling documents the distributed enforcement requirement", () => {
   const limiter = fs.readFileSync(path.join(__dirname, "../lib/login-rate-limit.ts"), "utf8");
   assert.match(limiter, /Serverless instances do not share memory/);
-  assert.match(limiter, /distributed (?:edge\\/)?WAF limit/);
+  assert.match(limiter, /distributed (?:edge\/)?WAF limit/);
   assert.match(limiter, /POST \/api\/auth\/login/);
 });
 
