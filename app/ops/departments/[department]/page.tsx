@@ -272,6 +272,12 @@ export default async function DepartmentDeskPage({
                           <dt className="text-[9px] font-bold uppercase tracking-[.12em] text-[#8a6b34]">Geographic coverage</dt>
                           <dd className="mt-1 break-words text-[11px] font-semibold leading-4 text-[#35483d]">{record.geography.label}</dd>
                         </div>
+                        {record.sourceUpdateDate ? (
+                          <div className="min-w-0">
+                            <dt className="text-[9px] font-bold uppercase tracking-[.12em] text-[#8a6b34]">Publisher update date</dt>
+                            <dd className="mt-1 break-words text-[11px] font-semibold leading-4 text-[#35483d]">{record.sourceUpdateDate}</dd>
+                          </div>
+                        ) : null}
                       </dl>
                       <div className="mt-3 grid gap-2 sm:grid-cols-2">
                         {record.metrics.slice(0, 2).map((metric) => (
