@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { privateJson } from "@/lib/private-response";
-import { requireStaffSession } from "@/lib/auth";
+import { requireCapability } from "@/lib/require-capability";
 import { verifyDepartmentApplicationsConnection } from "@/lib/notion";
 
 export const runtime = "nodejs";
@@ -11,9 +11,8 @@ export const dynamic = "force-dynamic";
  * never reads or returns applicant records or personal information.
  */
 export async function GET(_req: NextRequest) {
-  if (!(await requireStaffSession())) {
-    return privateJson({ ok: false, error: "Unauthorized" }, { status: 401 });
-  }
+  const access = await requireCapability("ops.browse");
+  if (!access.ok) return access.response;
 
   try {
     const result = await verifyDepartmentApplicationsConnection();
