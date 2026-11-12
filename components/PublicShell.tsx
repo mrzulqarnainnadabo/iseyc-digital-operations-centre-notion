@@ -21,10 +21,10 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
       <header className="border-b border-line bg-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:flex-row lg:items-center lg:justify-between lg:px-8">
           <Link href="/" className="flex min-w-0 items-center gap-3">
-            <img src="/iseyc-seal.svg" alt="" width="40" height="40" className="shrink-0 rounded-full border border-gold-600 bg-white object-contain" />
+            <img src="/iseyc-seal.svg" alt="ISEYC" width="40" height="40" className="shrink-0 rounded-full border border-gold-600 bg-white object-contain" />
             <span className="min-w-0">
-              <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-gold-700">ISEYC</span>
-              <span className="block max-w-[19rem] text-xs font-medium leading-5 text-ink-700 sm:max-w-none">What communities report. What evidence supports. What is still unknown.</span>
+              <span className="block text-sm font-bold tracking-tight text-forest-950">ISEYC</span>
+              <span className="block text-xs font-medium text-ink-700">Digital Operations Centre</span>
             </span>
           </Link>
           <nav aria-label="Public navigation" className="public-nav flex w-full max-w-full gap-1 overflow-x-auto pb-1 lg:w-auto lg:flex-wrap lg:overflow-visible lg:pb-0">
