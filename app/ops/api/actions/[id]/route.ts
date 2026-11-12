@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { privateJson } from "@/lib/private-response";
-import { requireStaffSession } from "@/lib/auth";
+import { requireCapability } from "@/lib/require-capability";
 import { isSameOriginRequest } from "@/lib/request-security";
 
 export const runtime = "nodejs";
@@ -15,9 +15,8 @@ export async function PATCH(request: NextRequest) {
   if (!isSameOriginRequest(request)) {
     return privateJson({ ok: false, error: "Forbidden" }, { status: 403 });
   }
-  if (!(await requireStaffSession())) {
-    return privateJson({ ok: false, error: "Unauthorized" }, { status: 401 });
-  }
+  const access = await requireCapability("ops.action.progress");
+  if (!access.ok) return access.response;
 
   return privateJson(
     {
