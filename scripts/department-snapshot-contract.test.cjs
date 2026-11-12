@@ -45,16 +45,6 @@ const payload = (overrides = {}) => {
       unit: "subscriptions",
       measurementType: "Active broadband subscriptions across mobile and fixed services",
     }),
-    baseObservation({
-      id: "superseded-health-total",
-      title: "Earlier health expenditure total",
-      value: 614.55,
-      unit: "₦ billion",
-      departments: ["health", "civic"],
-      sourceType: "published_research",
-      recordStatus: "superseded",
-      supersededBy: "later-health-total",
-    }),
   ];
   return {
     contractVersion: "1.0.0",
@@ -115,6 +105,33 @@ test("department adapter maps the new source-snapshot contract and department ID
   const cached = await getDepartmentSnapshots("digital-systems");
   assert.equal(cached.status, "ready");
   assert.equal(calls, 1, "same department request should use bounded per-runtime cache");
+});
+
+test("department adapter hides superseded health totals from normal department views", async (t) => {
+  const originalFetch = global.fetch;
+  global.fetch = async () => {
+    const health = payload();
+    health.observations = [
+      baseObservation({ id: "health-current-total", title: "Current health expenditure", departments: ["health", "civic"], sourceType: "published_research" }),
+      baseObservation({ id: "health-old-total", title: "Earlier health expenditure total", value: 614.55, unit: "₦ billion", departments: ["health", "civic"], sourceType: "published_research", recordStatus: "superseded", supersededBy: "health-current-total" }),
+    ];
+    health.recordCount = 2;
+    health.catalogOnlySources = [];
+    health.reconciliationNotes = [{
+      id: "health-total-reconciliation", severity: "high",
+      title: "Health expenditure totals differ",
+      detail: "Two publications report different totals.",
+      action: "Reconcile state-level BIRs."
+    }];
+    return new Response(JSON.stringify(health), { status: 200 });
+  };
+  t.after(() => { global.fetch = originalFetch; });
+
+  const result = await getDepartmentSnapshots("health");
+  assert.equal(result.status, "ready");
+  assert.equal(result.records.length, 1);
+  assert.equal(result.records[0].id, "health-current-total");
+  assert.ok(result.reconciliationNotes.some((note) => note.id === "health-total-reconciliation"));
 });
 
 test("department adapter maps civic-affairs to the Observatory civic department", async (t) => {
