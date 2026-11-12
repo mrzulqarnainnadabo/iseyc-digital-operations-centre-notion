@@ -44,6 +44,7 @@ export type DepartmentSnapshot = {
   geography: { level: string; label: string };
   evidenceType: string;
   metrics: DepartmentSnapshotMetric[];
+  additionalMetrics?: DepartmentSnapshotMetric[];
   limitations: string[];
   interpretation: string;
   recordStatus: "current" | "superseded";
