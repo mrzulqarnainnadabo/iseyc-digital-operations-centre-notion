@@ -106,7 +106,7 @@ test("action progress is blocked until an individual officer and assignment can 
   const adapter = read("lib/notion-registers.ts");
   const ui = read("components/OperationalRegister.tsx");
   assert.match(api, /isSameOriginRequest/);
-  assert.match(api, /requireStaffSession/);
+  assert.match(api, /requireCapability/);
   assert.match(api, /ACTION_AUTHORITY_UNAVAILABLE/);
   assert.match(api, /Individual officer identity and verified action assignment are not connected/);
   assert.match(api, /Shared staff access cannot attribute progress/);
@@ -126,7 +126,7 @@ test("meeting collaboration is limited to draft notes on Standard records", () =
   const adapter = read("lib/notion.ts");
   const detail = read("app/ops/review/[id]/page.tsx");
   assert.match(api, /isSameOriginRequest/);
-  assert.match(api, /requireStaffSession/);
+  assert.match(api, /requireCapability/);
   assert.match(api, /draftKeys = \["attendanceNotes", "draftMinutes", "outcomeSummary"\]/);
   assert.match(api, /updateMeetingDraft\(id, draftInput\)/);
   assert.match(adapter, /parent\.database_id/);
@@ -155,7 +155,7 @@ test("actions can be linked to an existing Standard meeting without granting dec
 
 test("action progress endpoint fails closed without individual identity and verified assignment", () => {
   const route = read("app/ops/api/actions/[id]/route.ts");
-  assert.match(route, /requireStaffSession/);
+  assert.match(route, /requireCapability/);
   assert.match(route, /ACTION_AUTHORITY_UNAVAILABLE/);
   assert.match(route, /status: 503/);
   assert.match(route, /No action record was changed/);
@@ -204,7 +204,7 @@ test("actions, chamber and communications expose authenticated Notion-backed ini
 
   const api = fs.readFileSync(path.join(opsRoot, "api/registers/[kind]/route.ts"), "utf8");
   assert.match(api, /isSameOriginRequest/);
-  assert.match(api, /requireStaffSession/);
+  assert.match(api, /requireCapability/);
   assert.match(api, /readBoundedJson/);
   assert.match(api, /createRegisterDraft/);
   const adapter = fs.readFileSync(path.join(root, "lib/notion-registers.ts"), "utf8");
@@ -442,7 +442,7 @@ test("external engagement is authenticated, linked and draft-only until human di
   assert.match(adapter, /Relationship status/);
   assert.match(adapter, /pages\.create/);
   assert.match(route, /isSameOriginRequest/);
-  assert.match(route, /requireStaffSession/);
+  assert.match(route, /requireCapability/);
   assert.match(route, /readBoundedJson/);
   assert.match(route, /status: "Draft"/);
   assert.match(route, /Not sent/);
@@ -465,7 +465,7 @@ test("external engagement is authenticated, linked and draft-only until human di
 test("external engagement list responses do not disclose private email or phone fields to shared-key sessions", () => {
   const adapter = fs.readFileSync(path.join(root, "lib/external-engagement.ts"), "utf8");
   const route = fs.readFileSync(path.join(opsRoot, "api/external-engagement/route.ts"), "utf8");
-  assert.match(route, /requireStaffSession/);
+  assert.match(route, /requireCapability/);
   assert.match(adapter, /row\(p, "Contact", "Official role", "Contact status"\)/);
   assert.doesNotMatch(adapter, /row\(p, "Contact", "Work email"/);
   assert.match(adapter, /detail: read\(p\.properties\?\.\["Organisation type"\]\)/);
@@ -484,7 +484,7 @@ test("external engagement keeps contact channels private and invitations as unse
   assert.ok(start >= 0 && end > start);
   const publicListing = adapter.slice(start, end);
   assert.doesNotMatch(publicListing, /Work email|Work phone|\.email|\.phone_number/i);
-  assert.match(route, /requireStaffSession/);
+  assert.match(route, /requireCapability/);
   assert.match(route, /privateJson/);
   assert.match(route, /isSameOriginRequest/);
   assert.match(route, /readBoundedJson/);
