@@ -18,9 +18,9 @@ export const DEPARTMENT_EVIDENCE_BRIEFS: Record<OpsDepartmentId, DepartmentEvide
     nextEvidenceStep: "Connect verified Kaduna State and LGA records on PHC facilities, staffing, essential medicines and service availability before proposing an intervention.",
   },
   "digital-systems": {
-    whatItCanInform: "Examine published digital-literacy programmes and innovation initiatives to understand reported programme activity and institutional capacity.",
-    cannotEstablish: "Programme and innovation records do not measure household device ownership, internet quality, digital-skills prevalence or equitable access.",
-    nextEvidenceStep: "Seek verified state and LGA data on connectivity, device access, digital skills and participation, with clear denominators and reference periods.",
+    whatItCanInform: "Compare NITDA digital-skills programme reach, NCC broadband subscriptions and World Bank/ITU internet use. These describe training reach, network subscriptions and people using the internet — different parts of digital inclusion.",
+    cannotEstablish: "Broadband subscriptions are not unique users; DL4ALL target progress is not national digital-literacy prevalence. National indicators do not establish affordability, device access, speed, reliability or Kaduna LGA conditions.",
+    nextEvidenceStep: "Obtain Kaduna/LGA connectivity coverage and quality, affordability, school/device inventories and verified DL4ALL completion records, with clear denominators and reference periods.",
   },
   "civic-affairs": {
     whatItCanInform: "Use identity-enrolment records as administrative registration context and as a starting point for questions about access to identity services.",
