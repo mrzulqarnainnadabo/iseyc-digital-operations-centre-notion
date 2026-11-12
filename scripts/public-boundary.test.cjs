@@ -23,7 +23,8 @@ test("public root is a public composer and does not load restricted operations",
 test("public shell uses the official seal, clear navigation and verified product entry points", () => {
   const shell = read("components/PublicShell.tsx");
   assert.match(shell, /src="\/iseyc-seal\.svg"/);
-  assert.match(shell, /What communities report\. What evidence supports\. What is still unknown\./);
+  assert.match(shell, /Digital Operations Centre/);
+  assert.match(shell, /iseyc-seal\.svg/);
   assert.doesNotMatch(shell, /Public Information & Civic Intelligence/);
   for (const label of ["Home", "Departments", "Explore", "Report", "Method"]) {
     assert.match(shell, new RegExp(`label: "${label}"`));
