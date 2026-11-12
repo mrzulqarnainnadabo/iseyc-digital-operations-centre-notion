@@ -42,17 +42,17 @@ const contracts = {
   },
   "meetings/route.ts": {
     methods: ["GET", "POST"],
-    required: ["requireCapability", "privateJson", "configFlags", "legacySessionCanReadMeeting", "legacySessionCanCreateMeeting"],
+    required: ["requireCapability", "ops.browse", "ops.meeting.standard", "privateJson", "configFlags", "legacySessionCanReadMeeting", "legacySessionCanCreateMeeting"],
     forbidden: []
   },
   "meetings/[id]/route.ts": {
     methods: ["GET", "PATCH"],
-    required: ["requireCapability", "privateJson", "legacySessionCanReadMeeting", "legacySessionCanSetMeetingStatus"],
+    required: ["requireCapability", "ops.browse", "ops.meeting.standard", "privateJson", "legacySessionCanReadMeeting", "legacySessionCanSetMeetingStatus"],
     forbidden: []
   },
   "department-applications/connection/route.ts": {
     methods: ["GET"],
-    required: ["requireCapability", "privateJson", "verifyDepartmentApplicationsConnection"],
+    required: ["requireCapability", "ops.browse", "privateJson", "verifyDepartmentApplicationsConnection"],
     forbidden: ["pages.query", "pages.create", "Applicant Name", "Applicant Statement"]
   }
 };
@@ -103,8 +103,19 @@ test("operations API route inventory is explicit and shared-session boundaries a
 
   for (const route of actual) {
     const source = fs.readFileSync(path.join(opsRoot, route), "utf8");
-    assert.ok(source.includes("requireCapability") || source.includes("requireStaffSession") || source.includes("from \"../../../../../api/") || source.includes("from \"../../../../api/") || source.includes("from \"../../../api/"),
+    assert.ok(source.includes("requireStaffSession") || source.includes("from \"../../../../../api/") || source.includes("from \"../../../../api/") || source.includes("from \"../../../api/"),
       `${route} must authenticate directly or delegate to an independently guarded API handler`);
+    if (/route\.ts$/.test(route) && !route.includes("connection") && !route.includes("status") && !route.includes("[id]")) {
+      if (source.includes("export async function POST") || source.includes("export async function PATCH")) {
+        // Operations aliases delegate to the canonical /api handler. Verify
+        // the actual handler guards rather than requiring duplicated checks.
+        const guardSource = route === "meetings/route.ts"
+          ? fs.readFileSync(path.join(__dirname, "../app/api/meetings/route.ts"), "utf8")
+          : source;
+        assert.ok(guardSource.includes("isSameOriginRequest"), `${route} POST must enforce same-origin in its handler`);
+        assert.ok(guardSource.includes("readBoundedJson"), `${route} POST must use bounded JSON parsing in its handler`);
+      }
+    }
   }
 });
 
@@ -162,6 +173,7 @@ test("meeting pagination rejects malformed continuation cursors before calling N
   assert.ok(source.includes("status: 400"));
 });
 
+
 test("staff login throttles repeated failures and clears the local bucket after success", () => {
   const login = fs.readFileSync(path.join(apiRoot, "auth/login/route.ts"), "utf8");
   const limiter = fs.readFileSync(path.join(__dirname, "../lib/login-rate-limit.ts"), "utf8");
@@ -193,6 +205,7 @@ test("department applications connection diagnostic is read-only and returns no 
   assert.doesNotMatch(source, /pages\.query|pages\.create|Applicant Name|Applicant Statement/);
 });
 
+
 test("Google OIDC verifies identity but cannot grant operations access", () => {
   const callback = fs.readFileSync(path.join(apiRoot, "auth/oidc/callback/route.ts"), "utf8");
   const status = fs.readFileSync(path.join(apiRoot, "auth/oidc/status/route.ts"), "utf8");
@@ -217,48 +230,106 @@ test("legacy shared-key sessions are explicitly limited to standard meeting reco
 test("login throttling documents the distributed enforcement requirement", () => {
   const limiter = fs.readFileSync(path.join(__dirname, "../lib/login-rate-limit.ts"), "utf8");
   assert.match(limiter, /Serverless instances do not share memory/);
-  assert.match(limiter, /distributed edge\/WAF limit|distributed Vercel Firewall\/WAF limit/);
+  assert.match(limiter, /distributed Vercel Firewall\/WAF limit/);
   assert.match(limiter, /POST \/api\/auth\/login/);
 });
 
+
 const opsApiRoot = path.join(__dirname, "../app/ops/api");
 
-test("every Operations Centre API route is private and every mutation is same-origin and session protected", () => {
-  const routes = collectRoutes(opsApiRoot);
-  assert.ok(routes.length > 0, "Operations Centre API route inventory must not be empty");
-  const identityOnlyRoutes = new Set([
-    "auth/oidc/start/route.ts",
-    "auth/oidc/callback/route.ts",
+test("every Operations Centre API route has an explicit capability boundary or a reviewed identity-only delegation", () => {
+  const opsRoot = path.join(__dirname, "../app/ops/api");
+  const actual = collectRoutes(opsRoot).sort();
+  const expected = [
+    "actions/[id]/route.ts",
     "auth/oidc/status/route.ts",
-  ]);
+    "department-applications/connection/route.ts",
+    "department-programmes/route.ts",
+    "department-reports/route.ts",
+    "department-workplans/route.ts",
+    "external-engagement/route.ts",
+    "meetings/[id]/route.ts",
+    "meetings/route.ts",
+    "registers/[kind]/route.ts"
+  ].sort();
+  assert.deepEqual(actual, expected, "A new operations API route requires security review");
 
-  for (const route of routes) {
-    const wrapper = fs.readFileSync(path.join(opsApiRoot, route), "utf8");
-    const delegated = wrapper.includes('from "../../../api/') || wrapper.includes('from "../../../../api/') || wrapper.includes('from "../../../../../api/');
-    const source = delegated ? fs.readFileSync(path.join(apiRoot, route), "utf8") : wrapper;
-    const identityOnly = identityOnlyRoutes.has(route);
-    if (!identityOnly) {
-      assert.ok(source.includes("requireCapability(") || source.includes("requireStaffSession()"), `${route} must require capability or session authorization`);
+  const contracts = {
+    "department-programmes/route.ts": ["ops.browse", "ops.draft.programme"],
+    "department-workplans/route.ts": ["ops.browse", "ops.draft.workplan"],
+    "department-reports/route.ts": ["ops.browse", "ops.draft.report"],
+    "registers/[kind]/route.ts": ["ops.browse", "ops.action.propose", "ops.draft.communications", "ops.meeting.standard"],
+    "external-engagement/route.ts": ["ops.browse", "ops.meeting.standard"],
+    "actions/[id]/route.ts": ["ops.action.progress"]
+  };
+  for (const [route, capabilities] of Object.entries(contracts)) {
+    const source = fs.readFileSync(path.join(opsRoot, route), "utf8");
+    assert.ok(source.includes("requireCapability"), route + " must use the capability gate");
+    for (const capability of capabilities) {
+      assert.ok(source.includes(capability), route + " must declare " + capability);
     }
-    assert.ok(source.includes("privateJson(") || source.includes("privateResponseHeaders("), `${route} must use private no-store response handling in its handler`);
-
-    const methods = [...source.matchAll(/export async function (GET|POST|PUT|PATCH|DELETE)\s*\(/g)]
-      .map((match) => match[1]);
-    for (const method of methods.filter((item) => item !== "GET")) {
-      const body = source.slice(source.indexOf(`export async function ${method}`));
-      assert.ok(body.includes("isSameOriginRequest("), `${route} ${method}: missing isSameOriginRequest`);
-      assert.ok(
-        body.includes("requireCapability(") || body.includes("requireStaffSession()"),
-        `${route} ${method}: missing capability or session gate`
-      );
-    }
+    assert.ok(source.includes("privateJson("), route + " must return private responses");
   }
+
+  const delegated = [
+    ["meetings/route.ts", "../app/api/meetings/route.ts"],
+    ["meetings/[id]/route.ts", "../app/api/meetings/[id]/route.ts"],
+    ["department-applications/connection/route.ts", "../app/api/department-applications/connection/route.ts"]
+  ];
+  for (const [route, canonical] of delegated) {
+    const wrapper = fs.readFileSync(path.join(opsRoot, route), "utf8");
+    assert.match(wrapper, /from ["']\.\.?\/.*api\//);
+    const source = fs.readFileSync(path.join(__dirname, canonical), "utf8");
+    assert.ok(source.includes('requireCapability("ops.browse")'), route + " canonical handler must require ops.browse");
+  }
+
+  const status = fs.readFileSync(path.join(opsRoot, "auth/oidc/status/route.ts"), "utf8");
+  assert.ok(status.includes("verifyPendingIdentity"), "OIDC status is identity-only, not an operations session");
+  assert.ok(status.includes("accessGranted: false"), "OIDC identity must not grant operations access");
+});
+
+test("operations API guards precede Notion reads and writes", () => {
+  const root = path.join(__dirname, "../app/ops/api");
+  const api = path.join(__dirname, "../app/api");
+  const order = (source, markers, label) => assertInOrder(source, markers, label);
+
+  for (const [file, capability, readMarker, writeMarker] of [
+    ["department-programmes/route.ts", "ops.browse", "listDepartmentProgrammes(", "createDepartmentProgrammeDraft("],
+    ["department-workplans/route.ts", "ops.browse", "listDepartmentWorkPlans(", "createDepartmentWorkPlanDraft("],
+    ["department-reports/route.ts", "ops.browse", "listDepartmentReports(", "createDepartmentReportDraft("],
+    ["registers/[kind]/route.ts", "ops.browse", "listRegister(", "createRegisterDraft("],
+    ["external-engagement/route.ts", "ops.browse", "listExternalOptions(", "createOrganisation("]
+  ]) {
+    const source = fs.readFileSync(path.join(root, file), "utf8");
+    const getBody = source.slice(source.indexOf("export async function GET"));
+    order(getBody, ['requireCapability("' + capability + '")', readMarker], file + " GET");
+    const postBody = source.slice(source.indexOf("export async function POST"));
+    order(postBody, ["isSameOriginRequest(", "requireCapability(", "readBoundedJson(", writeMarker], file + " POST");
+  }
+
+  const meetings = fs.readFileSync(path.join(api, "meetings/route.ts"), "utf8");
+  order(meetings.slice(meetings.indexOf("export async function GET")),
+    ['requireCapability("ops.browse")', "configFlags()", "listMeetings("], "meetings GET");
+  order(meetings.slice(meetings.indexOf("export async function POST")),
+    ["isSameOriginRequest(", 'requireCapability("ops.meeting.standard")', "readBoundedJson(", "createMeeting("], "meetings POST");
+
+  const meetingDetail = fs.readFileSync(path.join(api, "meetings/[id]/route.ts"), "utf8");
+  order(meetingDetail.slice(meetingDetail.indexOf("export async function GET")),
+    ['requireCapability("ops.browse")', "getMeeting("], "meeting detail GET");
+  order(meetingDetail.slice(meetingDetail.indexOf("export async function PATCH")),
+    ["isSameOriginRequest(", 'requireCapability("ops.meeting.standard")', "readBoundedJson(", "getMeeting("], "meeting detail PATCH");
+
+  const action = fs.readFileSync(path.join(root, "actions/[id]/route.ts"), "utf8");
+  order(action, ["isSameOriginRequest(", 'requireCapability("ops.action.progress")', "status: 503"], "action progress");
+  assert.doesNotMatch(action, /updateActionProgress\s*\(/, "shared staff must not write action progress");
+
+  const connection = fs.readFileSync(path.join(api, "department-applications/connection/route.ts"), "utf8");
+  order(connection, ['requireCapability("ops.browse")', "verifyDepartmentApplicationsConnection("], "connection diagnostic");
 });
 
 test("shared-key sessions cannot write unattributed action progress", () => {
   const source = fs.readFileSync(path.join(opsApiRoot, "actions/[id]/route.ts"), "utf8");
-  assert.ok(source.includes("requireCapability(\"ops.action.progress\")") || source.includes("requireCapability("));
-  assert.ok(source.includes("ACTION_AUTHORITY_UNAVAILABLE") || source.includes("Individual officer identity"));
+  assert.ok(source.includes('requireCapability("ops.action.progress")'));
   assert.match(source, /Individual officer identity and verified action assignment are not connected/);
   assert.match(source, /Shared staff access cannot attribute progress/);
   assert.match(source, /status: 503/);
