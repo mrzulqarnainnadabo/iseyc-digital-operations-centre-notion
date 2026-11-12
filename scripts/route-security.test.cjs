@@ -103,7 +103,7 @@ test("operations API route inventory is explicit and shared-session boundaries a
 
   for (const route of actual) {
     const source = fs.readFileSync(path.join(opsRoot, route), "utf8");
-    assert.ok(source.includes("requireStaffSession") || source.includes("from \"../../../../../api/") || source.includes("from \"../../../../api/") || source.includes("from \"../../../api/"),
+    assert.ok(source.includes("requireStaffSession") || source.includes("requireCapability") || source.includes("from \"../../../../../api/") || source.includes("from \"../../../../api/") || source.includes("from \"../../../api/"),
       `${route} must authenticate directly or delegate to an independently guarded API handler`);
     if (/route\.ts$/.test(route) && !route.includes("connection") && !route.includes("status") && !route.includes("[id]")) {
       if (source.includes("export async function POST") || source.includes("export async function PATCH")) {
@@ -283,7 +283,7 @@ test("every Operations Centre API route has an explicit capability boundary or a
     assert.ok(source.includes('requireCapability("ops.browse")'), route + " canonical handler must require ops.browse");
   }
 
-  const status = fs.readFileSync(path.join(opsRoot, "auth/oidc/status/route.ts"), "utf8");
+  const status = fs.readFileSync(path.join(__dirname, "../app/api/auth/oidc/status/route.ts"), "utf8");
   assert.ok(status.includes("verifyPendingIdentity"), "OIDC status is identity-only, not an operations session");
   assert.ok(status.includes("accessGranted: false"), "OIDC identity must not grant operations access");
 });
