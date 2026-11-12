@@ -163,7 +163,11 @@ test("department adapter rejects mismatched counts and withholds invalid records
   };
   t.after(() => { global.fetch = originalFetch; });
 
-  const result = await getDepartmentSnapshots("health");
+  const freshModule = new Module(sourcePath, module);
+  freshModule.filename = sourcePath;
+  freshModule.paths = Module._nodeModulePaths(path.dirname(sourcePath));
+  freshModule._compile(compiled, sourcePath);
+  const result = await freshModule.exports.getDepartmentSnapshots("health");
   assert.equal(result.status, "invalid");
   assert.deepEqual(result.records, []);
 });
