@@ -26,6 +26,7 @@ export type DepartmentSnapshotMetric = {
   unit: string;
   period: string;
   measurementType: string;
+  interval?: string;
 };
 
 export type DepartmentSnapshot = {
@@ -47,6 +48,7 @@ export type DepartmentSnapshot = {
   interpretation: string;
   recordStatus: "current" | "superseded";
   supersededBy?: string;
+  relatedSources?: Array<{ title: string; url: string }>;
 };
 
 export type DepartmentSnapshotCatalogueEntry = {
