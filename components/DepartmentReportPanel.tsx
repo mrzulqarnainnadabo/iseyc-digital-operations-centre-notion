@@ -149,7 +149,7 @@ export default function DepartmentReportPanel({ departmentId, departmentName, ev
         </span>
       </div>
 
-      {configured !== false ? (
+      {configured === true ? (
         <details className="rounded-xl border border-[#dfe6df] bg-[#fafbf8] p-3">
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-[#194b3b]">
             <span>Prepare a report draft<span className="mt-1 block text-xs font-normal text-[#68736b]">Draft records are for review; saving does not certify or approve the report.</span></span>
@@ -237,14 +237,19 @@ export default function DepartmentReportPanel({ departmentId, departmentName, ev
         </form>
           </div>
         </details>
-      ) : (
+      ) : configured === false ? (
         <p className="rounded-control border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
           Configure <code className="text-xs">NOTION_DEPARTMENT_REPORTS_DATABASE_ID</code>. No report records are invented while disconnected.
         </p>
+      ) : (
+        <p role="status" className="rounded-xl border border-[#e1e7df] bg-[#f8faf7] p-4 text-xs leading-5 text-[#68736b]">Checking the reports register. Draft entry becomes available only after the connection is confirmed.</p>
       )}
 
       {error ? (<p role="alert" className="rounded-control border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">{error}</p>) : null}
-      {loaded && configured && rows.length === 0 ? (<p className="text-sm text-ink-600">No reports on the returned page for this department.</p>) : null}
+      {loaded && configured && rows.length === 0 ? (<div className="rounded-xl border border-dashed border-[#d9e1d8] bg-[#f8faf7] p-4">
+          <p className="text-sm font-semibold text-[#35483d]">No reports returned</p>
+          <p className="mt-1 text-xs leading-5 text-[#68736b]">There are no report entries on the current result page for this department.</p>
+        </div>) : null}
       <ul className="space-y-2">
         {rows.map((row) => (
           <li key={row.id} className="rounded-control border border-line bg-white p-3">

@@ -91,6 +91,11 @@ test("department snapshot adapter validates the Observatory v1 contract and pres
   assert.match(page, /getDepartmentSnapshots\(department\)/);
   assert.match(page, /Snapshot · not a live publisher feed/);
   assert.match(page, /record\.referencePeriod/);
+  assert.match(page, /<dl className="mt-3 grid grid-cols-1 gap-2 rounded-lg border/);
+  assert.match(page, /Publisher/);
+  assert.match(page, /Reference period/);
+  assert.match(page, /Geographic coverage/);
+  assert.match(page, /record\.publisher/);
   assert.match(page, /record\.geography\.label/);
   assert.match(page, /record\.publisher/);
   assert.match(page, /metric\.measurementType/);
@@ -98,6 +103,23 @@ test("department snapshot adapter validates the Observatory v1 contract and pres
   assert.match(page, /No cached or estimated replacement records are shown/);
 });
 
+
+test("department registers share a clear, restrained empty-state treatment", () => {
+  for (const [componentPath, heading] of [
+    ["components/DepartmentProgrammePanel.tsx", "No programme proposals returned"],
+    ["components/DepartmentWorkPlanPanel.tsx", "No work-plan items returned"],
+    ["components/DepartmentReportPanel.tsx", "No reports returned"],
+  ]) {
+    const component = read(componentPath);
+    assert.match(component, /border-dashed border-\[#d9e1d8\] bg-\[#f8faf7\]/);
+    assert.ok(component.includes(heading), `${componentPath} should explain its empty state`);
+    assert.match(component, /current result page for this department/);
+    assert.match(component, /configured === true \?/);
+    assert.match(component, /configured === false \?/);
+    assert.match(component, /role="status"/);
+    assert.match(component, /becomes available only after the .*connection is confirmed/);
+  }
+});
 
 test("department draft forms can attach a source selected from the validated Observatory feed", () => {
   const page = read("app/ops/departments/[department]/page.tsx");
@@ -142,6 +164,11 @@ test("department programme and work-plan drafts use existing priority, risk and 
   assert.match(workplanRoute, /"contributors"/);
   assert.match(programmePanel, /Supporting teams \/ roles/);
   assert.match(workplanPanel, /Supporting teams \/ roles/);
+  assert.match(workplanPanel, /workPlanTitle=/);
+  assert.match(workplanPanel, /workPlanUrl=/);
+  assert.match(workplanPanel, /Prepare action/);
+  assert.match(workplanPanel, /not an automatic relation, approval or assignment/);
+  assert.match(workplanPanel, /Open work-plan record/);
 });
 
 test("department report drafts distinguish completed outputs from planned work", () => {
@@ -179,4 +206,36 @@ test("each department receives grounded evidence interpretation and a next verif
   assert.match(page, /Turn evidence into better questions/);
   assert.match(page, /What it cannot establish/);
   assert.match(page, /Next evidence step/);
+});
+
+test("Operations Centre homepage leads with an institutional visual and keeps department choices scannable", () => {
+  const page = read("app/ops/page.tsx");
+  assert.match(page, /role="img" aria-label="Four connected departments arranged around shared ISEYC institutional coordination"/);
+  assert.match(page, /One institution/);
+  assert.match(page, /Shared coordination/);
+  assert.match(page, /Dedicated department workspaces\. Shared coordination\. Human decisions\./);
+  assert.match(page, /Meetings, actions and external engagement use shared registers\./);
+  assert.match(page, /href="#departments"/);
+  assert.match(page, /dept-workspace-card--\$\{department\.tone\}/);
+  assert.match(page, /min-h-\[220px\]/);
+  assert.doesNotMatch(page, /department\.focus\.map/);
+  assert.doesNotMatch(page, /min-h-\[132px\]/);
+});
+
+test("Operations Centre register screens use compact authority guidance and scannable record cards", () => {
+  const register = read("components/OperationalRegister.tsx");
+  assert.match(register, /aria-label="Authority boundary"/);
+  assert.match(register, /New entries begin as proposals/);
+  assert.match(register, /Live register/);
+  assert.match(register, /on this page/);
+  assert.match(register, /border-l-4 bg-white/);
+  assert.match(register, /View source meeting/);
+  assert.match(register, /No records returned/);
+});
+
+test("Operations Centre home keeps the coordination diagram proportionate on mobile and uses neutral connected-systems language", () => {
+  const page = read("app/ops/page.tsx");
+  assert.match(page, /max-w-\[280px\] sm:max-w-\[340px\]/);
+  assert.match(page, /Connected public systems/);
+  assert.doesNotMatch(page, /Published civic systems/);
 });

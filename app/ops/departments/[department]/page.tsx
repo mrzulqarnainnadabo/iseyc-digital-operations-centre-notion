@@ -156,23 +156,26 @@ export default async function DepartmentDeskPage({
         </div>
         <div className="relative grid grid-cols-3 divide-x divide-white/10 border-t border-white/10 bg-black/10">
           <div className="px-4 py-3 sm:px-7"><p className="text-[9px] uppercase tracking-[.16em] text-white/50">Mandate</p><p className="mt-1 text-xs font-semibold text-white">Defined</p></div>
-          <div className="px-4 py-3 sm:px-7"><p className="text-[9px] uppercase tracking-[.16em] text-white/50">Programme register</p><p className="mt-1 text-xs font-semibold text-white">Notion-backed when configured</p></div>
+          <div className="px-4 py-3 sm:px-7"><p className="text-[9px] uppercase tracking-[.16em] text-white/50">Programme register</p><p className="mt-1 text-xs font-semibold text-white">Connection shown below</p></div>
           <div className="px-4 py-3 sm:px-7"><p className="text-[9px] uppercase tracking-[.16em] text-white/50">Authority</p><p className="mt-1 text-xs font-semibold text-white">Human-led</p></div>
         </div>
       </header>
 
-      <nav aria-label="Department workspace navigation" className="ops-department-nav flex gap-2 overflow-x-auto pb-1">
-        {[
-          ["#overview", "Overview"],
-          ["#functions", "Functions"],
-          ["#intelligence", "Evidence"],
-          ["#indicators", "Indicator pilot"],
-          ["#programmes", "Programmes"],
-          ["#work-plans", "Work plans"],
-          ["#reports", "Reports"],
-          ["#meetings", "Meetings"],
-          ["#shared-tools", "Shared tools"],
-        ].map(([href, label]) => <a key={href} href={href}>{label}</a>)}
+      <nav aria-label="Department workspace navigation" className="ops-department-nav flex min-w-0 flex-nowrap items-center gap-2 overflow-x-auto rounded-2xl border border-[#e1e5dc] bg-white p-2 shadow-[0_3px_14px_rgba(20,49,38,.04)]">
+        <a href="#overview">Overview</a>
+        <a href="#intelligence">Evidence</a>
+        <a href="#programmes">Programmes</a>
+        <a href="#work-plans">Work plans</a>
+        <details className="ops-department-nav-more relative shrink-0">
+          <summary className="inline-flex min-h-[2.65rem] cursor-pointer list-none items-center rounded-full border border-[#d9dfd7] bg-[#f3f4ee] px-4 text-xs font-bold text-[#315b45] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a7833f]">More <span aria-hidden="true" className="ml-2">＋</span></summary>
+          <div className="absolute right-0 top-full z-30 mt-2 flex w-[min(18rem,calc(100vw-2rem))] flex-col gap-1 rounded-xl border border-[#e1e5dc] bg-white p-2 shadow-xl">
+            <a href="#functions">Functions</a>
+            <a href="#indicators">Indicator pilot</a>
+            <a href="#reports">Reports</a>
+            <a href="#meetings">Meetings</a>
+            <a href="#shared-tools">Shared tools</a>
+          </div>
+        </details>
       </nav>
 
       <section id="overview" className="grid gap-4 lg:grid-cols-[1.2fr_.8fr]">
@@ -256,8 +259,20 @@ export default async function DepartmentDeskPage({
                         </div>
                         <span className="shrink-0 rounded-full border border-[#e2e7df] bg-white px-2.5 py-1 text-[9px] font-semibold text-[#59665d]">{record.geography.level}</span>
                       </div>
-                      <p className="mt-1 text-[10px] leading-4 text-[#68736b]">{record.publisher} · {record.referencePeriod}</p>
-                      <p className="mt-1 text-[10px] leading-4 text-[#7a837c]">{record.geography.label}</p>
+                      <dl className="mt-3 grid grid-cols-1 gap-2 rounded-lg border border-[#e8ece6] bg-white p-3 sm:grid-cols-3">
+                        <div className="min-w-0">
+                          <dt className="text-[9px] font-bold uppercase tracking-[.12em] text-[#8a6b34]">Publisher</dt>
+                          <dd className="mt-1 break-words text-[11px] font-semibold leading-4 text-[#35483d]">{record.publisher}</dd>
+                        </div>
+                        <div className="min-w-0">
+                          <dt className="text-[9px] font-bold uppercase tracking-[.12em] text-[#8a6b34]">Reference period</dt>
+                          <dd className="mt-1 break-words text-[11px] font-semibold leading-4 text-[#35483d]">{record.referencePeriod}</dd>
+                        </div>
+                        <div className="min-w-0">
+                          <dt className="text-[9px] font-bold uppercase tracking-[.12em] text-[#8a6b34]">Geographic coverage</dt>
+                          <dd className="mt-1 break-words text-[11px] font-semibold leading-4 text-[#35483d]">{record.geography.label}</dd>
+                        </div>
+                      </dl>
                       <div className="mt-3 grid gap-2 sm:grid-cols-2">
                         {record.metrics.slice(0, 2).map((metric) => (
                           <div key={metric.label} className="rounded-lg border border-[#e8ece6] bg-white p-3">
@@ -406,8 +421,9 @@ export default async function DepartmentDeskPage({
 
       <section className="grid scroll-mt-5 gap-4 lg:grid-cols-2">
         <article id="work-plans" className="rounded-2xl border border-[#e1e5dc] bg-white p-4 shadow-[0_4px_18px_rgba(20,49,38,.04)] sm:p-5">
-          <p className="mb-3 text-[10px] leading-4 text-[#7a837c]">A department task register is Not connected until its Notion register is configured. No task records are simulated.</p>
-          <div className="mb-3 flex items-center gap-3"><span className="h-8 w-1 rounded-full bg-[#315b45]" /><div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">02 · Execution</p><h2 className="font-serif text-xl text-[#173c30]">Work plans</h2></div></div>
+          
+          <p className="mb-3 text-[10px] leading-4 text-[#7a837c]">Department task register status appears in the work-plan panel. No sample tasks are displayed.</p>
+        <div className="mb-3 flex items-center gap-3"><span className="h-8 w-1 rounded-full bg-[#315b45]" /><div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8a6b34]">02 · Execution</p><h2 className="font-serif text-xl text-[#173c30]">Work plans</h2></div></div>
           <DepartmentWorkPlanPanel departmentId={department} departmentName={profile.name} evidenceOptions={evidenceOptions} />
         </article>
         <article id="reports" className="scroll-mt-5 rounded-2xl border border-[#e1e5dc] bg-white p-4 shadow-[0_4px_18px_rgba(20,49,38,.04)] sm:p-5">
@@ -428,7 +444,7 @@ export default async function DepartmentDeskPage({
             <p className="mt-1 text-[10px] text-[#7a837c]">{meeting.meetingDate || "Date not supplied"} · {meeting.conveningBody}</p>
             <Link href={`/ops/review/${encodeURIComponent(meeting.id)}`} className="mt-2 inline-flex min-h-8 items-center text-[11px] font-bold text-[#194b3b]">Open meeting record →</Link>
           </li>
-        ))}</ul> : <p className="mt-4 rounded-xl border border-dashed border-[#d7ddd4] bg-white/70 p-4 text-xs leading-5 text-[#6c786f]">No matching department meetings were found on the loaded page. This does not establish that no department activity exists.</p>}
+        ))}</ul> : <p className="mt-4 rounded-xl border border-dashed border-[#d7ddd4] bg-white/70 p-4 text-xs leading-5 text-[#6c786f]">No matching meetings appear on this page. Other pages may contain more.</p>}
       </section>
 
       <section id="shared-tools" className="scroll-mt-5 rounded-2xl border border-[#dce4dc] bg-white p-5 sm:p-6">

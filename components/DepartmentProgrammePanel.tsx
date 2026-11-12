@@ -128,7 +128,7 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName,
         </span>
       </div>
 
-      {configured !== false ? (
+      {configured === true ? (
         <details className="rounded-xl border border-[#dfe6df] bg-[#fafbf8] p-3">
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-[#194b3b]">
             <span>Prepare a programme proposal<span className="mt-1 block text-xs font-normal text-[#68736b]">Saved as Proposed in the live register. This does not approve or start a programme.</span></span>
@@ -243,12 +243,14 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName,
         </form>
           </div>
         </details>
-      ) : (
+      ) : configured === false ? (
         <p className="rounded-card border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
           Configure <code className="text-xs">NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID</code> and share
           the database with the DOC Notion integration. No programme records are invented while the
           register is disconnected.
         </p>
+      ) : (
+        <p role="status" className="rounded-xl border border-[#e1e7df] bg-[#f8faf7] p-4 text-xs leading-5 text-[#68736b]">Checking the programme register. Proposal entry becomes available only after the register connection is confirmed.</p>
       )}
 
       {error ? (
@@ -260,9 +262,10 @@ export default function DepartmentProgrammePanel({ departmentId, departmentName,
       {!loaded && !error ? <p className="text-sm text-ink-600">Loading programmes…</p> : null}
 
       {loaded && configured && rows.length === 0 ? (
-        <p className="rounded-card border border-line bg-white p-4 text-sm text-ink-600">
-          No programmes on the returned page for this department.
-        </p>
+        <div className="rounded-xl border border-dashed border-[#d9e1d8] bg-[#f8faf7] p-4">
+          <p className="text-sm font-semibold text-[#35483d]">No programme proposals returned</p>
+          <p className="mt-1 text-xs leading-5 text-[#68736b]">There are no programme entries on the current result page for this department.</p>
+        </div>
       ) : null}
 
       <div className="space-y-3">

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { StatusBadge } from "@/components/StatusBadge";
 import type { DepartmentEvidenceOption, OpsDepartmentId, WorkPlanRecord, WorkPriority, RiskLevel } from "@/lib/department-operations";
@@ -129,7 +130,11 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName, 
         </span>
       </div>
 
-      {configured !== false ? (
+      <p className="rounded-lg border border-[#e1e7df] bg-[#f8faf7] px-3 py-2 text-xs leading-5 text-[#59665d]">
+        Prepare an action from a work-plan item to carry its Notion source URL into the Action notes. This is a reference, not an automatic relation, approval or assignment.
+      </p>
+
+      {configured === true ? (
         <details className="rounded-xl border border-[#dfe6df] bg-[#fafbf8] p-3">
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-[#194b3b]">
             <span>Add a work-plan item<span className="mt-1 block text-xs font-normal text-[#68736b]">New items are saved as Proposed. They are not proof that work has started.</span></span>
@@ -208,14 +213,19 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName, 
         </form>
           </div>
         </details>
-      ) : (
+      ) : configured === false ? (
         <p className="rounded-control border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
           Configure <code className="text-xs">NOTION_DEPARTMENT_PROGRAMMES_DATABASE_ID</code>. Work-plan items use the shared register’s Operations work type; no separate work-plan database is assumed.
         </p>
+      ) : (
+        <p role="status" className="rounded-xl border border-[#e1e7df] bg-[#f8faf7] p-4 text-xs leading-5 text-[#68736b]">Checking the shared operations register. Work-plan entry becomes available only after the connection is confirmed.</p>
       )}
 
       {error ? (<p role="alert" className="rounded-control border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">{error}</p>) : null}
-      {loaded && configured && rows.length === 0 ? (<p className="text-sm text-ink-600">No work-plan items on the returned page for this department.</p>) : null}
+      {loaded && configured && rows.length === 0 ? (<div className="rounded-xl border border-dashed border-[#d9e1d8] bg-[#f8faf7] p-4">
+          <p className="text-sm font-semibold text-[#35483d]">No work-plan items returned</p>
+          <p className="mt-1 text-xs leading-5 text-[#68736b]">There are no work-plan entries on the current result page for this department.</p>
+        </div>) : null}
       <ul className="space-y-2">
         {rows.map((row) => (
           <li key={row.id} className="rounded-control border border-line bg-white p-3">
@@ -230,7 +240,13 @@ export default function DepartmentWorkPlanPanel({ departmentId, departmentName, 
               {row.riskLevel !== "Unspecified" ? <span className="rounded-full border border-[#e4e8e1] bg-[#fafbf8] px-2.5 py-1 text-[10px] font-semibold text-[#805b27]">Risk · {row.riskLevel}</span> : null}
             </div>
             {row.contributors ? <p className="mt-2 text-xs text-ink-600"><span className="font-semibold">Supporting teams / roles:</span> {row.contributors}</p> : null}
-            {row.evidenceNote ? <a href={row.evidenceNote} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-9 items-center text-sm font-semibold text-forest-800 underline">Open evidence / deliverable ↗</a> : null}
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+              {row.url ? <>
+                <a href={row.url} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center text-xs font-semibold text-forest-800 underline underline-offset-2">Open work-plan record ↗</a>
+                <Link href={`/ops/actions?workPlanTitle=${encodeURIComponent(row.title)}&workPlanUrl=${encodeURIComponent(row.url)}`} className="inline-flex min-h-9 items-center rounded-full border border-[#dce4dc] bg-[#f7faf6] px-3 text-xs font-semibold text-forest-800 hover:bg-[#edf3ec]">Prepare action →</Link>
+              </> : null}
+              {row.evidenceNote ? <a href={row.evidenceNote} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center text-xs font-semibold text-forest-800 underline underline-offset-2">Open evidence / deliverable ↗</a> : null}
+            </div>
           </li>
         ))}
       </ul>

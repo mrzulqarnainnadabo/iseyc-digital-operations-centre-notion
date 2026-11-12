@@ -191,13 +191,16 @@ test("actions, chamber and communications expose authenticated Notion-backed ini
   assert.match(component, /<option>Website<\/option><option>X<\/option><option>WhatsApp<\/option><option>Other<\/option>/);
   assert.match(read("app/ops/api/registers/[kind]/route.ts"), /\["X", "WhatsApp", "Website", "Other"\]/);
   assert.match(component, /human-authorised/);
+  assert.match(component, /Propose follow-up work from meetings or department priorities/);
+  assert.match(component, /Saving a draft does not approve or publish it/);
+  assert.match(component, /Records do not certify attendance, quorum or decisions/);
   assert.match(component, /Proposed owner role · required/);
-  assert.match(component, /Proposed action · unassigned · awaiting authorised acceptance/);
-  assert.match(component, /Proposed action · unassigned · awaiting authorised acceptance/);
+  assert.match(component, /Action proposal/);
+  assert.match(component, /Unassigned · awaiting authorised acceptance/);
   assert.match(component, /Proposed session · not yet convened/);
   assert.match(component, /kind === "actions" \|\| kind === "chamber" \? "Proposed" : row.status/);
   assert.match(component, /required minLength=\{2\} maxLength=\{180\}/);
-  assert.match(component, /does not assign access or imply a named officer/);
+  assert.match(component, /Role labels do not appoint a named officer or grant access; meeting links do not certify decisions/);
 
   const api = fs.readFileSync(path.join(opsRoot, "api/registers/[kind]/route.ts"), "utf8");
   assert.match(api, /isSameOriginRequest/);
@@ -239,7 +242,7 @@ test("institutional design tokens and reduced-motion accessibility are present",
   assert.match(shell, /fixed inset-x-0 bottom-0/);
   assert.match(shell, /aria-label="Primary navigation"/);
   assert.match(shell, /min-h-\[44px\]/);
-  assert.match(dashboard, /Four departments organise the work/);
+  assert.match(dashboard, /Dedicated department workspaces\. Shared coordination\. Human decisions\./);
   assert.match(dashboard, /Drafts are not approvals/);
   assert.match(dashboard, /No confirmed appointments are recorded yet/);
 });
@@ -250,11 +253,12 @@ test("department desks show sourced meeting activity without implying staffing o
   const calendar = fs.readFileSync(path.join(opsRoot, "calendar/page.tsx"), "utf8");
   const board = fs.readFileSync(path.join(opsRoot, "calendar/CalendarBoard.tsx"), "utf8");
   const seat = fs.readFileSync(path.join(opsRoot, "seat/page.tsx"), "utf8");
-  assert.match(department, /task register/i);
-  assert.match(department, /Not connected/);
+  assert.match(department, /id="work-plans"/);
+  assert.match(department, /Work plans/);
+  assert.match(department, /DepartmentWorkPlanPanel/);
   assert.match(department, /listMeetings/);
   assert.match(department, /filterLegacyVisibleMeetings/);
-  assert.match(department, /No matching department meetings/);
+  assert.match(department, /No matching meetings appear on this page/);
   assert.match(department, /not inferred from login identity/);
   assert.match(calendar, /requireStaffSession/);
   assert.match(calendar, /listMeetings/);
@@ -525,6 +529,24 @@ test("meeting review queue does not imply it handles every institutional approva
   assert.match(nav, /label: "Meeting review queue"/);
 });
 
+test("department navigation prioritises core work and groups secondary destinations", () => {
+  const department = fs.readFileSync(path.join(opsRoot, "departments/[department]/page.tsx"), "utf8");
+  assert.match(department, /aria-label="Department workspace navigation"/);
+  assert.match(department, /href="#overview">Overview/);
+  assert.match(department, /href="#intelligence">Evidence/);
+  assert.match(department, /href="#programmes">Programmes/);
+  assert.match(department, /href="#work-plans">Work plans/);
+  assert.match(department, /<summary[^>]*>More <span/);
+  assert.doesNotMatch(department, /A department task register is Not connected until its Notion register is configured/);
+  assert.match(department, /Connection shown below/);
+  assert.match(department, /No matching meetings appear on this page\. Other pages may contain more\./);
+  assert.match(department, /ops-department-nav flex min-w-0 flex-nowrap items-center gap-2 overflow-x-auto/);
+  assert.match(department, /ops-department-nav-more relative shrink-0/);
+  assert.match(department, /w-\[min\(18rem,calc\(100vw-2rem\)\)\]/);
+  assert.match(department, /href="#reports">Reports/);
+  assert.match(department, /href="#meetings">Meetings/);
+});
+
 test("department workspaces use distinct identity marks and every in-page navigation target resolves", () => {
   const page = read("app/ops/departments/[department]/page.tsx");
   const styles = read("app/globals.css");
@@ -534,7 +556,7 @@ test("department workspaces use distinct identity marks and every in-page naviga
     assert.ok(page.includes(`department === "${discipline}"`) || discipline === "civic-affairs", `Missing visual identity for ${discipline}`);
   }
   assert.match(page, /id="shared-tools"/);
-  assert.match(page, /\["#shared-tools", "Shared tools"\]/);
+  assert.match(page, /href="#shared-tools">Shared tools/);
   assert.doesNotMatch(page, /id="tools"/);
   assert.match(page, /ops-department-mark--education/);
   assert.match(page, /ops-department-mark--health/);
@@ -625,4 +647,71 @@ test("Presidential Council guide links to a bounded operating compact", () => {
   assert.match(compact, /Authority not configured/);
   assert.match(compact, /shared staff key cannot prove who attended/);
   assert.match(compact, /Automation must not approve/);
+});
+
+test("department work-plan records can carry a validated source URL into a proposed action note", () => {
+  const workplan = read("components/DepartmentWorkPlanPanel.tsx");
+  const actionsPage = read("app/ops/actions/page.tsx");
+  const register = read("components/OperationalRegister.tsx");
+  assert.match(workplan, /workPlanTitle=/);
+  assert.match(workplan, /workPlanUrl=/);
+  assert.match(workplan, /Prepare action/);
+  assert.match(workplan, /not an automatic relation, approval or assignment/);
+  assert.match(actionsPage, /function trustedNotionUrl/);
+  assert.match(actionsPage, /host === "notion\.so"/);
+  assert.match(actionsPage, /host\.endsWith\("\.notion\.site"\)/);
+  assert.match(actionsPage, /initialNotes/);
+  assert.match(register, /initialNotes\?: string/);
+  assert.match(register, /useState\(initialNotes\)/);
+  assert.match(register, /A work-plan reference was prefilled in these notes/);
+  assert.match(register, /text reference, not a database relation or approval/);
+});
+
+test("shared operational register creation stays unavailable until its Notion connection is confirmed", () => {
+  const register = read("components/OperationalRegister.tsx");
+  assert.match(register, /const \[configured, setConfigured\] = useState<boolean \| null>\(null\)/);
+  assert.match(register, /setConfigured\(true\)/);
+  assert.match(register, /setConfigured\(false\)/);
+  assert.match(register, /\{configured === true \? \(/);
+  assert.match(register, /Record entry unavailable/);
+  assert.match(register, /Checking the register connection/);
+});
+
+test("standard meeting review can hand off a contextual action proposal without implying a decision or assignment", () => {
+  const review = read("app/ops/review/[id]/page.tsx");
+  const actionsPage = read("app/ops/actions/page.tsx");
+  const register = read("components/OperationalRegister.tsx");
+  assert.match(review, /meeting\.sensitivity === "Standard"/);
+  assert.match(review, /ops\/actions\?meetingId=/);
+  assert.match(review, /does not certify a decision, approve the action or assign an officer/);
+  assert.match(actionsPage, /searchParams/);
+  assert.match(actionsPage, /initialMeetingId={initialMeetingId}/);
+  assert.match(register, /eligibleMeetings\.some/);
+  assert.match(register, /meeting\.sensitivity === "Standard"/);
+  assert.match(register, /setSourceMeetingId\(initialMeetingId\)/);
+});
+
+test("meeting-to-action deep links can resolve an eligible meeting beyond the first paginated page", () => {
+  const meetingsApi = read("app/api/meetings/route.ts");
+  const register = read("components/OperationalRegister.tsx");
+  assert.match(meetingsApi, /requestedMeetingId = requestUrl\.searchParams\.get\("meetingId"\)/);
+  assert.match(meetingsApi, /const requestedMeeting = await getMeeting\(requestedMeetingId\)/);
+  assert.match(meetingsApi, /legacySessionCanReadMeeting\(requestedMeeting\.sensitivity\)/);
+  assert.match(meetingsApi, /meetings\.push\(requestedMeeting\)/);
+  assert.match(register, /initialMeetingId \? `\?meetingId=/);
+  assert.match(register, /meetingHasMore/);
+  assert.match(register, /async function loadMoreMeetings\(\)/);
+  assert.match(register, /ops\/api\/meetings\?cursor=/);
+  assert.match(register, /Load more meeting options/);
+});
+
+test("meeting review exposes reverse-linked action records without treating links as decisions", () => {
+  const review = read("app/ops/review/[id]/page.tsx");
+  const adapter = read("lib/notion.ts");
+  assert.match(adapter, /linkedActionIds: Array\.isArray\(props\["Linked actions"\]\?\.relation\)/);
+  assert.match(review, /Related operational records/);
+  assert.match(review, /Linked actions/);
+  assert.match(review, /No linked action records are returned/);
+  assert.match(review, /A relation records context only/);
+  assert.match(review, /href="\/ops\/actions"/);
 });

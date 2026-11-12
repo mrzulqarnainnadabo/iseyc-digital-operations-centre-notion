@@ -19,15 +19,15 @@ const TITLES: Record<Kind, string> = {
   chamber: "Council and Chamber sessions",
 };
 const DETAILS: Record<Kind, string> = {
-  actions: "Record proposed follow-up work from meetings and departmental priorities. An initial register entry is not an accepted assignment; progress reporting waits for verified officer identity and assignment.",
-  media: "Prepare institutional communications for factual and editorial review. Draft creation does not approve, publish or dispatch content.",
-  chamber: "Prepare formal institutional sessions with an agenda, chair and secretary roles, attendance basis and draft decision notes. These records do not certify quorum or decisions.",
+  actions: "Propose follow-up work from meetings or department priorities. New entries are unassigned; progress requires verified officer identity and accepted assignment.",
+  media: "Prepare communications for factual and editorial review. Saving a draft does not approve or publish it.",
+  chamber: "Prepare Council sessions, agendas and draft notes. Records do not certify attendance, quorum or decisions.",
 };
 const KIND_LABEL: Record<Kind, string> = { actions: "Actions", media: "Communications", chamber: "Chamber" };
 const field = "mt-1 min-h-11 w-full rounded-control border border-line bg-cream-50 px-3 text-sm font-normal text-ink-950";
 const area = "mt-1 w-full rounded-control border border-line bg-cream-50 px-3 py-2 text-sm font-normal leading-5 text-ink-950";
 
-export default function OperationalRegister({ kind }: { kind: Kind }) {
+export default function OperationalRegister({ kind, initialMeetingId = "", initialNotes = "" }: { kind: Kind; initialMeetingId?: string; initialNotes?: string }) {
   const [rows, setRows] = useState<RecordRow[]>([]);
   const [title, setTitle] = useState("");
   const [detail, setDetail] = useState("");
@@ -37,10 +37,13 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
   const [priority, setPriority] = useState("Normal");
   const [expectedEvidence, setExpectedEvidence] = useState("");
   const [blocker, setBlocker] = useState("");
-  const [notes, setNotes] = useState("");
-  const [sourceMeetingId, setSourceMeetingId] = useState("");
+  const [notes, setNotes] = useState(initialNotes);
+  const [sourceMeetingId, setSourceMeetingId] = useState(initialMeetingId);
   const [meetings, setMeetings] = useState<MeetingOption[]>([]);
   const [meetingSourceError, setMeetingSourceError] = useState("");
+  const [meetingCursor, setMeetingCursor] = useState<string | null>(null);
+  const [meetingHasMore, setMeetingHasMore] = useState(false);
+  const [meetingLoadingMore, setMeetingLoadingMore] = useState(false);
   const [purpose, setPurpose] = useState("");
   const [chairRole, setChairRole] = useState("");
   const [secretaryRole, setSecretaryRole] = useState("");
@@ -52,6 +55,7 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [configured, setConfigured] = useState<boolean | null>(null);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
 
   async function refresh(append = false) {
@@ -62,15 +66,19 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
       const suffix = cursor ? `?cursor=${encodeURIComponent(cursor)}` : "";
       const response = await fetch(`/ops/api/registers/${kind}${suffix}`, { cache: "no-store" });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Could not load register.");
+      if (!response.ok) {
+        setConfigured(false);
+        throw new Error(data.error || "Could not load register.");
+      }
       if (!Array.isArray(data.records) || (data.nextCursor !== null && typeof data.nextCursor !== "string") || typeof data.hasMore !== "boolean") {
         throw new Error("The register returned an invalid response. No records are shown.");
       }
+      setConfigured(true);
       setRows((current) => append ? [...current, ...data.records] : data.records);
       setNextCursor(data.hasMore ? data.nextCursor : null);
       setLoaded(true);
     } catch (cause) {
-      if (!append) { setRows([]); setLoaded(false); setNextCursor(null); }
+      if (!append) { setConfigured(false); setRows([]); setLoaded(false); setNextCursor(null); }
       setError(cause instanceof Error ? cause.message : "Could not load register.");
     } finally { setBusy(false); }
   }
@@ -78,15 +86,48 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
   useEffect(() => {
     void refresh();
     if (kind === "actions") {
-      fetch("/ops/api/meetings", { cache: "no-store" })
+      fetch(`/ops/api/meetings${initialMeetingId ? `?meetingId=${encodeURIComponent(initialMeetingId)}` : ""}`, { cache: "no-store" })
         .then(async (response) => {
           const data = await response.json();
           if (!response.ok || !Array.isArray(data.meetings)) throw new Error("The Meetings source is not available.");
-          setMeetings(data.meetings.filter((meeting: MeetingOption) => meeting.sensitivity === "Standard"));
+          const eligibleMeetings = data.meetings.filter((meeting: MeetingOption) => meeting.sensitivity === "Standard");
+          setMeetings(eligibleMeetings);
+          setMeetingCursor(typeof data.nextCursor === "string" ? data.nextCursor : null);
+          setMeetingHasMore(typeof data.nextCursor === "string");
+          if (initialMeetingId) {
+            if (eligibleMeetings.some((meeting: MeetingOption) => meeting.id === initialMeetingId)) {
+              setSourceMeetingId(initialMeetingId);
+            } else {
+              setSourceMeetingId("");
+              setMeetingSourceError("The requested meeting is unavailable or not eligible for action linking.");
+            }
+          }
         })
         .catch(() => setMeetingSourceError("Meeting references are unavailable. You can still create an action without linking a meeting."));
     }
-  }, [kind]);
+  }, [kind, initialMeetingId]);
+
+  async function loadMoreMeetings() {
+    if (!meetingCursor || meetingLoadingMore) return;
+    setMeetingLoadingMore(true);
+    setMeetingSourceError("");
+    try {
+      const response = await fetch(`/ops/api/meetings?cursor=${encodeURIComponent(meetingCursor)}`, { cache: "no-store" });
+      const data = await response.json();
+      if (!response.ok || !Array.isArray(data.meetings)) throw new Error("The next Meetings page is not available.");
+      const eligible = data.meetings.filter((meeting: MeetingOption) => meeting.sensitivity === "Standard");
+      setMeetings((current) => {
+        const known = new Set(current.map((meeting) => meeting.id));
+        return [...current, ...eligible.filter((meeting: MeetingOption) => !known.has(meeting.id))];
+      });
+      setMeetingCursor(typeof data.nextCursor === "string" ? data.nextCursor : null);
+      setMeetingHasMore(typeof data.nextCursor === "string");
+    } catch {
+      setMeetingSourceError("More meeting references could not be loaded. Existing options remain available.");
+    } finally {
+      setMeetingLoadingMore(false);
+    }
+  }
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -123,12 +164,16 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
           </div>
           <Link href="/ops/executive" className="inline-flex min-h-10 items-center text-sm font-semibold text-forest-800 hover:underline">Executive desk →</Link>
         </div>
-        <section className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-          <p className="text-sm font-semibold text-amber-950">Authority and record boundary</p>
-          <p className="mt-1 text-xs leading-5 text-amber-900">A role label is not an appointment or an accepted action assignment. The proposed owner role field does not assign access or imply a named officer. A meeting reference is context, not proof of a decision. Records created here remain initial states. Approval, publication, closure and formal decisions remain human-authorised and require verified individual authority and audit.</p>
+        <section aria-label="Authority boundary" className="flex gap-3 rounded-xl border border-[#e5e3d8] border-l-4 border-l-[#b99a61] bg-[#f7f6f0] p-4">
+          <span aria-hidden="true" className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border border-[#e5ddc9] bg-white text-sm font-semibold text-[#8a6b34]">i</span>
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#5b513d]">Authority boundary</p>
+            <p className="mt-1 text-xs leading-5 text-[#5d625a]">New entries begin as proposals. Role labels do not appoint a named officer or grant access; meeting links do not certify decisions. Approval, publication and closure remain human-authorised and require separately verified authority.</p>
+          </div>
         </section>
       </header>
 
+      {configured === true ? (
       <section className="rounded-2xl border border-line bg-white p-5 shadow-card sm:p-6">
         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Create record</p>
         <h2 className="mt-1 font-serif text-xl text-forest-950">New {KIND_LABEL[kind].toLowerCase()} entry</h2>
@@ -171,6 +216,8 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
               </select>
               <span className="mt-1 block text-[10px] font-normal text-ink-600">{meetingSourceError || "Links to a Standard meeting record as context. It does not certify a decision or create an approval."}</span>
             </label>
+            {meetingHasMore ? <button type="button" onClick={loadMoreMeetings} disabled={meetingLoadingMore} className="inline-flex min-h-9 items-center text-xs font-semibold text-forest-800 underline underline-offset-2 disabled:opacity-50">{meetingLoadingMore ? "Loading meeting options…" : "Load more meeting options"}</button> : null}
+            {initialNotes ? <p role="status" className="rounded-lg border border-[#dfe6df] bg-[#f7faf6] px-3 py-2 text-xs leading-5 text-[#59665d]">A work-plan reference was prefilled in these notes. Check it before saving; this is a text reference, not a database relation or approval.</p> : null}
             <label className="block text-sm font-semibold text-ink-800">Working notes
               <textarea rows={2} maxLength={1000} value={notes} onChange={(e) => setNotes(e.target.value)} className={area} />
             </label>
@@ -227,16 +274,38 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
           </div>
         </form>
       </section>
+      ) : configured === false ? (
+        <section role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <p className="text-sm font-semibold text-amber-950">Record entry unavailable</p>
+          <p className="mt-1 text-xs leading-5 text-amber-900">The {KIND_LABEL[kind].toLowerCase()} register could not be confirmed as available. Check the connection and access, then refresh before creating records. No entry has been saved.</p>
+        </section>
+      ) : (
+        <p role="status" className="rounded-xl border border-[#e1e7df] bg-[#f8faf7] p-4 text-sm text-[#68736b]">Checking the register connection. Record entry becomes available only after the connection is confirmed.</p>
+      )}
 
-      <section className="space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Register</p><h2 className="font-semibold text-forest-950">Register records</h2></div><button type="button" onClick={() => void refresh()} disabled={busy} className="min-h-10 rounded-control border border-line px-3 text-sm font-semibold disabled:opacity-50">Refresh</button></div>
+      <section className="space-y-4">
+        <div className="flex flex-wrap items-end justify-between gap-3 border-b border-line pb-3">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">Live register</p>
+            <h2 className="font-serif text-xl text-forest-950">Records</h2>
+            <p className="mt-1 text-xs text-ink-600">{loaded ? `${rows.length} record${rows.length === 1 ? "" : "s"} on this page` : "Current register entries"}</p>
+          </div>
+          <button type="button" onClick={() => void refresh()} disabled={busy} className="inline-flex min-h-10 items-center gap-2 rounded-control border border-line bg-white px-3 text-sm font-semibold text-forest-950 transition hover:bg-cream-50 disabled:opacity-50"><span aria-hidden="true">↻</span> Refresh</button>
+        </div>
         {error ? <p role="alert" className="rounded-control border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">{error}</p> : null}
-        {!loaded && !error ? <p className="text-sm text-ink-600">Loading records…</p> : null}
-        {loaded && rows.length === 0 ? <p className="rounded-card border border-line bg-white p-4 text-sm text-ink-600">The connected register contains no records on the returned page.</p> : null}
+        {!loaded && !error ? <div role="status" className="space-y-2 rounded-xl border border-dashed border-line bg-white p-4"><span className="block h-3 w-2/5 animate-pulse rounded bg-cream-100" /><span className="block h-3 w-4/5 animate-pulse rounded bg-cream-100" /><span className="block h-3 w-1/3 animate-pulse rounded bg-cream-100" /><span className="sr-only">Loading records…</span></div> : null}
+        {loaded && rows.length === 0 ? <div className="rounded-xl border border-dashed border-[#d9e1d8] bg-[#f8faf7] p-5"><p className="text-sm font-semibold text-forest-950">No records returned</p><p className="mt-1 text-xs leading-5 text-ink-600">The connected register contains no records on the returned page.</p></div> : null}
         <div className="space-y-3">
           {rows.map((row) => (
-            <article key={row.id} className="rounded-card border border-line bg-white p-4 shadow-card">
-              <div className="flex flex-wrap items-start justify-between gap-2"><div><h3 className="font-semibold text-forest-950">{row.title}</h3>{kind === "actions" ? <p className="mt-1 text-xs font-medium text-ink-600">Proposed action · unassigned · awaiting authorised acceptance</p> : kind === "chamber" ? <p className="mt-1 text-xs font-medium text-ink-600">Proposed session · not yet convened</p> : null}</div><StatusBadge status={kind === "actions" || kind === "chamber" ? "Proposed" : row.status} /></div>
+            <article key={row.id} className={`overflow-hidden rounded-xl border border-line border-l-4 bg-white p-4 shadow-card transition-shadow hover:shadow-md sm:p-5 ${kind === "actions" ? "border-l-[#b99a61]" : kind === "chamber" ? "border-l-[#315b45]" : "border-l-[#668b91]"}`}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-gold-700">{kind === "actions" ? "Action proposal" : kind === "chamber" ? "Council session" : "Communication draft"}</p>
+                  <h3 className="mt-1 font-serif text-lg leading-snug text-forest-950">{row.title}</h3>
+                  {kind === "actions" ? <p className="mt-1 text-xs font-medium text-ink-600">Unassigned · awaiting authorised acceptance</p> : kind === "chamber" ? <p className="mt-1 text-xs font-medium text-ink-600">Proposed session · not yet convened</p> : null}
+                </div>
+                <StatusBadge status={kind === "actions" || kind === "chamber" ? "Proposed" : row.status} />
+              </div>
               {row.detail ? (kind === "actions" ? <p className="mt-2 text-sm leading-6 text-ink-700"><strong>Proposed owner role:</strong> {row.detail}</p> : <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-ink-700">{row.detail}</p>) : null}
               {row.date ? <p className="mt-1 text-xs text-ink-600">{row.date}</p> : null}
               {kind === "actions" ? <div className="mt-3 flex flex-wrap gap-2 text-[10px]">
@@ -249,7 +318,7 @@ export default function OperationalRegister({ kind }: { kind: Kind }) {
               {row.blocker ? <p className="mt-2 text-xs leading-5 text-amber-900"><strong>Blocker:</strong> {row.blocker}</p> : null}
               {kind === "actions" && !["Done", "Archived"].includes(row.status) ? <p className="mt-3 rounded-control border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-950">Progress updates are paused. The system must first verify the individual officer and their assignment to this action. Shared staff access cannot record accountable progress.</p> : null}
               {row.purpose || row.agenda ? <div className="mt-3 space-y-2 border-t border-line pt-3 text-xs leading-5 text-ink-700">{row.purpose ? <p><strong>Purpose:</strong> {row.purpose}</p> : null}{row.chairRole ? <p><strong>Chair role:</strong> {row.chairRole}</p> : null}{row.secretaryRole ? <p><strong>Secretary role:</strong> {row.secretaryRole}</p> : null}{row.agenda ? <p className="whitespace-pre-wrap"><strong>Agenda:</strong> {row.agenda}</p> : null}{row.decisionItems ? <p className="whitespace-pre-wrap"><strong>Decision items:</strong> {row.decisionItems}</p> : null}{row.draftMinutes ? <p className="whitespace-pre-wrap"><strong>Draft minutes:</strong> {row.draftMinutes}</p> : null}{row.decisionOutcome ? <p className="whitespace-pre-wrap"><strong>Decision outcome · draft:</strong> {row.decisionOutcome}</p> : null}</div> : null}
-              {row.sourceMeetingId ? <Link href={`/ops/review/${encodeURIComponent(row.sourceMeetingId)}`} className="mt-2 inline-flex min-h-9 items-center text-xs font-semibold text-forest-800 hover:underline">Open source meeting →</Link> : null}
+              {row.sourceMeetingId ? <Link href={`/ops/review/${encodeURIComponent(row.sourceMeetingId)}`} className="mt-3 inline-flex min-h-9 items-center rounded-full border border-[#dfe6df] bg-[#f7faf6] px-3 text-xs font-semibold text-forest-800 hover:bg-[#edf3ec]">View source meeting →</Link> : null}
               {row.url ? <a href={row.url} target="_blank" rel="noreferrer" className="mt-2 ml-3 inline-flex min-h-9 items-center text-xs font-semibold text-forest-800 underline">Open Notion record ↗</a> : null}
             </article>
           ))}

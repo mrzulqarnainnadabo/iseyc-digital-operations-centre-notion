@@ -283,3 +283,17 @@ button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
   .ops-department-mark svg { width: 6rem; height: 6rem; }
   .ops-department-mark span { bottom: .75rem; font-size: .38rem; }
 }
+
+
+/* Operations workspace navigation — compact primary rail, contained secondary menu */
+.ops-department-nav { overscroll-behavior-x: contain; scrollbar-width: thin; scrollbar-color: #c8d2c8 transparent; }
+.ops-department-nav > a { white-space: nowrap; }
+.ops-department-nav > a:first-child { border-color: #173f32; background: #173f32; color: white; }
+.ops-department-nav > a:first-child:hover { border-color: #245540; background: #245540; }
+.ops-department-nav-more > div a { width: 100%; min-height: 2.75rem; justify-content: flex-start; border-color: transparent; border-radius: .6rem; background: white; padding-inline: .85rem; }
+.ops-department-nav-more > div a:hover { border-color: #e1e5dc; background: #f3f6f1; }
+.ops-department-nav-more > summary::-webkit-details-marker { display: none; }
+.ops-department-nav-more[open] > summary { border-color: #a7833f; background: #fbf8ef; }
+@media (max-width: 640px) {
+  .ops-department-nav { margin-inline: -0.15rem; border-radius: 1rem; }
+}
