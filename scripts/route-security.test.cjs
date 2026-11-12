@@ -283,6 +283,8 @@ test("every Operations Centre API route has an explicit capability boundary or a
     assert.ok(source.includes('requireCapability("ops.browse")'), route + " canonical handler must require ops.browse");
   }
 
+  const statusWrapper = fs.readFileSync(path.join(opsRoot, "auth/oidc/status/route.ts"), "utf8");
+  assert.ok(statusWrapper.includes("getOidcStatus"), "OIDC status wrapper must delegate to the canonical identity handler");
   const status = fs.readFileSync(path.join(__dirname, "../app/api/auth/oidc/status/route.ts"), "utf8");
   assert.ok(status.includes("verifyPendingIdentity"), "OIDC status is identity-only, not an operations session");
   assert.ok(status.includes("accessGranted: false"), "OIDC identity must not grant operations access");
@@ -292,6 +294,8 @@ test("operations API guards precede Notion reads and writes", () => {
   const root = path.join(__dirname, "../app/ops/api");
   const api = path.join(__dirname, "../app/api");
   const order = (source, markers, label) => assertInOrder(source, markers, label);
+  const capabilityGate = fs.readFileSync(path.join(__dirname, "../lib/require-capability.ts"), "utf8");
+  order(capabilityGate, ["await requireStaffSession()", "modeFromStaffSession(verified)", "sessionAllows(mode, capability)"], "requireCapability authentication before authorization");
 
   for (const [file, capability, readMarker, writeMarker] of [
     ["department-programmes/route.ts", "ops.browse", "listDepartmentProgrammes(", "createDepartmentProgrammeDraft("],
