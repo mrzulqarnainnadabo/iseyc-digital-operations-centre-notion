@@ -194,7 +194,7 @@ function mapObservation(
     geography: { level: String(value.geoLevel), label: String(value.geographicCoverage) },
     evidenceType: String(value.sourceType),
     metrics: [{
-      label: String(value.title),
+      label: "Reported value",
       value: String(value.value),
       unit: String(value.unit),
       period: String(value.referencePeriod),
