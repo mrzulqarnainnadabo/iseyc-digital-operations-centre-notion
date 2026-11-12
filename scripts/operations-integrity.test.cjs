@@ -715,3 +715,33 @@ test("meeting review exposes reverse-linked action records without treating link
   assert.match(review, /A relation records context only/);
   assert.match(review, /href="\/ops\/actions"/);
 });
+
+test("operations routes declare department-specific session capabilities", () => {
+  const root = require("node:path").join(__dirname, "../app/ops/api");
+  const contracts = [
+    ["department-programmes/route.ts", ["ops.browse", "ops.draft.programme"]],
+    ["department-workplans/route.ts", ["ops.browse", "ops.draft.workplan"]],
+    ["department-reports/route.ts", ["ops.browse", "ops.draft.report"]],
+    ["registers/[kind]/route.ts", ["ops.browse", "ops.action.propose", "ops.draft.communications", "ops.meeting.standard"]],
+    ["external-engagement/route.ts", ["ops.browse", "ops.meeting.standard"]],
+    ["actions/[id]/route.ts", ["ops.action.progress"]],
+  ];
+  for (const [route, capabilities] of contracts) {
+    const source = fs.readFileSync(require("node:path").join(root, route), "utf8");
+    assert.ok(source.includes("requireCapability"), route + " must enforce session capabilities");
+    for (const capability of capabilities) {
+      assert.ok(source.includes(capability), route + " must include " + capability);
+    }
+  }
+  const meetings = fs.readFileSync(require("node:path").join(__dirname, "../app/api/meetings/route.ts"), "utf8");
+  const detail = fs.readFileSync(require("node:path").join(__dirname, "../app/api/meetings/[id]/route.ts"), "utf8");
+  const connection = fs.readFileSync(require("node:path").join(__dirname, "../app/api/department-applications/connection/route.ts"), "utf8");
+  for (const [label, source, markers] of [
+    ["meetings", meetings, ["ops.browse", "ops.meeting.standard"]],
+    ["meeting detail", detail, ["ops.browse", "ops.meeting.standard"]],
+    ["connection diagnostic", connection, ["ops.browse"]],
+  ]) {
+    assert.ok(source.includes("requireCapability"), label + " must use requireCapability");
+    for (const marker of markers) assert.ok(source.includes(marker), label + " missing " + marker);
+  }
+});
