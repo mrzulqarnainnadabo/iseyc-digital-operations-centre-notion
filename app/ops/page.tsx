@@ -12,7 +12,6 @@ const departments = [
     number: "01",
     name: "Education & Capacity Building",
     short: "Learning access, skills and stronger learning environments.",
-    focus: ["Learning access", "Skills development", "Education partnerships"],
     tone: "education",
   },
   {
@@ -20,7 +19,6 @@ const departments = [
     number: "02",
     name: "Health & Well-being",
     short: "Community health, prevention and access to essential services.",
-    focus: ["Health awareness", "Primary care access", "Facility conditions"],
     tone: "health",
   },
   {
@@ -28,7 +26,6 @@ const departments = [
     number: "03",
     name: "Digital Systems & Technology",
     short: "Digital inclusion, institutional systems and responsible innovation.",
-    focus: ["Digital inclusion", "Institutional systems", "Technology capacity"],
     tone: "digital",
   },
   {
@@ -36,7 +33,6 @@ const departments = [
     number: "04",
     name: "Civic Affairs & Public Accountability",
     short: "Civic participation, community concerns and accountability.",
-    focus: ["Civic participation", "Community engagement", "Accountability"],
     tone: "civic",
   },
 ] as const;
@@ -137,7 +133,7 @@ export default async function CommandBriefPage() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           {departments.map((department) => (
-            <Link key={department.id} href={`/ops/departments/${department.id}`} className={`group relative isolate flex min-h-[248px] flex-col overflow-hidden rounded-2xl border border-[#e1e5dc] bg-white p-5 shadow-[0_4px_18px_rgba(20,49,38,.045)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_16px_34px_rgba(20,49,38,.09)] sm:p-6 dept-workspace-card dept-workspace-card--${department.tone}`}>
+            <Link key={department.id} href={`/ops/departments/${department.id}`} className={`group relative isolate flex min-h-[220px] flex-col overflow-hidden rounded-2xl border border-[#e1e5dc] bg-white p-5 shadow-[0_4px_18px_rgba(20,49,38,.045)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_16px_34px_rgba(20,49,38,.09)] sm:p-6 dept-workspace-card dept-workspace-card--${department.tone}`}>
               <div className="flex items-start justify-between gap-3">
                 <span className="text-xs font-semibold tracking-[.16em] text-[#7b6a4b]">{department.number}</span>
                 <span className="dept-workspace-glyph"><DepartmentGlyph tone={department.tone} /></span>
@@ -145,9 +141,6 @@ export default async function CommandBriefPage() {
               <div className="mt-auto">
                 <h3 className="max-w-sm font-serif text-2xl leading-tight text-[#173c30]">{department.name}</h3>
                 <p className="mt-2 max-w-md text-sm leading-5 text-[#68736b]">{department.short}</p>
-                <div className="mt-4 flex flex-wrap gap-1.5">
-                  {department.focus.map((item) => <span key={item} className="rounded-full border border-[#e5e8e1] bg-[#fafaf7] px-2.5 py-1 text-[10px] font-medium text-[#59665d]">{item}</span>)}
-                </div>
                 <div className="mt-5 flex items-center justify-between border-t border-[#edf0ea] pt-3 text-xs font-bold text-[#194b3b]"><span>Enter department workspace</span><span className="text-base transition group-hover:translate-x-1" aria-hidden="true">→</span></div>
               </div>
             </Link>
