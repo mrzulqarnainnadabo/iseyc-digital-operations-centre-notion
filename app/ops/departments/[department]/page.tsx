@@ -242,7 +242,7 @@ export default async function DepartmentDeskPage({
           {snapshots.status === "ready" || snapshots.status === "stale" ? (
             <>
               <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                <p className="text-[10px] text-[#68736b]">{snapshots.records.length} source records · Snapshot bundle retrieved {snapshots.retrievedAt}</p>
+                <p className="text-[10px] text-[#68736b]">{snapshots.records.length}{snapshots.totalRecords && snapshots.totalRecords > snapshots.records.length ? ` of ${snapshots.totalRecords}` : ""} current records · Source checked {snapshots.sourceCheckedAt}</p>
                 <span className={snapshots.status === "stale" ? "rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-[10px] font-semibold text-amber-900" : "rounded-full border border-[#dce6dc] bg-[#f0f5ef] px-3 py-1.5 text-[10px] font-semibold text-[#315b45]"}>
                   {snapshots.status === "stale" ? "Snapshot bundle needs refresh" : "Published snapshots connected"}
                 </span>
@@ -254,7 +254,7 @@ export default async function DepartmentDeskPage({
                     <article key={record.id} className="rounded-xl border border-[#e4e9e2] bg-[#fbfcfa] p-4">
                       <div className="flex flex-wrap items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <p className="text-[9px] font-bold uppercase tracking-[.13em] text-[#8a6b34]">{record.evidenceType}</p>
+                          <p className="text-[9px] font-bold uppercase tracking-[.13em] text-[#8a6b34]">{record.evidenceType === "official_source" ? "Official source" : "Published research"}</p>
                           <h3 className="mt-1 text-sm font-semibold leading-5 text-[#173c30]">{record.title}</h3>
                         </div>
                         <span className="shrink-0 rounded-full border border-[#e2e7df] bg-white px-2.5 py-1 text-[9px] font-semibold text-[#59665d]">{record.geography.level}</span>
@@ -302,7 +302,7 @@ export default async function DepartmentDeskPage({
                             <p className="text-[9px] font-bold uppercase tracking-[.12em] text-[#8a6b34]">Limitations</p>
                             <ul className="mt-1 list-disc space-y-1 pl-4">{record.limitations.map((item) => <li key={item} className="text-[10px] leading-4 text-[#68736b]">{item}</li>)}</ul>
                           </div>
-                          <p className="text-[9px] text-[#7a837c]">Record retrieved {record.retrievedAt} · Source ID: {record.sourceId}</p>
+                          <p className="text-[9px] text-[#7a837c]">Source checked {record.sourceCheckedAt} · Fetched {record.retrievedAt} · Source ID: {record.sourceId}</p>
                           {record.relatedSources?.length ? <div className="flex flex-wrap gap-3">{record.relatedSources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noopener noreferrer" className="text-[10px] font-semibold text-[#194b3b]">{source.title} ↗</a>)}</div> : null}
                         </div>
                       </details>
@@ -314,6 +314,37 @@ export default async function DepartmentDeskPage({
                   );
                 })}
               </div>
+              {snapshots.reconciliationNotes?.length ? (
+                <details className="mt-4 rounded-xl border border-[#e8ece6] bg-[#fbfcfa] p-3">
+                  <summary className="min-h-8 cursor-pointer text-[11px] font-semibold text-[#315b45]">Evidence reconciliation notes · {snapshots.reconciliationNotes.length}</summary>
+                  <div className="mt-2 space-y-3">
+                    {snapshots.reconciliationNotes.map((note) => (
+                      <article key={note.id} className="border-t border-[#e8ece6] pt-2">
+                        <p className="text-[10px] font-semibold text-[#35483d]">{note.title}</p>
+                        <p className="mt-1 text-[10px] leading-5 text-[#68736b]">{note.detail}</p>
+                        <p className="mt-1 text-[10px] leading-5 text-[#59665d]">Next verification: {note.action}</p>
+                      </article>
+                    ))}
+                  </div>
+                </details>
+              ) : null}
+              {snapshots.catalogue?.length ? (
+                <details className="mt-3 rounded-xl border border-[#e8ece6] bg-[#fbfcfa] p-3">
+                  <summary className="min-h-8 cursor-pointer text-[11px] font-semibold text-[#315b45]">Sources being integrated · {snapshots.catalogue.length}</summary>
+                  <div className="mt-2 space-y-2">
+                    {snapshots.catalogue.map((source) => (
+                      <article key={source.id} className="border-t border-[#e8ece6] pt-2">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <p className="text-[10px] font-semibold text-[#35483d]">{source.title}</p>
+                          <span className="text-[9px] font-semibold uppercase tracking-wide text-[#8a6b34]">{source.status.replace("_", " ")}</span>
+                        </div>
+                        <p className="mt-1 text-[10px] text-[#68736b]">{source.publisher} · {source.note}</p>
+                        <a href={source.url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex min-h-7 items-center text-[10px] font-semibold text-[#194b3b]">Open source ↗</a>
+                      </article>
+                    ))}
+                  </div>
+                </details>
+              ) : null}
               {snapshots.note ? <p className="mt-4 text-[10px] leading-5 text-[#7a837c]">{snapshots.note}</p> : null}
               {snapshots.limitations?.length ? <ul className="mt-2 list-disc space-y-1 pl-4">{snapshots.limitations.map((item) => <li key={item} className="text-[10px] leading-4 text-[#7a837c]">{item}</li>)}</ul> : null}
             </>
