@@ -89,7 +89,7 @@ test("department snapshot adapter validates the Observatory v1 contract and pres
   assert.match(adapter, /payload\.limitations\.length > 20/);
   assert.match(adapter, /AbortSignal\.timeout\(8000\)/);
   assert.match(page, /getDepartmentSnapshots\(department\)/);
-  assert.match(page, /Curated, dated Observatory transcriptions/);
+  assert.match(adapter, /Curated, dated Observatory transcriptions/);
   assert.match(page, /record\.referencePeriod/);
   assert.match(page, /<dl className="mt-3 grid grid-cols-1 gap-2 rounded-lg border/);
   assert.match(page, /Publisher/);
@@ -202,7 +202,7 @@ test("each department receives grounded evidence interpretation and a next verif
   assert.match(briefs, /classroom quality, teacher availability, learning outcomes/);
   assert.match(briefs, /Kaduna facility conditions, medicine availability, staffing/);
   assert.match(briefs, /Broadband subscriptions are not unique users/);
-  assert.match(briefs, /public accountability/);
+  assert.match(briefs, /civic participation, public trust, representation, accountability/);
   assert.match(page, /Turn evidence into better questions/);
   assert.match(page, /What it cannot establish/);
   assert.match(page, /Next evidence step/);
