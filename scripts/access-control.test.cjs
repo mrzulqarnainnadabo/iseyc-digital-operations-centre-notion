@@ -459,8 +459,8 @@ test("sensitive DOC API handlers retain their authentication and CSRF guards", (
   const contracts = [
     ["auth/login/route.ts", ["POST"], ["isSameOriginRequest"], []],
     ["auth/logout/route.ts", ["POST"], ["isSameOriginRequest"], []],
-    ["meetings/route.ts", ["GET", "POST"], ["isSameOriginRequest"], ["requireStaffSession"]],
-    ["meetings/[id]/route.ts", ["GET", "PATCH"], ["isSameOriginRequest"], ["requireStaffSession"]]
+    ["meetings/route.ts", ["GET", "POST"], ["isSameOriginRequest"], ["requireCapability"]],
+    ["meetings/[id]/route.ts", ["GET", "PATCH"], ["isSameOriginRequest"], ["requireCapability"]]
   ];
 
   for (const [relativePath, methods, csrfGuards, authGuards] of contracts) {

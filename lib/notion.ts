@@ -3,7 +3,8 @@ import { Client } from "@notionhq/client";
 export function notion(): Client | null {
   const auth = process.env.NOTION_TOKEN?.trim();
   if (!auth) return null;
-  return new Client({ auth });
+  // Bound upstream wait time so ops pages fail closed instead of hanging.
+  return new Client({ auth, timeoutMs: 20_000 });
 }
 
 function canonicalNotionId(id: string): string {

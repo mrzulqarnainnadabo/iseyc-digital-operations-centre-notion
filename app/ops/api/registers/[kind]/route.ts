@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { privateJson } from "@/lib/private-response";
-import { requireStaffSession } from "@/lib/auth";
+import { requireCapability } from "@/lib/require-capability";
 import { isSameOriginRequest, readBoundedJson } from "@/lib/request-security";
 import { createRegisterDraft, isRegisterKind, listRegister, registerConfigured } from "@/lib/notion-registers";
 
@@ -9,7 +9,8 @@ export const dynamic = "force-dynamic";
 type Context = { params: Promise<{ kind: string }> };
 
 export async function GET(request: NextRequest, context: Context) {
-  if (!(await requireStaffSession())) return privateJson({ ok: false, error: "Unauthorized" }, { status: 401 });
+  const access = await requireCapability("ops.browse");
+  if (!access.ok) return access.response;
   const { kind } = await context.params;
   if (!isRegisterKind(kind)) return privateJson({ ok: false, error: "Unknown register." }, { status: 404 });
   if (!registerConfigured(kind)) return privateJson({ ok: false, error: "Register is not configured. No records are shown." }, { status: 503 });
@@ -25,9 +26,14 @@ export async function GET(request: NextRequest, context: Context) {
 }
 export async function POST(request: NextRequest, context: Context) {
   if (!isSameOriginRequest(request)) return privateJson({ ok: false, error: "Forbidden" }, { status: 403 });
-  if (!(await requireStaffSession())) return privateJson({ ok: false, error: "Unauthorized" }, { status: 401 });
   const { kind } = await context.params;
   if (!isRegisterKind(kind)) return privateJson({ ok: false, error: "Unknown register." }, { status: 404 });
+  const capability =
+    kind === "actions" ? "ops.action.propose" :
+    kind === "media" ? "ops.draft.communications" :
+    "ops.meeting.standard";
+  const access = await requireCapability(capability);
+  if (!access.ok) return access.response;
   if (!registerConfigured(kind)) return privateJson({ ok: false, error: "Register is not configured." }, { status: 503 });
   const parsed = await readBoundedJson(request, 8192);
   if (!parsed.ok) {

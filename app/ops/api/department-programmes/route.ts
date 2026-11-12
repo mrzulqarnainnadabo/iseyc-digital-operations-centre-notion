@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { privateJson } from "@/lib/private-response";
-import { requireStaffSession } from "@/lib/auth";
+import { requireCapability } from "@/lib/require-capability";
 import { isSameOriginRequest, readBoundedJson } from "@/lib/request-security";
 import { isOpsDepartmentId, type OpsDepartmentId, type WorkPriority, type RiskLevel } from "@/lib/department-operations";
 import {
@@ -33,9 +33,8 @@ function validDate(value: string): boolean {
 }
 
 export async function GET(request: NextRequest) {
-  if (!(await requireStaffSession())) {
-    return privateJson({ ok: false, error: "Unauthorized" }, { status: 401 });
-  }
+  const access = await requireCapability("ops.browse");
+  if (!access.ok) return access.response;
   if (!departmentProgrammesConfigured()) {
     return privateJson(
       {
@@ -85,9 +84,8 @@ export async function POST(request: NextRequest) {
   if (!isSameOriginRequest(request)) {
     return privateJson({ ok: false, error: "Forbidden" }, { status: 403 });
   }
-  if (!(await requireStaffSession())) {
-    return privateJson({ ok: false, error: "Unauthorized" }, { status: 401 });
-  }
+  const access = await requireCapability("ops.draft.programme");
+  if (!access.ok) return access.response;
   if (!departmentProgrammesConfigured()) {
     return privateJson(
       { ok: false, error: "Department programmes register is not configured." },

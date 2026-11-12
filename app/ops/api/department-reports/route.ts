@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { privateJson } from "@/lib/private-response";
-import { requireStaffSession } from "@/lib/auth";
+import { requireCapability } from "@/lib/require-capability";
 import { isSameOriginRequest, readBoundedJson } from "@/lib/request-security";
 import {
   isOpsDepartmentId,
@@ -35,9 +35,8 @@ function validDate(value: string): boolean {
 const REPORT_TYPES: ReportType[] = ["Weekly", "Monthly", "Quarterly", "Annual"];
 
 export async function GET(request: NextRequest) {
-  if (!(await requireStaffSession())) {
-    return privateJson({ ok: false, error: "Unauthorized" }, { status: 401 });
-  }
+  const access = await requireCapability("ops.browse");
+  if (!access.ok) return access.response;
   if (!departmentReportsConfigured()) {
     return privateJson(
       {
@@ -87,9 +86,8 @@ export async function POST(request: NextRequest) {
   if (!isSameOriginRequest(request)) {
     return privateJson({ ok: false, error: "Forbidden" }, { status: 403 });
   }
-  if (!(await requireStaffSession())) {
-    return privateJson({ ok: false, error: "Unauthorized" }, { status: 401 });
-  }
+  const access = await requireCapability("ops.draft.report");
+  if (!access.ok) return access.response;
   if (!departmentReportsConfigured()) {
     return privateJson(
       { ok: false, error: "Department reports register is not configured." },

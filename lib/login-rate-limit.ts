@@ -3,7 +3,9 @@
  *
  * This protects a warm application instance from repeated password guessing.
  * Serverless instances do not share memory: production must ALSO enforce a
- * distributed Vercel Firewall/WAF limit on POST /api/auth/login.
+ * distributed edge/WAF limit on POST /api/auth/login (Vercel Firewall,
+ * Cloudflare WAF, or equivalent). Durable in-app limiting is not configured
+ * in this module and must not be assumed across instances.
  */
 const WINDOW_MS = 15 * 60 * 1000;
 const MAX_FAILURES = 5;

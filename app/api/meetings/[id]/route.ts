@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { privateJson } from "@/lib/private-response";
-import { requireStaffSession } from "@/lib/auth";
+import { requireCapability } from "@/lib/require-capability";
 import { isSameOriginRequest, readBoundedJson } from "@/lib/request-security";
 import { getMeeting, setMeetingStatus, updateMeetingDraft } from "@/lib/notion";
 import { legacySessionCanReadMeeting, legacySessionCanSetMeetingStatus } from "@/lib/legacy-session-boundary";
@@ -12,9 +12,8 @@ export async function GET(
   _req: NextRequest,
   ctx: { params: Promise<{ id: string }> }
 ) {
-  if (!(await requireStaffSession())) {
-    return privateJson({ ok: false, error: "Unauthorized" }, { status: 401 });
-  }
+  const access = await requireCapability("ops.browse");
+  if (!access.ok) return access.response;
 
   try {
     const { id } = await ctx.params;
@@ -39,9 +38,8 @@ export async function PATCH(
     return privateJson({ ok: false, error: "Forbidden" }, { status: 403 });
   }
 
-  if (!(await requireStaffSession())) {
-    return privateJson({ ok: false, error: "Unauthorized" }, { status: 401 });
-  }
+  const access = await requireCapability("ops.meeting.standard");
+  if (!access.ok) return access.response;
 
   const parsed = await readBoundedJson(req, 8_192);
   if (!parsed.ok) {

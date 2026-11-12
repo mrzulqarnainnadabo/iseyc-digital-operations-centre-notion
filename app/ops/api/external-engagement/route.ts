@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { privateJson } from "@/lib/private-response";
-import { requireStaffSession } from "@/lib/auth";
+import { requireCapability } from "@/lib/require-capability";
 import { isSameOriginRequest, readBoundedJson } from "@/lib/request-security";
 import {
   createExternalContact, createMeetingInvitation, createOrganisation,
@@ -18,7 +18,8 @@ const validUrl = (value: string) => {
 };
 
 export async function GET(request: NextRequest) {
-  if (!(await requireStaffSession())) return privateJson({ ok: false, error: "Unauthorized" }, { status: 401 });
+  const access = await requireCapability("ops.browse");
+  if (!access.ok) return access.response;
   if (!externalRegistersConfigured()) return privateJson({ ok: false, error: "External engagement registers are not configured in this environment. No records are shown." }, { status: 503 });
   const params = new URL(request.url).searchParams;
   const cursors = {
@@ -49,7 +50,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   if (!isSameOriginRequest(request)) return privateJson({ ok: false, error: "Forbidden" }, { status: 403 });
-  if (!(await requireStaffSession())) return privateJson({ ok: false, error: "Unauthorized" }, { status: 401 });
+  const writeAccess = await requireCapability("ops.meeting.standard");
+  if (!writeAccess.ok) return writeAccess.response;
   if (!externalRegistersConfigured()) return privateJson({ ok: false, error: "External engagement registers are not configured." }, { status: 503 });
   const parsed = await readBoundedJson(request, 8192);
   if (!parsed.ok) {

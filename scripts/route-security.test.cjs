@@ -42,17 +42,17 @@ const contracts = {
   },
   "meetings/route.ts": {
     methods: ["GET", "POST"],
-    required: ["requireStaffSession", "privateJson", "configFlags", "legacySessionCanReadMeeting", "legacySessionCanCreateMeeting"],
+    required: ["requireCapability", "ops.browse", "ops.meeting.standard", "privateJson", "configFlags", "legacySessionCanReadMeeting", "legacySessionCanCreateMeeting"],
     forbidden: []
   },
   "meetings/[id]/route.ts": {
     methods: ["GET", "PATCH"],
-    required: ["requireStaffSession", "privateJson", "legacySessionCanReadMeeting", "legacySessionCanSetMeetingStatus"],
+    required: ["requireCapability", "ops.browse", "ops.meeting.standard", "privateJson", "legacySessionCanReadMeeting", "legacySessionCanSetMeetingStatus"],
     forbidden: []
   },
   "department-applications/connection/route.ts": {
     methods: ["GET"],
-    required: ["requireStaffSession", "privateJson", "verifyDepartmentApplicationsConnection"],
+    required: ["requireCapability", "ops.browse", "privateJson", "verifyDepartmentApplicationsConnection"],
     forbidden: ["pages.query", "pages.create", "Applicant Name", "Applicant Statement"]
   }
 };
@@ -103,7 +103,7 @@ test("operations API route inventory is explicit and shared-session boundaries a
 
   for (const route of actual) {
     const source = fs.readFileSync(path.join(opsRoot, route), "utf8");
-    assert.ok(source.includes("requireStaffSession") || source.includes("from \"../../../../../api/") || source.includes("from \"../../../../api/") || source.includes("from \"../../../api/"),
+    assert.ok(source.includes("requireStaffSession") || source.includes("requireCapability") || source.includes("from \"../../../../../api/") || source.includes("from \"../../../../api/") || source.includes("from \"../../../api/"),
       `${route} must authenticate directly or delegate to an independently guarded API handler`);
     if (/route\.ts$/.test(route) && !route.includes("connection") && !route.includes("status") && !route.includes("[id]")) {
       if (source.includes("export async function POST") || source.includes("export async function PATCH")) {
@@ -146,22 +146,22 @@ test("state-changing DOC routes enforce origin and session checks before parsing
 
   const createMeeting = fs.readFileSync(path.join(apiRoot, "meetings/route.ts"), "utf8");
   const postBody = createMeeting.slice(createMeeting.indexOf("export async function POST"));
-  assertInOrder(postBody, ["isSameOriginRequest(req)", "requireStaffSession()", "readBoundedJson(req", "createMeeting({"], "meeting POST");
+  assertInOrder(postBody, ["isSameOriginRequest(req)", "requireCapability(\"ops.meeting.standard\")", "readBoundedJson(req", "createMeeting({"], "meeting POST");
 
   const updateMeeting = fs.readFileSync(path.join(apiRoot, "meetings/[id]/route.ts"), "utf8");
   const patchBody = updateMeeting.slice(updateMeeting.indexOf("export async function PATCH"));
-  assertInOrder(patchBody, ["isSameOriginRequest(req)", "requireStaffSession()", "readBoundedJson(req", "getMeeting(id)", "setMeetingStatus(id"], "meeting PATCH");
+  assertInOrder(patchBody, ["isSameOriginRequest(req)", "requireCapability(\"ops.meeting.standard\")", "readBoundedJson(req", "getMeeting(id)", "setMeetingStatus(id"], "meeting PATCH");
 });
 
 test("protected meeting reads authenticate and fail closed when Notion is not configured", () => {
   const collection = fs.readFileSync(path.join(apiRoot, "meetings/route.ts"), "utf8");
   const getBody = collection.slice(collection.indexOf("export async function GET"));
-  assertInOrder(getBody, ["requireStaffSession()", "configFlags()", "listMeetings({ cursor"], "meeting GET");
+  assertInOrder(getBody, ["requireCapability(\"ops.browse\")", "configFlags()", "listMeetings({ cursor"], "meeting GET");
   assert.match(getBody, /The Notion Meetings source is not configured/);
 
   const detail = fs.readFileSync(path.join(apiRoot, "meetings/[id]/route.ts"), "utf8");
   const getDetail = detail.slice(detail.indexOf("export async function GET"));
-  assertInOrder(getDetail, ["requireStaffSession()", "getMeeting(id)"], "meeting detail GET");
+  assertInOrder(getDetail, ["requireCapability(\"ops.browse\")", "getMeeting(id)"], "meeting detail GET");
 });
 
 test("meeting pagination rejects malformed continuation cursors before calling Notion", () => {
@@ -199,7 +199,7 @@ test("staff login throttles repeated failures and clears the local bucket after 
 
 test("department applications connection diagnostic is read-only and returns no applicant records", () => {
   const source = fs.readFileSync(path.join(apiRoot, "department-applications/connection/route.ts"), "utf8");
-  assertInOrder(source, ["requireStaffSession()", "verifyDepartmentApplicationsConnection()"], "department applications connection check");
+  assertInOrder(source, ["requireCapability(\"ops.browse\")", "verifyDepartmentApplicationsConnection()"], "department applications connection check");
   assert.match(source, /schemaReady/);
   assert.match(source, /privateJson/);
   assert.doesNotMatch(source, /pages\.query|pages\.create|Applicant Name|Applicant Statement/);
@@ -230,48 +230,110 @@ test("legacy shared-key sessions are explicitly limited to standard meeting reco
 test("login throttling documents the distributed enforcement requirement", () => {
   const limiter = fs.readFileSync(path.join(__dirname, "../lib/login-rate-limit.ts"), "utf8");
   assert.match(limiter, /Serverless instances do not share memory/);
-  assert.match(limiter, /distributed Vercel Firewall\/WAF limit/);
+  assert.match(limiter, /distributed (?:edge\/)?WAF limit/);
   assert.match(limiter, /POST \/api\/auth\/login/);
 });
 
 
 const opsApiRoot = path.join(__dirname, "../app/ops/api");
 
-test("every Operations Centre API route is private and every mutation is same-origin and session protected", () => {
-  const routes = collectRoutes(opsApiRoot);
-  assert.ok(routes.length > 0, "Operations Centre API route inventory must not be empty");
-  const identityOnlyRoutes = new Set([
-    "auth/oidc/start/route.ts",
-    "auth/oidc/callback/route.ts",
+test("every Operations Centre API route has an explicit capability boundary or a reviewed identity-only delegation", () => {
+  const opsRoot = path.join(__dirname, "../app/ops/api");
+  const actual = collectRoutes(opsRoot).sort();
+  const expected = [
+    "actions/[id]/route.ts",
     "auth/oidc/status/route.ts",
-  ]);
+    "department-applications/connection/route.ts",
+    "department-programmes/route.ts",
+    "department-reports/route.ts",
+    "department-workplans/route.ts",
+    "external-engagement/route.ts",
+    "meetings/[id]/route.ts",
+    "meetings/route.ts",
+    "registers/[kind]/route.ts"
+  ].sort();
+  assert.deepEqual(actual, expected, "A new operations API route requires security review");
 
-  for (const route of routes) {
-    const wrapper = fs.readFileSync(path.join(opsApiRoot, route), "utf8");
-    const delegated = wrapper.includes('from "../../../api/') || wrapper.includes('from "../../../../api/') || wrapper.includes('from "../../../../../api/');
-    const source = delegated ? fs.readFileSync(path.join(apiRoot, route), "utf8") : wrapper;
-    const identityOnly = identityOnlyRoutes.has(route);
-    if (!identityOnly) {
-      assert.ok(source.includes("requireStaffSession()"), `${route} must require an authenticated staff session in its handler`);
+  const contracts = {
+    "department-programmes/route.ts": ["ops.browse", "ops.draft.programme"],
+    "department-workplans/route.ts": ["ops.browse", "ops.draft.workplan"],
+    "department-reports/route.ts": ["ops.browse", "ops.draft.report"],
+    "registers/[kind]/route.ts": ["ops.browse", "ops.action.propose", "ops.draft.communications", "ops.meeting.standard"],
+    "external-engagement/route.ts": ["ops.browse", "ops.meeting.standard"],
+    "actions/[id]/route.ts": ["ops.action.progress"]
+  };
+  for (const [route, capabilities] of Object.entries(contracts)) {
+    const source = fs.readFileSync(path.join(opsRoot, route), "utf8");
+    assert.ok(source.includes("requireCapability"), route + " must use the capability gate");
+    for (const capability of capabilities) {
+      assert.ok(source.includes(capability), route + " must declare " + capability);
     }
-    assert.ok(source.includes("privateJson(") || source.includes("privateResponseHeaders("), `${route} must use private no-store response handling in its handler`);
-
-    const methods = [...source.matchAll(/export async function (GET|POST|PUT|PATCH|DELETE)\s*\(/g)]
-      .map((match) => match[1]);
-    for (const method of methods.filter((item) => item !== "GET")) {
-      const body = source.slice(source.indexOf(`export async function ${method}`));
-      assertInOrder(
-        body,
-        ["isSameOriginRequest(", "requireStaffSession()"],
-        `${route} ${method}`
-      );
-    }
+    assert.ok(source.includes("privateJson("), route + " must return private responses");
   }
+
+  const delegated = [
+    ["meetings/route.ts", "../app/api/meetings/route.ts"],
+    ["meetings/[id]/route.ts", "../app/api/meetings/[id]/route.ts"],
+    ["department-applications/connection/route.ts", "../app/api/department-applications/connection/route.ts"]
+  ];
+  for (const [route, canonical] of delegated) {
+    const wrapper = fs.readFileSync(path.join(opsRoot, route), "utf8");
+    assert.match(wrapper, /from ["']\.\.?\/.*api\//);
+    const source = fs.readFileSync(path.join(__dirname, canonical), "utf8");
+    assert.ok(source.includes('requireCapability("ops.browse")'), route + " canonical handler must require ops.browse");
+  }
+
+  const statusWrapper = fs.readFileSync(path.join(opsRoot, "auth/oidc/status/route.ts"), "utf8");
+  assert.ok(statusWrapper.includes("getOidcStatus"), "OIDC status wrapper must delegate to the canonical identity handler");
+  const status = fs.readFileSync(path.join(__dirname, "../app/api/auth/oidc/status/route.ts"), "utf8");
+  assert.ok(status.includes("verifyPendingIdentity"), "OIDC status is identity-only, not an operations session");
+  assert.ok(status.includes("accessGranted: false"), "OIDC identity must not grant operations access");
+});
+
+test("operations API guards precede Notion reads and writes", () => {
+  const root = path.join(__dirname, "../app/ops/api");
+  const api = path.join(__dirname, "../app/api");
+  const order = (source, markers, label) => assertInOrder(source, markers, label);
+  const capabilityGate = fs.readFileSync(path.join(__dirname, "../lib/require-capability.ts"), "utf8");
+  order(capabilityGate, ["await requireStaffSession()", "modeFromStaffSession(verified)", "sessionAllows(mode, capability)"], "requireCapability authentication before authorization");
+
+  for (const [file, capability, readMarker, writeMarker] of [
+    ["department-programmes/route.ts", "ops.browse", "listDepartmentProgrammes(", "createDepartmentProgrammeDraft("],
+    ["department-workplans/route.ts", "ops.browse", "listDepartmentWorkPlans(", "createDepartmentWorkPlanDraft("],
+    ["department-reports/route.ts", "ops.browse", "listDepartmentReports(", "createDepartmentReportDraft("],
+    ["registers/[kind]/route.ts", "ops.browse", "listRegister(", "createRegisterDraft("],
+    ["external-engagement/route.ts", "ops.browse", "listExternalOptions(", "createOrganisation("]
+  ]) {
+    const source = fs.readFileSync(path.join(root, file), "utf8");
+    const getBody = source.slice(source.indexOf("export async function GET"));
+    order(getBody, ['requireCapability("' + capability + '")', readMarker], file + " GET");
+    const postBody = source.slice(source.indexOf("export async function POST"));
+    order(postBody, ["isSameOriginRequest(", "requireCapability(", "readBoundedJson(", writeMarker], file + " POST");
+  }
+
+  const meetings = fs.readFileSync(path.join(api, "meetings/route.ts"), "utf8");
+  order(meetings.slice(meetings.indexOf("export async function GET")),
+    ['requireCapability("ops.browse")', "configFlags()", "listMeetings("], "meetings GET");
+  order(meetings.slice(meetings.indexOf("export async function POST")),
+    ["isSameOriginRequest(", 'requireCapability("ops.meeting.standard")', "readBoundedJson(", "createMeeting("], "meetings POST");
+
+  const meetingDetail = fs.readFileSync(path.join(api, "meetings/[id]/route.ts"), "utf8");
+  order(meetingDetail.slice(meetingDetail.indexOf("export async function GET")),
+    ['requireCapability("ops.browse")', "getMeeting("], "meeting detail GET");
+  order(meetingDetail.slice(meetingDetail.indexOf("export async function PATCH")),
+    ["isSameOriginRequest(", 'requireCapability("ops.meeting.standard")', "readBoundedJson(", "getMeeting("], "meeting detail PATCH");
+
+  const action = fs.readFileSync(path.join(root, "actions/[id]/route.ts"), "utf8");
+  order(action, ["isSameOriginRequest(", 'requireCapability("ops.action.progress")', "status: 503"], "action progress");
+  assert.doesNotMatch(action, /updateActionProgress\s*\(/, "shared staff must not write action progress");
+
+  const connection = fs.readFileSync(path.join(api, "department-applications/connection/route.ts"), "utf8");
+  order(connection, ['requireCapability("ops.browse")', "verifyDepartmentApplicationsConnection("], "connection diagnostic");
 });
 
 test("shared-key sessions cannot write unattributed action progress", () => {
   const source = fs.readFileSync(path.join(opsApiRoot, "actions/[id]/route.ts"), "utf8");
-  assert.ok(source.includes("requireStaffSession()"));
+  assert.ok(source.includes('requireCapability("ops.action.progress")'));
   assert.match(source, /Individual officer identity and verified action assignment are not connected/);
   assert.match(source, /Shared staff access cannot attribute progress/);
   assert.match(source, /status: 503/);

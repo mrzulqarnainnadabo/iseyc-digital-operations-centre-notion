@@ -9,7 +9,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 test("department programme work-plan and report APIs are authenticated draft-only and fail closed", () => {
   for (const name of ["department-programmes", "department-workplans", "department-reports"]) {
     const route = read(`app/ops/api/${name}/route.ts`);
-    assert.match(route, /requireStaffSession/);
+    assert.match(route, /requireCapability|requireStaffSession/);
     assert.match(route, /isSameOriginRequest/);
     assert.match(route, /privateJson/);
     assert.match(route, /isOpsDepartmentId/);

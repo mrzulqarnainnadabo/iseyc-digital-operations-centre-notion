@@ -19,6 +19,7 @@ export type SessionCapability =
   | "ops.draft.programme"
   | "ops.draft.workplan"
   | "ops.draft.report"
+  | "ops.draft.communications"
   | "ops.meeting.standard"
   | "ops.action.propose"
   | "ops.action.progress"
@@ -33,6 +34,7 @@ const SHARED_STAFF_CAPABILITIES: ReadonlySet<SessionCapability> = new Set([
   "ops.draft.programme",
   "ops.draft.workplan",
   "ops.draft.report",
+  "ops.draft.communications",
   "ops.meeting.standard",
   "ops.action.propose",
 ]);
