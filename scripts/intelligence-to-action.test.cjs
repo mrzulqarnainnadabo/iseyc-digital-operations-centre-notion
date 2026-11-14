@@ -78,18 +78,18 @@ test("department snapshot adapter validates the Observatory v1 contract and pres
   const adapter = read("lib/department-snapshots.ts");
   const page = read("app/ops/departments/[department]/page.tsx");
   assert.match(adapter, /https:\/\/iseyc-civic-intelligence-observatory\.vercel\.app/);
-  assert.match(adapter, /\/api\/evidence\/snapshots/);
-  assert.match(adapter, /iseyc-observatory-national-snapshots-v1/);
+  assert.match(adapter, /\/api\/evidence\/source-snapshots/);
+  assert.match(adapter, /iseyc-observatory-curated-source-snapshots-v1/);
   assert.match(adapter, /contractVersion !== "1\.0\.0"/);
-  assert.match(adapter, /payload\.recordCount !== payload\.records\.length/);
+  assert.match(adapter, /payload\.recordCount !== payload\.observations\.length/);
   assert.match(adapter, /httpsUrl\(value\.sourceUrl\)/);
   assert.match(adapter, /value\.limitations\.every\(nonEmpty\)/);
-  assert.match(adapter, /DEPARTMENTS\.includes\(value\.departmentId as OpsDepartmentId\)/);
-  assert.match(adapter, /DEPARTMENTS\.includes\(id as OpsDepartmentId\)/);
-  assert.match(adapter, /payload\.limitations\.length > 10/);
+  assert.match(adapter, /DEPARTMENT_TO_OBSERVATORY\[departmentId\]/);
+  assert.match(adapter, /DEPARTMENTS\.includes\(departmentId\)/);
+  assert.match(adapter, /payload\.limitations\.length > 20/);
   assert.match(adapter, /AbortSignal\.timeout\(8000\)/);
   assert.match(page, /getDepartmentSnapshots\(department\)/);
-  assert.match(page, /Snapshot · not a live publisher feed/);
+  assert.match(adapter, /Curated, dated Observatory transcriptions/);
   assert.match(page, /record\.referencePeriod/);
   assert.match(page, /<dl className="mt-3 grid grid-cols-1 gap-2 rounded-lg border/);
   assert.match(page, /Publisher/);
@@ -201,7 +201,7 @@ test("each department receives grounded evidence interpretation and a next verif
   }
   assert.match(briefs, /classroom quality, teacher availability, learning outcomes/);
   assert.match(briefs, /Kaduna facility conditions, medicine availability, staffing/);
-  assert.match(briefs, /household device ownership, internet quality, digital-skills prevalence/);
+  assert.match(briefs, /Broadband subscriptions are not unique users/);
   assert.match(briefs, /civic participation, public trust, representation, accountability/);
   assert.match(page, /Turn evidence into better questions/);
   assert.match(page, /What it cannot establish/);

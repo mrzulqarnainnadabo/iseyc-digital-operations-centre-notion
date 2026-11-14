@@ -35,34 +35,49 @@ The integration reads already published, source-attributed public data. It does 
 
 ## Remaining limitations
 
-The Observatory pilot is limited to its published indicators and source periods. It does not provide a broad department-evidence feed, direct software/technology indicators, civic public-service indicators, state/LGA or facility-level education or health coverage, or a durable retrieval log. IDCC currently has no background scheduler, alerting, source-change history, broken-link monitor, or durable operational error-reporting service. On-demand refresh after the per-runtime cache expires is the only automatic source refresh currently implemented; it is not a scheduled or shared refresh service. Public department copy and evidence mapping still need institutional review before any wider launch.
+The World Bank pilot is still limited to two national series, but the separate curated source-snapshot feed now provides a wider, source-attributed evidence catalogue for all four IDCC departments. It does not yet provide complete state/LGA/facility coverage, a live feed from each publisher, or a durable retrieval log. IDCC currently has no background scheduler, alerting, source-change history, broken-link monitor, or durable operational error-reporting service. On-demand refresh after the per-runtime cache expires is the only automatic source refresh currently implemented; it is not a scheduled or shared refresh service. Public department copy and evidence mapping still need institutional review before any wider launch.
 
 
-## Curated department snapshot feed — connected in department workspaces
+## Curated national source snapshots — connected in department workspaces
 
-The Observatory also exposes a separate read-only endpoint:
+The Observatory now exposes a separate read-only source-snapshot endpoint:
 
-- `GET /api/evidence/snapshots?departmentId=education`
-- `GET /api/evidence/snapshots?departmentId=health`
-- `GET /api/evidence/snapshots?departmentId=digital-systems`
-- `GET /api/evidence/snapshots?departmentId=civic-affairs`
+- `GET /api/evidence/source-snapshots?departmentId=education`
+- `GET /api/evidence/source-snapshots?departmentId=health`
+- `GET /api/evidence/source-snapshots?departmentId=software-technology`
+- `GET /api/evidence/source-snapshots?departmentId=civic`
 
-IDCC now consumes this endpoint server-side through `lib/department-snapshots.ts`. The adapter pins the Observatory host and source contract, validates the response version, record count, department mapping, HTTPS publisher URLs, metric fields, geography labels, retrieval dates and limitations, and rejects the entire response if a record fails validation. Requests have an eight-second timeout, a bounded ten-minute per-runtime cache and a one-minute failure cooldown. No browser-supplied upstream URL is accepted.
+The earlier `GET /api/evidence/snapshots` contract remains unchanged for existing consumers. IDCC's department workspace adapter now uses `/api/evidence/source-snapshots` through `lib/department-snapshots.ts`; it no longer treats the older nine-record snapshot bundle as the full evidence foundation.
 
-The department workspace displays the source records and their publisher, evidence type, reference period, geography, metrics, retrieval date, interpretation, source links and limitations. It preserves values as published strings rather than coercing them into comparable numeric series. A record marked as a snapshot is never presented as a live publisher feed.
+The current source pack contains **104 curated observations**, **105 source-registry entries** and **28 catalogue-only or partially integrated sources**. These are dated manual transcriptions and published research records, not live feeds from each publisher. The source registry is not itself proof that a dataset has been ingested.
 
-The current Observatory bundle contains nine records, retrieved 10 November 2026. Department filters return only records explicitly linked by the Observatory:
+IDCC maps Observatory departments to its internal workspaces:
+- **Education and Capacity Building** ← `education`
+- **Health and Well-being** ← `health`
+- **Software and Technology** ← `software-technology` (IDCC route: `digital-systems`)
+- **Civic Department** ← `civic` (IDCC route: `civic-affairs`)
 
-- **Education:** FME national and Kaduna State school-census snapshots, plus NITDA digital-literacy, NASENI innovation and ISN hub-assessment records where the source explicitly links them to education.
-- **Health:** WHO Nigeria health indicators and their indicator-specific periods and limitations.
-- **Software and Technology:** NITDA digital-literacy programme records, NASENI innovation programme records and ISN innovation-hub assessment records.
-- **Civic Affairs:** NIMC national and Kaduna State enrolment snapshot.
+The adapter pins the Observatory host and source contract, requests only the server-defined department ID, and validates the response version, record count, observation IDs, source publisher, HTTPS URL, value/unit/period, geography, source type, department mapping, interpretation and limitations. It validates the full returned department payload before rendering, excludes records explicitly marked superseded from ordinary department views, and surfaces relevant reconciliation notes separately. It also displays catalogue-only or partial source entries so a missing sector dataset is visible as an evidence gap rather than a zero or invented metric.
 
-These are uneven, dated source records, not four complete departmental datasets. Kaduna State values are not Kaduna South values. Programme reach is not population prevalence or proof of durable outcomes. Announcements are not implementation. NIMC enrolment is not a census or a service-access measure. The UI retains those source limitations with each record.
+The adapter uses an eight-second timeout, a bounded ten-minute per-runtime cache and a one-minute failure cooldown. It shows up to 20 current records per department view, reports the total current record count, labels the dataset's source-check date separately from the IDCC fetch time, and marks bundles stale when the source check is older than seven days. No browser-supplied upstream URL is accepted.
 
-The earlier World Bank national indicator pilot remains a separate supplementary series. It is not merged into the curated snapshot bundle, and its estimates are not represented as local measurements.
+### Department evidence coverage
 
-A department with no matching snapshot, an invalid contract response or an unavailable endpoint receives an explicit state; the application does not fill gaps with proxy metrics, zeroes or invented activity.
+- **Education:** published school-census and education-budget evidence, plus NITDA digital-literacy programme measures where the source explicitly links them to education. School counts and programme reach do not prove classroom quality, teacher availability or learning outcomes.
+- **Health:** WHO national health indicators, NPHCDA programme records and BudgIT's secondary H1 2026 state-health spending analysis. The ₦621.34bn detailed-report total and earlier ₦614.55bn infographic are preserved as a visible reconciliation issue; the earlier figure is superseded and excluded from ordinary cards.
+- **Software and Technology:** NITDA DL4ALL programme reach, NCC broadband subscriptions/penetration and fixed-fibre subscriptions, and World Bank/ITU internet-use estimates. These use different denominators and periods; broadband subscriptions are not unique people, DL4ALL target progress is not national digital-literacy prevalence, and national figures do not establish state or household access.
+- **Civic Department:** state budget/appropriation and fiscal-transparency evidence, selected state actual expenditure, revenue and implementation records, and public-administration sources. Budget allocation, release, expenditure, procurement, completion and service functionality remain separate states.
+
+The state-budget register tracks all 36 states and FCT separately. Current discovery located 15 official state budget portals and three additional official state budget documents; 18 states remain unreviewed in this source-discovery pass. This is not a complete 36-state budget-execution dataset. The FCT is tracked separately and must not be silently included in state denominators.
+
+Anambra's official Q3 2026 BIR is one of the available state examples: the nine-month report records ₦229.80bn expenditure (30.0% of the original budget) and ₦165.76bn capital expenditure (27.8% of the capital budget). These are fiscal execution ratios, not proof of project delivery or service failure.
+
+The department workspace displays each record's source publisher, evidence type, reference period, geography, reported value/unit, interpretation, source-check date, source link and limitations. It does not coerce values from different sources into comparable numeric series. It does not infer Kaduna South, facility, ward or household conditions from state or national figures.
+
+The earlier World Bank national-indicator pilot remains a separate supplementary series for Education and Health. It is not merged into the curated snapshot bundle, and its estimates are not represented as local measurements.
+
+A department with no matching current snapshot, a valid empty response, an invalid contract, an unavailable endpoint, a stale source check, or a source awaiting integration receives a distinct UI state. The application does not fill gaps with proxy metrics, zeroes or invented activity.
+
 
 
 ### Using evidence in a department draft
